@@ -1,0 +1,17 @@
+{
+  "name": "dolphilia.com",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/dolphilia/dolphilia.com.git",
+  "author": "dolphilia <dolphilia@outlook.com>",
+  "license": "none",
+  "devDependencies": {
+    "vitepress": "^1.0.0-alpha.45",
+    "vue": "^3.2.47"
+  },
+  "scripts": {
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:serve": "vitepress serve docs"
+  }
+}
