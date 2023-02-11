@@ -15,7 +15,7 @@
 }
 ```
 
-> ヒント：あなたのサイトがサブディレクトリ（https://example.com/subdir/）で提供される場合、あなたのdocs/.vitepress/config.jsで '/subdir/' をベースとして設定する必要があります。例えば、Github (または GitLab) ページを使用していて user.github.io/repo/ にデプロイしている場合は、ベースを /repo/ に設定します。
+> ヒント：あなたのサイトがサブディレクトリ（`https://example.com/subdir/`）で提供される場合、あなたのdocs/.vitepress/config.jsで '/subdir/' をベースとして設定する必要があります。例えば、Github (または GitLab) ページを使用していて user.github.io/repo/ にデプロイしている場合は、ベースを /repo/ に設定します。
 
 ## ローカルでのビルドとテスト
 
@@ -31,7 +31,7 @@ $ yarn docs:build
 $ yarn docs:serve
 ```
 
-serve コマンドはローカルの静的ウェブサーバを起動し.vitepress/dist にあるファイルを http://localhost:4173 で配信します。これは本番環境のビルドがあなたのローカル環境で問題なく見えるかどうかをチェックする簡単な方法です。
+serve コマンドはローカルの静的ウェブサーバを起動し.vitepress/dist にあるファイルを `http://localhost:4173` で配信します。これは本番環境のビルドがあなたのローカル環境で問題なく見えるかどうかをチェックする簡単な方法です。
 
 - 引数に --port を渡すと、サーバーのポートを設定することができます。
 
@@ -43,7 +43,7 @@ serve コマンドはローカルの静的ウェブサーバを起動し.vitepre
 }
 ```
 
-これでdocs:serveメソッドは http://localhost:8080 でサーバーを起動するようになります。
+これでdocs:serveメソッドは `http://localhost:8080` でサーバーを起動するようになります。
 
 ## Netlify, Vercel, AWS Amplify, Cloudflare Pages, Render
 

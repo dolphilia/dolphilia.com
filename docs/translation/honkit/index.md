@@ -6,7 +6,7 @@
 
 `honkit` は GitHub/Git と Markdown (または AsciiDoc) を使って美しい本を作るためのコマンドラインツール (および Node.js ライブラリ) です。このドキュメントは `honkit` を使って生成されています。
 
-`honkit`はコンテンツをウェブサイト（[customizable](themes/README.md)・[extensibles](plugins/README.md)）や電子書籍（PDF・ePub・Mobi）として出力することが可能です。
+`honkit`はコンテンツをウェブサイト（customizable・extensibles）や電子書籍（PDF・ePub・Mobi）として出力することが可能です。
 
 `honkit` は [GitBook (Legacy)](https://github.com/GitbookIO/gitbook) をフォークしたものです。
 
@@ -16,7 +16,7 @@
 
 ### よくあるご質問
 
-よくある質問もあります。問題がある場合は[まずこちら](faq.md)を確認してください。
+よくある質問もあります。問題がある場合はまずこちらを確認してください。
 
 ### このドキュメントに貢献する
 

@@ -2,22 +2,6 @@
 
 ショートカット:
 
-- [データ](README.md#Data)
-- [入力](README.md#Input)
-- [定数](README.md#Constants)
-- [タイポグラフィ](README.md#Typography)
-- [レンダリング](README.md#Rendering)
-- [画像](README.md#Image)
-- [シェイプ](README.md#Shape)
-- [数学](README.md#Math)
-- [出力](README.md#Output)
-- [カラー](README.md#Color)
-- [ライト・カメラ](README.md#Lights_Camera)
-- [トランスフォーム](README.md#Transform)
-- [構造](README.md#Structure)
-- [制御](README.md#Control)
-- [環境](README.md#Environment)
-
 ## データ {#Data}
 
 ### コンポジット

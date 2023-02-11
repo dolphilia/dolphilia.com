@@ -19,5 +19,3 @@ cd myapp
 npm install
 npm run dev
 ```
-			
-[Svelteを学ぶ](tutorial.md)

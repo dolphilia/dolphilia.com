@@ -75,7 +75,7 @@ package.jsonにいくつかのスクリプトを追加します。
 $ yarn docs:dev
 ```
 
-VitePressがホットリロード対応開発サーバー（http://localhost:5173）を開始します。
+VitePressがホットリロード対応開発サーバー（`http://localhost:5173`）を開始します。
 
 ## ステップ4: ページを追加する
 
@@ -89,7 +89,7 @@ VitePressがホットリロード対応開発サーバー（http://localhost:517
 └─ package.json
 ```
 
-その後、http://localhost:5173/getting-started.html にアクセスしてみるとget-started.mdの内容が表示されるはずです。
+その後、`http://localhost:5173/getting-started.html` にアクセスしてみるとget-started.mdの内容が表示されるはずです。
 
 VitePressは基本的にこのような仕組みになっています。ディレクトリ構造はURLのパスと対応しています。ファイルを追加してアクセスするだけです。
 

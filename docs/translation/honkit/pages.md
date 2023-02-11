@@ -69,7 +69,7 @@ HonKitは本のチャプターとサブチャプターの構造を定義する�
 
 #### Markdownの構文
 
-HonKitのほとんどのファイルではデフォルトでMarkdown構文が使用されています。HonKitはそこからページの構造を推論します。使用される構文は[GitHub Flavored Markdown syntax](https://guides.github.com/features/mastering-markdown/)に似ています。また[AsciiDoc syntax](asciidoc.md)を選択することもできます。
+HonKitのほとんどのファイルではデフォルトでMarkdown構文が使用されています。HonKitはそこからページの構造を推論します。使用される構文は[GitHub Flavored Markdown syntax](https://guides.github.com/features/mastering-markdown/)に似ています。またAsciiDoc syntaxを選択することもできます。
 
 ##### チャプターファイルの例
 

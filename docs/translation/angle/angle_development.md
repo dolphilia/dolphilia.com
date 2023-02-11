@@ -49,7 +49,7 @@ cd angle
 fetch angle
 ```
 
-コードを寄稿する場合は、Git の `commit-msg` フックも設定する必要があります。設定方法は [ContributingCode#getting-started-with-gerrit](ContributingCode.md#getting-started-with-gerrit) を参照してください。
+コードを寄稿する場合は、Git の `commit-msg` フックも設定する必要があります。設定方法は ContributingCode#getting-started-with-gerrit を参照してください。
 
 Linuxのみ、このコマンドを実行して先に進む前に、必要なすべての依存関係をインストールする必要があります。
 ```
@@ -113,7 +113,7 @@ Visual Studioでは。
 
 ### ANGLE for Androidの構築
 
-Android専用の[ドキュメント](DevSetupAndroid.md#ANGLE-for-Android)をご覧ください。
+Android専用のドキュメントをご覧ください。
 
 ## ANGLEによるアプリケーション開発
 

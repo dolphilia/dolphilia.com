@@ -1,6 +1,6 @@
 # テーマ
 
-バージョン3.0.0以降、HonKitは簡単にテーマを設定することができるようになりました。書籍では、デフォルトで [theme-default](https://github.com/honkit/honkit/tree/master/packages/%40honkit/theme-default) というテーマが使用されます。
+バージョン3.0.0以降、HonKitは簡単にテーマを設定することができるようになりました。書籍では、デフォルトで theme-defaultというテーマが使用されます。
 
 > **ご注意ください**: カスタムテーマにより、一部のプラグインが正しく動作しない場合があります。
 
@@ -21,7 +21,7 @@
 
 ### Forkingの代わりにExtend
 
-テーマの変更を複数のブックで利用できるようにしたい場合、デフォルトのテーマをフォークするのではなく、[templating syntax](../templating/README.md) を使って拡張することが可能です。
+テーマの変更を複数のブックで利用できるようにしたい場合、デフォルトのテーマをフォークするのではなく、templating syntax を使って拡張することが可能です。
 
 ```html
 {% extends template.self %}
@@ -32,8 +32,8 @@
 {% endblock %}
 ```
 
-より完全な例として[API](https://github.com/GitbookIO/theme-api)テーマを見てみましょう。
+より完全な例としてAPIテーマを見てみましょう。
 
 ### テーマを公開する
 
-テーマはプラグイン ([関連ドキュメント](../plugins/README.md)) として `theme-` というプレフィックスを付けて公開されています。例えば、テーマ `awesome` はプラグイン `theme-awesome` からロードされ、NPM パッケージ `honkit-plugin-theme-awesome` からロードされます。
+テーマはプラグイン (関連ドキュメント) として `theme-` というプレフィックスを付けて公開されています。例えば、テーマ `awesome` はプラグイン `theme-awesome` からロードされ、NPM パッケージ `honkit-plugin-theme-awesome` からロードされます。

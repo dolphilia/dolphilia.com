@@ -923,7 +923,6 @@ export default {
                     collapsed: false,
                     items: [
                         {text: 'はじめに', link: '/translation/svelte/'},
-                        {text: 'チュートリアル', link: '/translation/svelte/tutorial'},
                     ]
                 },
             ],
