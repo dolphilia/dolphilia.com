@@ -1,20 +1,20 @@
 # Markdown Extensions
 
-VitePress comes with built in Markdown Extensions.
+VitePressには、Markdown Extensionsが組み込まれています。
 
-## Header Anchors
+## ヘッダーアンカー
 
-Headers automatically get anchor links applied. Rendering of anchors can be configured using the `markdown.anchor` option.
+ヘッダーには自動的にアンカーリンクが適用されます。アンカーのレンダリングは `markdown.anchor` オプションで設定することができる。
 
-## Links
+## リンク
 
-Both internal and external links gets special treatments.
+内部リンク、外部リンクともに特別な扱いを受けています。
 
-### Internal Links
+### 内部リンク
 
-Internal links are converted to router link for SPA navigation. Also, every `index.md` contained in each sub-directory will automatically be converted to `index.html`, with corresponding URL `/`.
+SPAのナビゲーションとして、内部リンクはルーターリンクに変換されます。また、各サブディレクトリに含まれる `index.md` は自動的に `index.html` に変換され、対応する URL は `/` となります。
 
-For example, given the following directory structure:
+例えば、次のようなディレクトリ構成があったとします。
 
 ```
 .
@@ -32,28 +32,28 @@ For example, given the following directory structure:
 And providing you are in `foo/one.md`:
 
 ```md
-[Home](/) <!-- sends the user to the root index.md -->
-[foo](/foo/) <!-- sends the user to index.html of directory foo -->
-[foo heading](./#heading) <!-- anchors user to a heading in the foo index file -->
-[bar - three](../bar/three) <!-- you can omit extension -->
-[bar - three](../bar/three.md) <!-- you can append .md -->
-[bar - four](../bar/four.html) <!-- or you can append .html -->
+[Home](/) <!-- ユーザーをルートの index.md に送ります。 -->
+[foo](/foo/) <!-- foo ディレクトリの index.html にユーザーを送る。 -->
+[foo heading](./#heading) <!-- foo インデックスファイル内の見出しにユーザーを固定します。 -->
+[bar - three](../bar/three) <!-- 拡張子を省略することができます。 -->
+[bar - three](../bar/three.md) <!-- .mdを追加することができます。 -->
+[bar - four](../bar/four.html) <!-- または、.html を追加してください。 -->
 ```
 
-### Page Suffix
+### ページサフィックス
 
-Pages and internal links get generated with the `.html` suffix by default.
+ページと内部リンクは、デフォルトで `.html` という接尾辞で生成されます。
 
-### External Links
+### 外部リンク
 
-Outbound links automatically get `target="_blank" rel="noreferrer"`:
+外部リンクは、自動的に `target="_blank" rel="noreferrer"` を取得します。
 
 - [vuejs.org](https://vuejs.org)
 - [VitePress on GitHub](https://github.com/vuejs/vitepress)
 
-## Frontmatter
+## フロントマター
 
-[YAML frontmatter](https://jekyllrb.com/docs/front-matter/) is supported out of the box:
+[YAML frontmatter](https://jekyllrb.com/docs/front-matter/)は、そのままサポートされます。
 
 ```yaml
 ---
@@ -62,11 +62,11 @@ lang: en-US
 ---
 ```
 
-This data will be available to the rest of the page, along with all custom and theming components.
+このデータは、すべてのカスタムコンポーネントとテーマコンポーネントとともに、ページの残りの部分から利用できるようになります。
 
-For more details, see [Frontmatter](./frontmatter).
+詳しくは、Frontmatterをご覧ください。
 
-## GitHub-Style Tables
+## GitHubスタイルのテーブル
 
 **Input**
 
@@ -98,7 +98,7 @@ For more details, see [Frontmatter](./frontmatter).
 
 :tada: :100:
 
-A [list of all emojis](https://github.com/markdown-it/markdown-it-emoji/blob/master/lib/data/full.json) is available.
+[全絵文字の一覧](https://github.com/markdown-it/markdown-it-emoji/blob/master/lib/data/full.json)があります。
 
 ## Table of Contents
 
@@ -112,13 +112,13 @@ A [list of all emojis](https://github.com/markdown-it/markdown-it-emoji/blob/mas
 
 [[toc]]
 
-Rendering of the TOC can be configured using the `markdown.toc` option.
+TOCのレンダリングは `markdown.toc` オプションで設定することができます。
 
-## Custom Containers
+## カスタムコンテナ
 
-Custom containers can be defined by their types, titles, and contents.
+カスタムコンテナは、タイプ、タイトル、コンテンツによって定義することができます。
 
-### Default Title
+### デフォルトのタイトル
 
 **Input**
 
@@ -166,9 +166,9 @@ This is a dangerous warning.
 This is a details block.
 :::
 
-### Custom Title
+### カスタムタイトル
 
-You may set custom title by appending the text right after the "type" of the container.
+コンテナの "type "の直後にテキストを追加することで、カスタムタイトルを設定することができます。
 
 **Input**
 
@@ -198,7 +198,7 @@ console.log('Hello, VitePress!')
 
 ### `raw`
 
-This is a special container that can be used to prevent style and router conflicts with VitePress. This is especially useful when you're documenting component libraries. You might also wanna check out [whyframe](https://whyframe.dev/docs/integrations/vitepress) for better isolation.
+これは、VitePressのスタイルとルータの競合を防ぐために使用できる特別なコンテナです。これは、特にコンポーネントライブラリのドキュメントを作成するときに便利です。また、[whyframe](https://whyframe.dev/docs/integrations/vitepress) をチェックすると、より良い分離ができるかもしれません。
 
 **Syntax**
 
@@ -208,7 +208,7 @@ Wraps in a <div class="vp-raw">
 :::
 ```
 
-`vp-raw` class can be directly used on elements too. Style isolation is currently opt-in:
+`vp-raw` クラスは、エレメントにも直接使用することができます。スタイル分離は現在オプトインです。
 
 ::: details
 
@@ -237,9 +237,9 @@ Wraps in a <div class="vp-raw">
 
 :::
 
-## Syntax Highlighting in Code Blocks
+## コードブロックのシンタックスハイライト
 
-VitePress uses [Shiki](https://shiki.matsu.io/) to highlight language syntax in Markdown code blocks, using coloured text. Shiki supports a wide variety of programming languages. All you need to do is append a valid language alias to the beginning backticks for the code block:
+VitePressは[Shiki](https://shiki.matsu.io/)を使用して、Markdownコードブロック内の言語シンタックスをカラーテキストでハイライトしています。Shikiは様々なプログラミング言語をサポートしています。必要なことは、コードブロックの最初のバックティックに有効な言語エイリアスを追加することだけです。
 
 **Input**
 
@@ -279,11 +279,11 @@ export default {
 </ul>
 ```
 
-A [list of valid languages](https://github.com/shikijs/shiki/blob/main/docs/languages.md) is available on Shiki's repository.
+[有効言語一覧](https://github.com/shikijs/shiki/blob/main/docs/languages.md)は、Shikiのリポジトリで公開されています。
 
-You may also customize syntax highlight theme in app config. Please see `markdown` options for more details.
+また、アプリの設定でシンタックスハイライトのテーマをカスタマイズすることができます。詳しくは `markdown` オプションを参照してください。
 
-## Line Highlighting in Code Blocks
+## コードブロックのラインハイライト
 
 **Input**
 
@@ -311,9 +311,9 @@ export default {
 }
 ```
 
-In addition to a single line, you can also specify multiple single lines, ranges, or both:
+1行だけでなく、複数の1行、範囲、またはその両方を指定することも可能です。
 
-- Line ranges: for example `{5-8}`, `{3-10}`, `{10-17}`
+- 行の範囲：例えば `{5-8}`, `{3-10}`, `{10-17}`
 - Multiple single lines: for example `{4,7,9}`
 - Line ranges and single lines: for example `{4,7-13,16,23-27,40}`
 
@@ -351,7 +351,7 @@ export default { // Highlighted
 }
 ```
 
-Alternatively, it's possible to highlight directly in the line by using the `// [!code hl]` comment.
+また、`// [!code hl]` というコメントを使うことで、その行に直接ハイライトを入れることも可能です。
 
 **Input**
 
@@ -379,15 +379,15 @@ export default {
 }
 ```
 
-## Focus in Code Blocks
+## コードブロックにフォーカス
 
-Adding the `// [!code focus]` comment on a line will focus it and blur the other parts of the code.
+行に `// [!code focus]` というコメントを付けると、その行にフォーカスが当たり、他の部分がぼやけます。
 
-Additionally, you can define a number of lines to focus using `// [!code focus:<lines>]`.
+さらに、`// [!code focus:<lines>]` を使って、フォーカスする行数を定義することができます。
 
 **Input**
 
-Note that only one space is required after `!code`, here are two to prevent processing.
+なお、`!code`の後に必要なスペースは1つだけですが、ここでは処理落ちを防ぐために2つにしています。
 
 ````
 ```js
@@ -413,13 +413,13 @@ export default {
 }
 ```
 
-## Colored Diffs in Code Blocks
+## コードブロックのカラー差分
 
-Adding the `// [!code --]` or `// [!code ++]` comments on a line will create a diff of that line, while keeping the colors of the codeblock.
+行に `// [!code --]` または `// [!code ++]` コメントを追加すると、コードブロックの色を維持したまま、その行の diff を作成することができます。
 
 **Input**
 
-Note that only one space is required after `!code`, here are two to prevent processing.
+なお、`!code`の後に必要なスペースは1つだけですが、ここでは処理落ちを防ぐために2つにしています。
 
 ````
 ```js
@@ -449,11 +449,11 @@ export default {
 
 ## Errors and Warnings in Code Blocks
 
-Adding the `// [!code warning]` or `// [!code error]` comments on a line will color it accordingly.
+行に `// [!コード警告]` または `// [!コードエラー]` のコメントを追加すると、それに応じて色がつきます。
 
 **Input**
 
-Note that only one space is required after `!code`, here are two to prevent processing.
+なお、`!code`の後に必要なスペースは1つだけですが、ここでは処理落ちを防ぐために2つにしています。
 
 ````
 ```js
@@ -481,9 +481,9 @@ export default {
 }
 ```
 
-## Line Numbers
+## ライン番号
 
-You can enable line numbers for each code blocks via config:
+設定により、各コードブロックの行番号を有効にすることができます。
 
 ```js
 export default {
@@ -493,9 +493,9 @@ export default {
 }
 ```
 
-Please see `markdown` options for more details.
+詳しくは `markdown` オプションを参照してください。
 
-You can add `:line-numbers` / `:no-line-numbers` mark in your fenced code blocks to override the value set in config.
+フェンスで囲まれたコードブロックに `:line-numbers` / `:no-line-numbers` マークを追加することで、設定で設定した値をオーバーライドすることができます。
 
 **Input**
 
@@ -529,13 +529,13 @@ const line3 = 'This is line 3'
 
 ## Import Code Snippets
 
-You can import code snippets from existing files via following syntax:
+以下の構文で、既存のファイルからコードスニペットをインポートすることができます。
 
 ```md
 <<< @/filepath
 ```
 
-It also supports [line highlighting](#line-highlighting-in-code-blocks):
+また、[ラインハイライト](#line-highlighting-in-code-blocks)にも対応しています。
 
 ```md
 <<< @/filepath{highlightLines}
@@ -556,10 +556,10 @@ It also supports [line highlighting](#line-highlighting-in-code-blocks):
 <<< @/snippets/snippet.js{2}
 
 ::: tip
-The value of `@` corresponds to the source root. By default it's the VitePress project root, unless `srcDir` is configured.
+値は、ソースルートに対応します。デフォルトでは、`srcDir`が設定されていない限り、VitePressプロジェクトのルートになります。
 :::
 
-You can also use a [VS Code region](https://code.visualstudio.com/docs/editor/codebasics#_folding) to only include the corresponding part of the code file. You can provide a custom region name after a `#` following the filepath:
+また、[VS Code region](https://code.visualstudio.com/docs/editor/codebasics#_folding)を使って、コードファイルの対応する部分のみを含めることができます。ファイルパスに続く `#` の後に、カスタムリージョン名を指定することができます。
 
 **Input**
 
@@ -575,7 +575,7 @@ You can also use a [VS Code region](https://code.visualstudio.com/docs/editor/co
 
 <<< @/snippets/snippet-with-region.js#snippet{1}
 
-You can also specify the language inside the braces (`{}`) like this:
+また、次のように中括弧（`{}`）の中に言語を指定することもできます。
 
 ```md
 <<< @/snippets/snippet.cs{c#}
@@ -589,11 +589,11 @@ You can also specify the language inside the braces (`{}`) like this:
 <<< @/snippets/snippet.cs{1,2,4-6 c#:line-numbers}
 ```
 
-This is helpful if source language cannot be inferred from your file extension.
+これは、ファイルの拡張子からソース言語が推測できない場合に便利です。
 
-## Code Groups
+## コードグループ
 
-You can group multiple code blocks like this:
+このように、複数のコードブロックをグループ化することができます。
 
 **Input**
 
@@ -651,9 +651,9 @@ export default config
 
 :::
 
-## Markdown File Inclusion
+## Markdownファイルのインクルージョン
 
-You can include a markdown file in another markdown file like this:
+マークダウン・ファイルを別のマークダウン・ファイルにインクルードすることができます。
 
 **Input**
 
@@ -690,12 +690,12 @@ Can be created using `.foorc.json`.
 ```
 
 ::: warning
-Note that this does not throw errors if your file is not present. Hence, when using this feature make sure that the contents are being rendered as expected.
+ただし、ファイルが存在しない場合はエラーを出しません。したがって、この機能を使用する場合は、コンテンツが期待通りにレンダリングされることを確認してください。
 :::
 
-## Advanced Configuration
+## アドバンスト・コンフィグレーション
 
-VitePress uses [markdown-it](https://github.com/markdown-it/markdown-it) as the Markdown renderer. A lot of the extensions above are implemented via custom plugins. You can further customize the `markdown-it` instance using the `markdown` option in `.vitepress/config.js`:
+VitePressはMarkdownレンダラとして[markdown-it](https://github.com/markdown-it/markdown-it)を使用しています。上記の拡張機能の多くは、カスタムプラグインによって実装されています。さらに、 `.vitepress/config.js` の `markdown` オプションを使用すると、 `markdown-it` インスタンスをカスタマイズすることができます。
 
 ```js
 const anchor = require('markdown-it-anchor')
@@ -720,4 +720,4 @@ module.exports = {
 }
 ```
 
-See full list of configurable properties in Configs: App Configs.
+設定可能なプロパティの一覧はConfigsをご覧ください。アプリの設定(Config)

@@ -19,6 +19,7 @@ export default {
             //{ icon: 'discord', link: 'https://https://discord.gg/f4sKFrsHyK'},
         ],
         nav: [
+            { text: '小説', activeMatch: '/novel/', link: '/novel/index' },
             { text: '論考', activeMatch: '/essay/', link: '/essay/index' },
             { text: '雑記', activeMatch: '/note/', link: '/note/index' 
               //items: [
@@ -44,6 +45,7 @@ export default {
                     {text: 'HonKit', link: '/translation/honkit/'},
                     {text: 'HSP', link: '/translation/hsp/'},
                     {text: 'JavaScript', link: '/translation/javascript/'},
+                    {text: 'Mastodon', link: '/translation/mastodon/'},
                     {text: 'Mermaid', link: '/translation/mermaid/'},
                     {text: 'Meson', link: '/translation/meson/'},
                     {text: 'Natural Docs', link: '/translation/natural-docs/'},
@@ -51,6 +53,7 @@ export default {
                     {text: 'Nuklear', link: '/translation/nuklear/'},
                     {text: 'Processing', link: '/translation/processing/'},
                     {text: 'pygame', link: '/translation/pygame/reference/'},
+                    {text: 'Sass', link: '/translation/sass/'},
                     {text: 'sokol', link: '/translation/sokol/'},
                     {text: 'stb', link: '/translation/stb/'},
                     {text: 'SteamOS', link: '/translation/steamos/'},
@@ -60,6 +63,45 @@ export default {
             },
         ],
         sidebar: {
+            '/novel/': [
+                {
+                    text: '小説',
+                    collapsed: false,
+                    items: [
+                        {text: 'はじめに', link: '/novel/'},
+                    ]
+                },
+                {
+                    text: 'みがらいあ',
+                    collapsed: false,
+                    items: [
+                        {text: 'みがらいあ', link: '/novel/migaraia'},
+                    ]
+                },
+                {
+                    text: '情報部',
+                    collapsed: false,
+                    items: [
+                        {text: '黒の思惑', link: '/novel/kuro-no-omowaku'},
+                    ]
+                },
+                {
+                    text: '読み切り',
+                    collapsed: false,
+                    items: [
+                        {text: '箸でコバエを捕まえたら', link: '/novel/hashi-de-kobae-wo'},
+                        {text: 'SOSを発信するVとテトラー', link: '/novel/sos-wo-hasshin'},
+                        {text: '代理ちゃん戦争', link: '/novel/dairi-chan-sensou'},
+                        {text: '虚塔', link: '/novel/kyotou'},
+                        {text: 'うたかたのゆめ', link: '/novel/utakata-no-yume'},
+                        {text: '冥府の森と英雄の花', link: '/novel/meifu-no-mori'},
+                        {text: '泣き虫魔王と鈴木勇者', link: '/novel/nakimushi-maou'},
+                        {text: '家出ギャルと電車の旅', link: '/novel/iede-gyaru-to'},
+                        {text: 'もやし革命', link: '/novel/moyashi-kakumei'},
+                        {text: 'タイムマシンを作った男', link: '/novel/taimu-mashin-wo'},
+                    ]
+                }
+            ],
             '/translation/angle/': [
                 {
                     text: 'ANGLE',
@@ -766,6 +808,33 @@ export default {
                     ]
                 },
             ],
+            '/translation/mastodon/': [
+                {
+                    text: 'Mastodon',
+                    collapsed: false,
+                    items: [
+                        {text: 'はじめに', link: '/translation/mastodon/'},
+                    ]
+                },
+                {
+                    text: 'マストドンを実行する',
+                    collapsed: false,
+                    items: [
+                        {text: 'マシンを準備する', link: '/translation/mastodon/running/'},
+                        {text: 'ソースからのインストール', link: '/translation/mastodon/running/install'},
+                        {text: '環境を設定する', link: '/translation/mastodon/running/config'},
+                        {text: 'オプション機能のインストール', link: '/translation/mastodon/running/optional'},
+                        {text: '新しいインスタンスのセットアップ', link: '/translation/mastodon/running/setup'},
+                        {text: '管理者用CLIを使用する', link: '/translation/mastodon/running/tootctl'},
+                        {text: '新しいリリースへのアップグレード', link: '/translation/mastodon/running/upgrading'},
+                        {text: 'サーバーのバックアップ', link: '/translation/mastodon/running/backups'},
+                        {text: '新しいマシンへの移行', link: '/translation/mastodon/running/migrating'},
+                        {text: 'サーバーのスケールアップ', link: '/translation/mastodon/running/scaling'},
+                        {text: 'モデレーションアクション', link: '/translation/mastodon/running/moderation'},
+                        {text: 'トラブルシューティングエラー', link: '/translation/mastodon/running/troubleshooting'},
+                    ]
+                },
+            ],
             '/translation/mermaid/': [
                 {
                     text: 'Mermaid',
@@ -843,6 +912,19 @@ export default {
                     collapsed: false,
                     items: [
                         {text: 'リファレンス', link: '/translation/pygame/'},
+                    ]
+                },
+            ],
+            '/translation/sass/': [
+                {
+                    text: 'Sass',
+                    collapsed: false,
+                    items: [
+                        {text: 'はじめに', link: '/translation/sass/'},
+                        {text: 'シンタックス', link: '/translation/sass/syntax.md'},
+                        {text: 'スタイルルール', link: '/translation/sass/style_rules.md'},
+                        {text: '変数', link: '/translation/sass/variables.md'},
+                        {text: '補間処理', link: '/translation/sass/interpolation.md'},
                     ]
                 },
             ],
