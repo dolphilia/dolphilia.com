@@ -59,6 +59,7 @@ export default {
                     {text: 'SteamOS', link: '/translation/steamos/'},
                     {text: 'Svelte', link: '/translation/svelte/'},
                     {text: 'VitePress', link: '/translation/vitepress/'},
+                    {text: 'VivlioStyle', link: '/translation/vivliostyle/'},
                 ]
             },
         ],
@@ -1073,6 +1074,25 @@ export default {
                     items: [
                         {text: 'VuePressからの移行', link: '/translation/vitepress/migration-from-vuepress.md'},
                         {text: 'VitePress 0.xからの移行', link: '/translation/vitepress/migration-from-vitepress-0.md'},
+                    ]
+                },
+            ],
+            '/translation/vivliostyle/': [
+                {
+                    text: 'VivlioStyle',
+                    collapsed: false,
+                    items: [
+                        {text: 'はじめに', link: '/translation/vivliostyle/'},
+                        {text: 'Viewer', link: '/translation/vivliostyle/vivliostyle-viewer'},
+                        {text: 'CLI', link: '/translation/vivliostyle/vivliostyle-cli'},
+                        {text: 'Create Book', link: '/translation/vivliostyle/create-book'},
+                        {text: 'サポートするCSS機能', link: '/translation/vivliostyle/supported-css-features'},
+                        {text: 'Core APIリファレンス', link: '/translation/vivliostyle/api'},
+                        {text: 'コントリビューションガイド', link: '/translation/vivliostyle/contribution-guide'},
+                        {text: 'VFM概要', link: '/translation/vivliostyle/vfm_overview'},
+                        {text: 'VFM', link: '/translation/vivliostyle/vfm'},
+                        {text: 'テーマ', link: '/translation/vivliostyle/themes'},
+                        
                     ]
                 },
             ],

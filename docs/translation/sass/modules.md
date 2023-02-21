@@ -1,5 +1,7 @@
 # 組み込みモジュール
 
+[[TOC]]
+
 ## 概要
 
 互換性:
@@ -1531,7 +1533,7 @@ $font-weights: ("regular": 400, "medium": 500, "bold": 700);
 - Ruby Sass: ✗
 - ▶
 
-### Variables
+### 変数
 
 ```scss
 math.$e
@@ -1567,7 +1569,7 @@ math.$pi
 @debug math.$pi; // 3.1415926536
 ```
 
-### Bounding Functions
+### バウンディング関数
 
 ```scss
 math.ceil($number)
@@ -1667,7 +1669,7 @@ round($number) //=> number
 ```
 
 
-### Distance Functions
+### 距離関数
 
 ```scss
 math.abs($number)
@@ -1705,7 +1707,7 @@ $lengths: 1in, 10cm, 50px;
 ```
 
 
-### Exponential Functions
+### 指数関数
 
 ```scss
 math.log($number, $base: null) //=> number 
@@ -1990,7 +1992,7 @@ $numberの単位を文字列で返します。
 @debug math.unit(math.div(5px, 1s)); // "px/s"
 ```
 
-### Other Functions
+### その他の関数
 
 ```scss
 math.div($number1, $number2) //=> number 
@@ -2155,7 +2157,7 @@ body.dark code {
 :::
 
 
-### Functions
+### 関数
 
 ```scss
 meta.calc-args($calc) //=> list 
