@@ -1,17 +1,17 @@
-# Interpolation
+# 補間
 
-Interpolation can be used almost anywhere in a Sass stylesheet to embed the result of a SassScript expression into a chunk of CSS. Just wrap an expression in #{} in any of the following places:
+補間は、Sass スタイルシートのほぼすべての場所で使用でき、SassScript 式の結果を CSS のチャンクに埋め込むことができます。以下のいずれかの場所で、式を#{}で囲むだけです。
 
-- Selectors in style rules
-- Property names in declarations
-- Custom property values
-- CSS at-rules
+- スタイルルールのセレクタ
+- 宣言の中のプロパティ名
+- カスタムプロパティ値
+- CSSのアット・ルール
 - @extends
-- Plain CSS @imports
-- Quoted or unquoted strings
-- Special functions
-- Plain CSS function names
-- Loud comments
+- プレーン CSS @imports
+- 引用符で囲むか囲まないかの文字列
+- 特殊関数
+- プレーンなCSSの関数名
+- 大きなコメント
 
 ::: code-group
 
@@ -40,16 +40,16 @@ Interpolation can be used almost anywhere in a Sass stylesheet to embed the resu
 :::
 
 
-## In SassScript permalinkIn SassScript
+## SassScriptでは
 
-Compatibility (Modern Syntax):
+互換性 (Modern Syntax):
 
 - Dart Sass: ✓
 - LibSass: ✗
 - Ruby Sass: since 4.0.0 (unreleased)
 - ▶
 
-Interpolation can be used in SassScript to inject SassScript into unquoted strings. This is particularly useful when dynamically generating names (for example for animations), or when using slash-separated values. Note that interpolation in SassScript always returns an unquoted string.
+SassScript で補間を使用すると、引用符で囲まれていない文字列に SassScript を挿入することができます。これは、動的に名前を生成する場合 (アニメーションなど) や、スラッシュで区切られた値を使用する場合に特に有用です。SassScript の補間は、常に引用符で囲まれていない文字列を返すことに注意してください。
 
 ::: code-group
 
@@ -96,7 +96,7 @@ Interpolation can be used in SassScript to inject SassScript into unquoted strin
 
 💡 Fun fact:
 
-Interpolation is useful for injecting values into strings, but other than that it’s rarely necessary in SassScript expressions. You definitely don’t need it to just use a variable in a property value. Instead of writing color: #{$accent}, you can just write color: $accent!
+補間は文字列に値を注入するのに便利ですが、それ以外では SassScript の式で必要になることはほとんどありません。プロパティの値で変数を使用するだけなら、間違いなく必要ありません。color と書く代わりに#と書く代わりに、color: $accentと書けばいいのです!
 
 :::
 
@@ -104,16 +104,16 @@ Interpolation is useful for injecting values into strings, but other than that i
 
 ⚠️ Heads up!
 
-It’s almost always a bad idea to use interpolation with numbers. Interpolation returns unquoted strings that can’t be used for any further math, and it avoids Sass’s built-in safeguards to ensure that units are used correctly.
+数値の補間を使用することは、ほとんどの場合、悪い考えです。補間は、それ以上の計算に使用できない引用符で囲まれていない文字列を返し、単位が正しく使用されていることを保証するための Sass の組み込みの安全策を回避します。
 
-Sass has powerful unit arithmetic that you can use instead. For example, instead of writing #{$width}px, write $width * 1px—or better yet, declare the $width variable in terms of px to begin with. That way if $width already has units, you’ll get a nice error message instead of compiling bogus CSS.
+Sass には強力な単位演算機能があり、代わりに使用することができます。たとえば、#{$width}px と書く代わりに $width * 1px と書くか、よりよい方法として、$width 変数を px の単位で宣言します。そうすれば、$widthがすでに単位を持っている場合、偽のCSSをコンパイルする代わりに、適切なエラーメッセージが表示されます。
 
 :::
 
 
-## Quoted Strings permalinkQuoted Strings
+## Quoted Strings
 
-In most cases, interpolation injects the exact same text that would be used if the expression were used as a property value. But there is one exception: the quotation marks around quoted strings are removed (even if those quoted strings are in lists). This makes it possible to write quoted strings that contain syntax that’s not allowed in SassScript (like selectors) and interpolate them into style rules.
+ほとんどの場合、補間は、式がプロパティ値として使用される場合と全く同じテキストを注入します。しかし、1つだけ例外があります。引用された文字列を囲む引用符は削除されます (引用された文字列がリストであっても)。これにより、SassScript で許可されていない構文 (セレクタなど) を含む引用文字列を記述し、スタイル ルールに挿入することができるようになります。
 
 ::: code-group
 
@@ -135,6 +135,6 @@ In most cases, interpolation injects the exact same text that would be used if t
 
 ⚠️ Heads up!
 
-While it’s tempting to use this feature to convert quoted strings to unquoted strings, it’s a lot clearer to use the string.unquote() function. Instead of #{$string}, write string.unquote($string)!
+この機能を使って引用符で囲まれた文字列を引用符で囲まれていない文字列に変換したいところですが、string.unquote()関数を使った方がずっと分かりやすいでしょう。`#{$string}`の代わりに、`string.unquote($string)`と書いてください!
 
 :::

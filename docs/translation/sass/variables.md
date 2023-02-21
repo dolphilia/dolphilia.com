@@ -1,8 +1,8 @@
-# Variables
+# 変数
 
-Sass variables are simple: you assign a value to a name that begins with $, and then you can refer to that name instead of the value itself. But despite their simplicity, they're one of the most useful tools Sass brings to the table. Variables make it possible to reduce repetition, do complex math, configure libraries, and much more.
+Sass変数はシンプルです。$で始まる名前に値を代入し、値自体の代わりにその名前を参照することができます。しかし、そのシンプルさにもかかわらず、Sassがもたらす最も便利なツールの一つです。変数によって、繰り返しの削減、複雑な計算、ライブラリの設定、その他多くのことが可能になります。
 
-A variable declaration looks a lot like a property declaration: it’s written `<variable>: <expression>`. Unlike a property, which can only be declared in a style rule or at-rule, variables can be declared anywhere you want. To use a variable, just include it in a value.
+変数の宣言は、プロパティの宣言とよく似ています。`<variable>: <expression>` と書かれます。プロパティはスタイルルールやアットルールの中でしか宣言できませんが、変数はどこでも好きなところで宣言できます。変数を使うには、それを値の中に含めればいいのです。
 
 ::: code-group
 
@@ -26,13 +26,13 @@ $border-dark: rgba($base-color, 0.88);
 
 ::: warning
 
-⚠️ Heads up!
+⚠️ 気をつけよう
 
-CSS has variables of its own, which are totally different than Sass variables. Know the differences!
+CSSには独自の変数があり、それはSassの変数とは全く異なります。その違いを知ってください。
 
-- Sass variables are all compiled away by Sass. CSS variables are included in the CSS output.
-- CSS variables can have different values for different elements, but Sass variables only have one value at a time.
-- Sass variables are imperative, which means if you use a variable and then change its value, the earlier use will stay the same. CSS variables are declarative, which means if you change the value, it’ll affect both earlier uses and later uses.
+- Sass変数は、Sassによってすべてコンパイルされます。CSS変数は、CSSの出力に含まれます。
+- CSS変数は要素ごとに異なる値を持つことができますが、Sass変数は一度に一つの値しか持ちません。
+- Sass変数は命令型です。つまり、ある変数を使用した後にその値を変更すると、先に使用した値はそのまま残ります。CSS変数は宣言的であり、値を変更すると、以前の使用と後の使用の両方に影響します。
 
 ::: code-group
 
@@ -58,41 +58,35 @@ $variable: value 2;
 }
 ```
 
-
 :::
-
-
-
-
-
 
 ::: tip
 
-💡 Fun fact:
+💡 楽しい事実
 
-Sass variables, like all Sass identifiers, treat hyphens and underscores as identical. This means that $font-size and $font_size both refer to the same variable. This is a historical holdover from the very early days of Sass, when it only allowed underscores in identifier names. Once Sass added support for hyphens to match CSS’s syntax, the two were made equivalent to make migration easier.
+Sass変数は、すべてのSass識別子と同様に、ハイフンとアンダースコアを同一として扱います。つまり、$font-size と $font_size はどちらも同じ変数を指しているということです。これは、Sass のごく初期のころ、識別子の名前にアンダースコアしか使用できなかったころの名残です。SassがCSSの構文に合わせてハイフンのサポートを追加した後、移行を容易にするためにこの2つを等価にしました。
 
 :::
 
 
-## Default Values permalinkDefault Values
+## デフォルト値
 
-Normally when you assign a value to a variable, if that variable already had a value, its old value is overwritten. But if you’re writing a Sass library, you might want to allow your users to configure your library’s variables before you use them to generate CSS.
+通常、変数に値を代入すると、その変数がすでに値を持っていた場合、古い値が上書きされます。しかし、Sassライブラリを書いている場合、CSSの生成に使用する前に、ユーザーがライブラリの変数を設定できるようにしたいと思うかもしれません。
 
-To make this possible, Sass provides the !default flag. This assigns a value to a variable only if that variable isn’t defined or its value is null. Otherwise, the existing value will be used.
+これを可能にするために、Sass は !default フラグを用意しています。これは、変数が定義されていない場合、またはその値が NULL の場合にのみ、変数に値を割り当てます。それ以外の場合は、既存の値が使用されます。
 
-Configuring Modules permalinkConfiguring Modules
+## モジュールの設定
 
-Compatibility:
+互換性:
 
 - Dart Sass: since 1.23.0
 - LibSass: ✗
 - Ruby Sass: ✗
 - ▶
 
-Variables defined with !default can be configured when loading a module with the @use rule. Sass libraries often use !default variables to allow their users to configure the library’s CSS.
+defaultで定義された変数は、@useルールでモジュールをロードする際に設定することができます。Sassライブラリは、ユーザーがライブラリのCSSを設定できるようにするために、しばしば!default変数を使用します。
 
-To load a module with configuration, write @use `<url>` with `(<variable>: <value>, <variable>: <value>)`. The configured values will override the variables’ default values. Only variables written at the top level of the stylesheet with a !default flag can be configured.
+モジュールを設定付きでロードするには、@use `<url>` に `(<variable>: <value>, <variable>: <value>)` を記述します。設定された値は、変数のデフォルト値を上書きします。設定できるのはスタイルシートのトップレベルに !default フラグを付けて書かれた変数だけです。
 
 ::: code-group
 
@@ -124,9 +118,9 @@ code {
 :::
 
 
-## Built-in Variables
+## 内蔵変数
 
-Variables that are defined by a built-in module cannot be modified.
+ビルトインモジュールで定義された変数は変更できません。
 
 ```scss [SCSS]
 @use "sass:math" as math;
@@ -135,9 +129,9 @@ Variables that are defined by a built-in module cannot be modified.
 math.$pi: 0;
 ```
 
-## Scope
+## スコープ
 
-Variables declared at the top level of a stylesheet are global. This means that they can be accessed anywhere in their module after they’ve been declared. But that’s not true for all variables. Those declared in blocks (curly braces in SCSS or indented code in Sass) are usually local, and can only be accessed within the block they were declared.
+スタイルシートのトップレベルで宣言された変数はグローバルである。これは、それらが宣言された後、そのモジュール内のどこにでもアクセスできることを意味する。しかし、これはすべての変数に当てはまるわけではない。ブロック（SCSSでは中括弧、Sassではインデントされたコード）で宣言されたものは通常ローカルであり、宣言されたブロック内でのみアクセスすることができます。
 
 ::: code-group
 
@@ -153,7 +147,7 @@ $global-variable: global value;
 .sidebar {
   global: $global-variable;
 
-  // This would fail, because $local-variable isn't in scope:
+  // これでは失敗してしまいます。 なぜなら、$local-variable はスコープ内にないからです。
   // local: $local-variable;
 }
 ```
@@ -172,9 +166,9 @@ $global-variable: global value;
 :::
 
 
-### Shadowing
+### シャドーイング
 
-Local variables can even be declared with the same name as a global variable. If this happens, there are actually two different variables with the same name: one local and one global. This helps ensure that an author writing a local variable doesn’t accidentally change the value of a global variable they aren’t even aware of.
+ローカル変数は、グローバル変数と同じ名前で宣言されることもあります。この場合、実際には同じ名前の変数が2つ存在することになります。1つはローカル変数、もう1つはグローバル変数です。これは、ローカル変数を記述した作者が、自分でも気づいていないグローバル変数の値を誤って変更しないようにするためのものです。
 
 ::: code-group
 
@@ -203,7 +197,7 @@ $variable: global value;
 
 :::
 
-If you need to set a global variable’s value from within a local scope (such as in a mixin), you can use the !global flag. A variable declaration flagged as !global will always assign to the global scope.
+ローカルスコープからグローバル変数の値を設定する必要がある場合（ミキシン内など）には、!global フラグを使用することができます。グローバルフラグを付けた変数宣言は、常にグローバルスコープに代入されます。
 
 ::: code-group
 
@@ -235,22 +229,22 @@ $variable: first global value;
 
 ::: warning
 
-⚠️ Heads up!
+⚠️ 気をつけよう
 
-Compatibility:
+互換性:
 
 - Dart Sass: since 2.0.0
 - LibSass: ✗
 - Ruby Sass: ✗
 - ▶
 
-The !global flag may only be used to set a variable that has already been declared at the top level of a file. It may not be used to declare a new variable.
+グローバルフラグは、ファイルのトップレベルですでに宣言されている変数を設定するためにのみ使用することができます。新しい変数を宣言するために使用することはできません。
 
 :::
 
-### Flow Control Scope
+### フロー制御の範囲
 
-Variables declared in flow control rules have special scoping rules: they don’t shadow variables at the same level as the flow control rule. Instead, they just assign to those variables. This makes it much easier to conditionally assign a value to a variable, or build up a value as part of a loop.
+フロー制御ルールで宣言された変数は、フロー制御ルールと同じレベルの変数をシャドウしない、特別なスコープ・ルールを持ちます。その代わり、これらの変数に代入するだけである。これにより、条件付きで変数に値を代入したり、ループの一部として値を蓄積したりすることが非常に容易になる。
 
 ::: code-group
 
@@ -283,22 +277,22 @@ $accent-color: #6a1b9a !default;
 
 ::: warning
 
-⚠️ Heads up!
+⚠️ 気をつけよう
 
-Variables in flow control scope can assign to existing variables in the outer scope, but they can’t declare new variables there. Make sure the variable is already declared before you assign to it, even if you need to declare it as null.
+フローコントロールスコープにある変数は、外部スコープにある既存の変数に代入することはできますが、そこで新しい変数を宣言することはできません。たとえNULL宣言が必要であっても、代入する前にその変数がすでに宣言されていることを確認します。
 
 :::
 
 
-## Advanced Variable Functions permalinkAdvanced Variable Functions
+## 高度な変数機能
 
-The Sass core library provides a couple advanced functions for working with variables. The meta.variable-exists() function returns whether a variable with the given name exists in the current scope, and the meta.global-variable-exists() function does the same but only for the global scope.
+Sass コアライブラリには、変数を扱うための高度な関数がいくつか用意されています。meta.variable-exists() 関数は、与えられた名前の変数が現在のスコープに存在するかどうかを返します。また meta.global-variable-exists() 関数は、同じことを行いますがグローバルスコープに対してのみ行います。
 
 ::: warning
 
-⚠️ Heads up!
+⚠️ 気をつけよう
 
-Users occasionally want to use interpolation to define a variable name based on another variable. Sass doesn’t allow this, because it makes it much harder to tell at a glance which variables are defined where. What you can do, though, is define a map from names to values that you can then access using variables.
+ユーザーは時々、別の変数に基づいて変数名を定義するために補間を使用したいと思うことがあります。Sassはこれを許可しません。なぜなら、どの変数がどこに定義されているのかを一目で見分けるのが難しくなるからです。しかし、できることは、名前から値へのマップを定義し、変数を使ってアクセスできるようにすることです。
 
 ::: code-group
 

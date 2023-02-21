@@ -1,8 +1,8 @@
-# Style Rules
+# スタイルルール
 
-## Overview
+## 概要
 
-Style rules are the foundation of Sass, just like they are for CSS. And they work the same way: you choose which elements to style with a selector, and declare properties that affect how those elements look.
+スタイルルールはSassの基礎であり、CSSの基礎と同じです。セレクタでスタイルを設定する要素を選択し、それらの要素がどのように見えるかに影響を与えるプロパティを宣言します。
 
 ::: code-group
 
@@ -26,9 +26,9 @@ Style rules are the foundation of Sass, just like they are for CSS. And they wor
 
 :::
 
-### Nesting
+### ネスティング
 
-But Sass wants to make your life easier. Rather than repeating the same selectors over and over again, you can write one style rules inside another. Sass will automatically combine the outer rule’s selector with the inner rule’s.
+しかし、Sassはあなたの生活をより簡単にすることを望んでいます。同じセレクタを何度も繰り返すのではなく、あるスタイルルールを別のルールの中に書くことができます。Sassは自動的に外側のルールのセレクタを内側のルールのセレクタと結合します。
 
 ::: code-group
 
@@ -70,15 +70,15 @@ nav a {
 
 ::: warning
 
-⚠️ Heads up!
+⚠️ 気をつけよう
 
-Nested rules are super helpful, but they can also make it hard to visualize how much CSS you’re actually generating. The deeper you nest, the more bandwidth it takes to serve your CSS and the more work it takes the browser to render it. Keep those selectors shallow!
+ネストされたルールは非常に便利ですが、実際に生成されているCSSの量を可視化するのが難しくなる場合もあります。ネストが深ければ深いほど、CSSを提供するために必要な帯域幅が増え、ブラウザがCSSをレンダリングするために必要な作業量も増えます。セレクタは浅くしましょう。
 
 :::
 
-#### Selector Lists
+#### セレクタリスト
 
-Nested rules are clever about handling selector lists (that is, comma-separated selectors). Each complex selector (the ones between the commas) is nested separately, and then they’re combined back into a selector list.
+入れ子のルールは、セレクタリスト（つまり、カンマで区切られたセレクタ）の扱いに関して巧妙です。それぞれの複合セレクタ（カンマで区切られたもの）は別々にネストされ、その後、セレクタリストに戻されます。
 
 ::: code-group
 
@@ -102,9 +102,9 @@ Nested rules are clever about handling selector lists (that is, comma-separated 
 
 :::
 
-#### Selector Combinators
+#### セレクターコンビネーター
 
-You can nest selectors that use combinators as well. You can put the combinator at the end of the outer selector, at the beginning of the inner selector, or even all on its own in between the two.
+コンビネータを使用したセレクタも入れ子にすることができます。コンビネータを外側のセレクタの末尾に置いたり内側のセレクタの先頭に置いたり、 あるいはその間に単独で置いたりすることができます。
 
 ::: code-group
 
@@ -146,13 +146,13 @@ p ~ span {
 
 :::
 
-#### Advanced Nesting
+#### 高度なネスティング
 
-If you want to do more with your nested style rules than just combine them in order with the descendant combinator (that is, a plain space) separating them, Sass has your back. See the parent selector documentation for more details.
+ネストされたスタイル・ルールを、単に子孫の組み合わせ（つまり、空白）で区切って順番に組み合わせるだけではなく、より多くのことを行いたい場合、Sassはあなたの背中を押します。詳しくは親セレクタのドキュメントをご覧ください。
 
-### Interpolation
+### 補間処理
 
-You can use interpolation to inject values from expressions like variables and function calls into your selectors. This is particularly useful when you’re writing mixins, since it allows you to create selectors from parameters your users pass in.
+補間機能を使用すると、変数や関数呼び出しなどの式からセレクタに値を注入することができます。これは mixin を書いているときに特に便利です。 ユーザーが渡すパラメータからセレクタを作成することができるからです。
 
 ::: code-group
 
@@ -183,17 +183,17 @@ span.emoji-women-holding-hands {
 
 ::: tip
 
-💡 Fun fact:
+💡 楽しい事実
 
-Sass only parses selectors after interpolation is resolved. This means you can safely use interpolation to generate any part of the selector without worrying that it won’t parse.
+Sass は、補間が解決された後にのみセレクタをパースします。つまり、セレクタのどの部分であっても、パースされないという心配をせずに、安全に補間を使用して生成することができます。
 
 :::
 
-You can combine interpolation with the parent selector &, the @at-root rule, and selector functions to wield some serious power when dynamically generating selectors. For more information, see the parent selector documentation.
+補間と親セレクタの&、@at-rootルール、セレクタ関数を組み合わせることで、セレクタを動的に生成する際に大きな力を発揮することができます。詳しくは、親セレクタのドキュメントを参照してください。
 
-## Property Declarations
+## プロパティ宣言
 
-In Sass as in CSS, property declarations define how elements that match a selector are styled. But Sass adds extra features to make them easier to write and to automate. First and foremost, a declaration's value can be any SassScript expression, which will be evaluated and included in the result.
+SassではCSSと同様に、セレクタにマッチした要素がどのようにスタイリングされるかをプロパティ宣言で定義します。しかし、Sass は宣言の記述と自動化を容易にするために、特別な機能を追加しています。まず、宣言の値は SassScript の任意の式にすることができ、評価されて結果に含まれます。
 
 ::: code-group
 
@@ -216,9 +216,9 @@ In Sass as in CSS, property declarations define how elements that match a select
 
 :::
 
-### Interpolation
+### 補間処理
 
-A property’s name can include interpolation, which makes it possible to dynamically generate properties as needed. You can even interpolate the entire property name!
+プロパティの名前に補間を入れることができるので、必要に応じて動的にプロパティを生成することができます。プロパティ名全体を補間することも可能です。
 
 ::: code-group
 
@@ -245,9 +245,9 @@ A property’s name can include interpolation, which makes it possible to dynami
 
 :::
 
-### Nesting
+### ネスティング
 
-Many CSS properties start with the same prefix that acts as a kind of namespace. For example, font-family, font-size, and font-weight all start with font-. Sass makes this easier and less redundant by allowing property declarations to be nested. The outer property names are added to the inner, separated by a hyphen.
+多くのCSSプロパティは、一種の名前空間として機能する同じ接頭辞で始まります。例えば、font-family、font-size、font-weight は全て font- で始まります。Sassでは、プロパティの宣言をネストできるようにすることで、これを簡単にし、冗長性をなくしました。外側のプロパティ名は、ハイフンで区切られて内側のプロパティ名に追加されます。
 
 ::: code-group
 
@@ -301,9 +301,9 @@ Some of these CSS properties have shorthand versions that use the namespace as t
 
 :::
 
-### Hidden Declarations
+### 隠し宣言
 
-Sometimes you only want a property declaration to show up some of the time. If a declaration’s value is null or an empty unquoted string, Sass won’t compile that declaration to CSS at all.
+時には、あるプロパティの宣言だけを表示させたい場合があります。宣言の値が null または引用されていない空の文字列である場合、Sass はその宣言を CSS に全くコンパイルしません。
 
 ::: code-group
 
@@ -322,18 +322,18 @@ $rounded-corners: false;
 }
 ```
 
-### Custom Properties
+### カスタムプロパティ
 
-Compatibility (SassScript Syntax):
+互換性 (SassScript Syntax):
 
 - Dart Sass: ✓
 - LibSass: since 3.5.0
 - Ruby Sass: since 3.5.0
 - ▶
 
-CSS custom properties, also known as CSS variables, have an unusual declaration syntax: they allow almost any text at all in their declaration values. What’s more, those values are accessible to JavaScript, so any value might potentially be relevant to the user. This includes values that would normally be parsed as SassScript.
+CSSカスタムプロパティは、CSS変数とも呼ばれ、変わった宣言構文を持っています：宣言値には、ほとんどすべてのテキストが許容されます。さらに、これらの値は JavaScript からアクセス可能であるため、どのような値でもユーザーに関係する可能性があります。これには、通常は SassScript として解析されるような値も含まれます。
 
-Because of this, Sass parses custom property declarations differently than other property declarations. All tokens, including those that look like SassScript, are passed through to CSS as-is. The only exception is interpolation, which is the only way to inject dynamic values into a custom property.
+このため、Sass はカスタムプロパティ宣言を他のプロパティ宣言とは異なる方法でパースします。SassScript のように見えるものも含め、すべてのトークンはそのまま CSS に渡されます。唯一の例外は補間で、これはカスタムプロパティに動的な値を注入する唯一の方法です。
 
 ::: code-group
 
@@ -347,8 +347,7 @@ $warn: #dfa612;
   --accent: #{$accent};
   --warn: #{$warn};
 
-  // Even though this looks like a Sass variable, it's valid CSS so it's not
-  // evaluated.
+  // これがSass変数のように見えても、有効なCSSなので評価されません。
   --consumed-by-js: $primary;
 }
 ```
@@ -366,9 +365,9 @@ $warn: #dfa612;
 
 ::: warning
 
-⚠️ Heads up!
+⚠️ 気をつけよう
 
-Unfortunately, interpolation removes quotes from strings, which makes it difficult to use quoted strings as values for custom properties when they come from Sass variables. As a workaround, you can use the meta.inspect() function to preserve the quotes.
+残念ながら、補間は文字列から引用符を削除します。そのため、Sass 変数から来る場合、カスタムプロパティの値として引用符付きの文字列を使用することが困難です。回避策として、引用符を保持するために meta.inspect() 関数を使用することができます。
 
 ::: code-group
 
@@ -393,30 +392,28 @@ $font-family-monospace: SFMono-Regular, Menlo, Monaco, Consolas;
 
 :::
 
-## Parent Selector
+## 親セレクタ
 
-The parent selector, &, is a special selector invented by Sass that’s used in nested selectors to refer to the outer selector. It makes it possible to re-use the outer selector in more complex ways, like adding a pseudo-class or adding a selector before the parent.
+親セレクタ（&）は、Sassが考案した特殊なセレクタで、入れ子になったセレクタの中で外側のセレクタを参照するために使用されます。これにより、擬似クラスの追加や、親の前にセレクタを追加するなど、より複雑な方法で外部セレクタを再利用することが可能になります。
 
-When a parent selector is used in an inner selector, it’s replaced with the corresponding outer selector. This happens instead of the normal nesting behavior.
+親セレクタが内部セレクタで使用されると、対応する外部セレクタに置き換わります。これは、通常の入れ子の動作の代わりに起こります。
 
 ::: code-group
 
 ```scss [SCSS]
 .alert {
-  // The parent selector can be used to add pseudo-classes to the outer
-  // selector.
+  // 親セレクタは、外側のセレクタに擬似クラスを追加するために使用することができます。
   &:hover {
     font-weight: bold;
   }
 
-  // It can also be used to style the outer selector in a certain context, such
-  // as a body set to use a right-to-left language.
+  // また、右から左への言語を使用するように設定されたボディなど、特定のコンテキストで外側のセレクタをスタイルするために使用することができます。
   [dir=rtl] & {
     margin-left: 0;
     margin-right: 10px;
   }
 
-  // You can even use it as an argument to pseudo-class selectors.
+  // 擬似クラスセレクタの引数として使用することも可能です。
   :not(&) {
     opacity: 0.8;
   }
@@ -440,17 +437,17 @@ When a parent selector is used in an inner selector, it’s replaced with the co
 
 ::: warning
 
-⚠️ Heads up!
+⚠️ 気をつけよう
 
-Because the parent selector could be replaced by a type selector like h1, it’s only allowed at the beginning of compound selectors where a type selector would also be allowed. For example, span& is not allowed.
+親セレクタは h1 のようなタイプセレクタに置き換えることができるので、タイプセレクタも許可される複合セレクタの冒頭でのみ許可されます。例えば、span& は許可されません。
 
-We’re looking into loosening this restriction, though. If you’d like to help make that happen, check out this GitHub issue.
+しかし、私たちはこの制限を緩和することを検討しています。もし、この制限を緩和することに興味があれば、GitHub issueを参照してください。
 
 :::
 
-### Adding Suffixes permalinkAdding Suffixes
+### サフィックスの追加
 
-You can also use the parent selector to add extra suffixes to the outer selector. This is particularly useful when using a methodology like BEM that uses highly structured class names. As long as the outer selector ends with an alphanumeric name (like class, ID, and element selectors), you can use the parent selector to append additional text.
+親セレクタを使用して、外部セレクタに追加のサフィックスを追加することもできます。これは、BEMのように高度に構造化されたクラス名を使用する方法論を使用する場合に特に便利です。外部セレクタが英数字の名前で終わっている限り（クラス、ID、要素セレクタのように）、親セレクタを使用して追加のテキストを追加することができます。
 
 ::: code-group
 
@@ -500,9 +497,9 @@ You can also use the parent selector to add extra suffixes to the outer selector
 
 :::
 
-### In SassScript
+### SassScriptでは
 
-The parent selector can also be used within SassScript. It’s a special expression that returns the current parent selector in the same format used by selector functions: a comma-separated list (the selector list) that contains space-separated lists (the complex selectors) that contain unquoted strings (the compound selectors).
+親セレクタは、SassScript 内でも使用できます。カンマで区切られたリスト (セレクタリスト) とスペースで区切られたリスト (複合セレクタ)、引用符で囲まれていない文字列 (複合セレクタ) から構成されています。
 
 ::: code-group
 
@@ -524,7 +521,7 @@ The parent selector can also be used within SassScript. It’s a special express
 
 :::
 
-If the & expression is used outside any style rules, it returns null. Since null is falsey, this means you can easily use it to determine whether a mixin is being called in a style rule or not.
+スタイル ルールの外で & 式が使用された場合、null が返されます。null は虚偽であるため、スタイル ルールの中でミキシンが呼び出されているかどうかを簡単に判断するために使用できることを意味します。
 
 ::: code-group
 
@@ -557,11 +554,11 @@ If the & expression is used outside any style rules, it returns null. Since null
 
 :::
 
-#### Advanced Nesting
+#### 高度なネスティング
 
-You can use & as a normal SassScript expression, which means you can pass it to functions or include it in interpolation—even in other selectors! Using it in combination with selector functions and the @at-root rule allows you to nest selectors in very powerful ways.
+は通常の SassScript 式として使用できます。つまり、関数に渡したり、他のセレクタに含めたりすることができます。セレクタ関数と @at-root ルールを組み合わせて使用することで、非常に強力な方法でセレクタをネストすることができます。
 
-For example, suppose you want to write a selector that matches the outer selector and an element selector. You could write a mixin like this one that uses the selector.unify() function to combine & with a user’s selector.
+例えば、外部セレクタと要素セレクタをマッチさせるセレクタを書きたいとします。このようなミキシンを書いて、selector.unify()関数を使って&とユーザーのセレクタを結合させることができます。
 
 ::: code-group
 
@@ -598,15 +595,15 @@ For example, suppose you want to write a selector that matches the outer selecto
 
 ::: warning
 
-⚠️ Heads up!
+⚠️ 気をつけよう
 
-When Sass is nesting selectors, it doesn’t know what interpolation was used to generate them. This means it will automatically add the outer selector to the inner selector even if you used & as a SassScript expression. That’s why you need to explicitly use the @at-root rule to tell Sass not to include the outer selector.
+Sassがセレクタをネストしているとき、セレクタを生成するためにどのような補間が使用されたかはわかりません。つまり、SassScript の式として & を使用した場合でも、外側のセレクタを内側のセレクタに自動的に追加してしまうのです。そのため、@at-rootルールを明示的に使用して、Sassに外側のセレクタを含めないように指示する必要があります。
 
 :::
 
-## Placeholder Selectors
+## プレースホルダーセレクタ
 
-Sass has a special kind of selector known as a “placeholder”. It looks and acts a lot like a class selector, but it starts with a % and it's not included in the CSS output. In fact, any complex selector (the ones between the commas) that even contains a placeholder selector isn't included in the CSS, nor is any style rule whose selectors all contain placeholders.
+Sass には、「プレースホルダー」として知られる特別な種類のセレクタがあります。これはクラスセレクタと同じように見えますが、% で始まり、CSS の出力には含まれません。実際、プレースホルダ セレクタを含む複雑なセレクタ（カンマで囲まれたもの）は CSS に含まれませんし、セレクタがすべてプレースホルダを含むスタイル ルールも含まれません。
 
 ::: code-group
 
@@ -628,7 +625,7 @@ Sass has a special kind of selector known as a “placeholder”. It looks and a
 
 :::
 
-What’s the use of a selector that isn’t emitted? It can still be extended! Unlike class selectors, placeholders don’t clutter up the CSS if they aren’t extended and they don’t mandate that users of a library use specific class names for their HTML.
+発光しないセレクタの使い道は？それは、まだ拡張できることです。クラスセレクタと違って、プレースホルダは拡張されなくてもCSSが散らかることはありませんし、ライブラリのユーザがHTMLに特定のクラス名を使うことを義務付けることもありません。
 
 ::: code-group
 
@@ -675,4 +672,4 @@ What’s the use of a selector that isn’t emitted? It can still be extended! U
 
 :::
 
-Placeholder selectors are useful when writing a Sass library where each style rule may or may not be used. As a rule of thumb, if you’re writing a stylesheet just for your own app, it’s often better to just extend a class selector if one is available.
+プレースホルダーセレクタは、各スタイルルールが使用される場合とされない場合がある Sass ライブラリを記述する場合に便利です。経験則として、自分のアプリケーションのためだけにスタイルシートを書いている場合、クラスセレクタが利用可能であれば、単にそれを拡張する方が良い場合があります。

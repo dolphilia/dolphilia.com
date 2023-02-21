@@ -1,14 +1,16 @@
 # シンタックス
 
-## Overview
+[[TOC]]
 
-Sass supports two different syntaxes. Each one can load the other, so it's up to you and your team which one to choose.
+## 概要
+
+Sassは2つの異なる構文をサポートしています。それぞれを読み込むことができるので、どちらを選択するかはあなたやあなたのチーム次第です。
 
 ### SCSS
 
-The SCSS syntax uses the file extension .scss. With a few small exceptions, it’s a superset of CSS, which means essentially all valid CSS is valid SCSS as well. Because of its similarity to CSS, it’s the easiest syntax to get used to and the most popular.
+SCSSの構文は、ファイル拡張子.scssを使用します。わずかな例外を除き、CSSのスーパーセットであり、基本的にすべての有効なCSSはSCSSも有効であることを意味します。CSSと似ているため、最も馴染みやすく、最も普及している構文です。
 
-SCSS looks like this:
+SCSSは次のようなものです。
 
 ```scss
 @mixin button-base() {
@@ -32,23 +34,23 @@ SCSS looks like this:
 }
 ```
 
-### The Indented Syntax
+### インデントされた構文
 
-The indented syntax was Sass’s original syntax, and so it uses the file extension .sass. Because of this extension, it’s sometimes just called “Sass”. The indented syntax supports all the same features as SCSS, but it uses indentation instead of curly braces and semicolons to describe the format of the document.
+インデント構文は Sass のオリジナルの構文であり、そのためファイル拡張子として .sass が使用されています。この拡張子のため、単に "Sass" と呼ばれることもあります。インデント構文は SCSS と同じ機能をサポートしていますが、中括弧やセミコロンの代わりにインデントを使用してドキュメントの形式を記述します。
 
-In general, any time you’d write curly braces in CSS or SCSS, you can just indent one level deeper in the indented syntax. And any time a line ends, that counts as a semicolon. There are also a few additional differences in the indented syntax that are noted throughout the reference.
+一般に、CSS や SCSS で中括弧を記述する場合は、インデント構文で 1 レベル深くインデントすればよいのです。また、行の終わりはいつでもセミコロンとしてカウントされます。また、インデント構文にはさらにいくつかの違いがあり、このリファレンスの中で説明されています。
 
 ::: warning
 
 ⚠️ Heads up!
 
-The indented syntax currently doesn’t support expressions that wrap across multiple lines. See issue #216.
+インデント構文は、現在、複数行にまたがる式をサポートしていません。issue #216 を参照してください。
 
 :::
 
-The indented syntax looks like this:
+インデントされた構文は次のようになります。
 
-```scss
+```sass
 @mixin button-base()
   @include typography(button)
   @include ripple-surface
@@ -69,145 +71,145 @@ The indented syntax looks like this:
     pointer-events: none
 ```
 
-## Parsing a Stylesheet
+## スタイルシートの解析
 
-A Sass stylesheet is parsed from a sequence of Unicode code points. It's parsed directly, without first being converted to a token stream.
+Sass スタイルシートは、一連の Unicode コードポイントから解析されます。最初にトークンストリームに変換されることなく、直接パースされます。
 
-### Input Encoding
+### 入力エンコーディング
 
-Compatibility:
+互換性があります。
 
 - Dart Sass: ✗
 - LibSass: ✓
 - Ruby Sass: ✓
 - ▶
 
-It’s often the case that a document is initially available only as a sequence of bytes, which must be decoded into Unicode. Sass performs this decoding as follows:
+ドキュメントが最初はバイト列としてのみ利用可能で、それを Unicode にデコードする必要があることはよくあります。Sass はこのデコードを次のように行います。
 
-- If the sequence of bytes begins with the UTF-8 or UTF-16 encoding of U+FEFF BYTE ORDER MARK, the corresponding encoding is used.
-- If the sequence of bytes begins with the plain ASCII string @charset, Sass determines the encoding using step 2 of the CSS algorithm for determining the fallback encoding.
-- Otherwise, UTF-8 is used.
+- バイト列が U+FEFF BYTE ORDER MARK の UTF-8 または UTF-16 エンコーディングで始まる場合、対応するエンコーディングが使用されます。
+- バイト列がプレーンな ASCII 文字列 @charset で始まる場合、Sass はフォールバックエンコーディングを決定するための CSS アルゴリズムのステップ 2 を使用してエンコーディングを決定します。
+- それ以外の場合は、UTF-8 が使用されます。
 
-### Parse Errors
+### パースエラー
 
-When Sass encounters invalid syntax in a stylesheet, parsing will fail and an error will be presented to the user with information about the location of the invalid syntax and the reason it was invalid.
+Sass がスタイルシート内で無効な構文に遭遇すると、パースに失敗し、無効な構文の場所と無効な理由についての情報を含むエラーがユーザーに表示されます。
 
-Note that this is different than CSS, which specifies how to recover from most errors rather than failing immediately. This is one of the few cases where SCSS isn’t strictly a superset of CSS. However, it’s much more useful to Sass users to see errors immediately, rather than having them passed through to the CSS output.
+これは、すぐに失敗するのではなく、ほとんどのエラーから回復する方法を指定するCSSとは異なることに注意してください。これは、SCSSが厳密にはCSSのスーパーセットでない数少ないケースのひとつです。しかし、Sassのユーザーにとっては、CSSの出力にエラーが渡されるよりも、エラーをすぐに確認できる方がはるかに便利です。
 
-The location of parse errors can be accessed through implementation-specific APIs. For example, in Dart Sass you can access SassException.span, and in Node Sass’s and Dart Sass’s JS API you can access the file, line, and column properties.
+パースエラーの位置は、実装固有の API を介してアクセスすることができます。例えば、Dart Sass では SassException.span にアクセスでき、Node Sass と Dart Sass の JS API では、ファイル、行、列のプロパティにアクセスすることが可能です。
 
-## Structure of a Stylesheet
+## スタイルシートの構造
 
-Just like CSS, most Sass stylesheets are mainly made up of style rules that contain property declarations. But Sass stylesheets have many more features that can exist alongside these.
+CSS と同様に、ほとんどの Sass スタイルシートはプロパティ宣言を含むスタイル規則で主に構成されています。しかし、Sass スタイルシートには、これらと並行して存在しうる多くの機能があります。
 
-### Statements
+### ステートメント
 
-A Sass stylesheet is made up of a series of statements, which are evaluated in order to build the resulting CSS. Some statements may have blocks, defined using { and }, which contain other statements. For example, a style rule is a statement with a block. That block contains other statements, such as property declarations.
+Sass スタイルシートは一連のステートメントで構成され、これらのステートメントは結果の CSS を構築するために評価されます。いくつかのステートメントには、他のステートメントを含む { と } を使用して定義されたブロックが含まれることがあります。たとえば、スタイル ルールはブロックを持つステートメントです。このブロックには、プロパティの宣言など、他のステートメントが含まれています。
 
-In SCSS, statements are separated by semicolons (which are optional if the statement uses a block). In the indented syntax, they’re just separated by newlines.
+SCSS では、ステートメントはセミコロンで区切られます（ステートメントがブロックを使用する場合、セミコロンは省略可能です）。インデントされた構文では、それらは単に改行で区切られています。
 
-#### Universal Statements
+#### ユニバーサルステートメント
 
-These types of statements can be used anywhere in a Sass stylesheet:
+これらのタイプのステートメントは、Sass スタイルシートのどこでも使用することができます。
 
-- Variable declarations, like $var: value.
-- Flow control at-rules, like @if and @each.
-- The @error, @warn, and @debug rules.
+- $var: valueのような変数宣言。
+- @ifや@eachのようなフロー制御のアットルール
+- @error、@warn、@debugの規則。
 
-#### CSS Statements
+#### CSSステートメント
 
-These statements produce CSS. They can be used anywhere except within a @function:
+CSSを記述します。関数の中以外ならどこでも使えます。
 
-- Style rules, like h1 { /* ... */ }.
-- CSS at-rules, like @media and @font-face.
-- Mixin uses using @include.
-- The @at-root rule.
+- h1 { /* ... */ }のようなスタイルルール。
+- @mediaや@font-faceなどのCSSのat-rule。
+- Mixinの@includeによる使用
+- @at-rootルール。
 
-#### Top-Level Statements
+#### トップレベルステートメント
 
-These statements can only be used at the top level of a stylesheet, or nested within a CSS statement at the top level:
+これらの文は、スタイルシートのトップレベル、またはトップレベルのCSS文の中にネストしてのみ使用することができます。
 
-- Module loads, using @use.
-- Imports, using @import.
-- Mixin definitions using @mixin.
-- Function definitions using @function.
+- モジュールのロード（@useを使用
+- importは、@importを使用しています。
+- @mixinを使ったMixin定義。
+- @functionを使った関数定義
 
-#### Other Statements
+#### その他のステートメント
 
-Property declarations like width: 100px may only be used within style rules and some CSS at-rules.
-The @extend rule may only be used within style rules.
+width: 100px などのプロパティ宣言は、スタイルルールおよび一部の CSS アットルール内でのみ使用可能です。
+@extend 規則は、スタイル規則の中でのみ使用可能です。
 
-### Expressions
+### 式
 
-An expression is anything that goes on the right-hand side of a property or variable declaration. Each expression produces a value. Any valid CSS property value is also a Sass expression, but Sass expressions are much more powerful than plain CSS values. They’re passed as arguments to mixins and functions, used for control flow with the @if rule, and manipulated using arithmetic. We call Sass’s expression syntax SassScript.
+式とは、プロパティや変数宣言の右辺に書かれるものである。各式は値を生成します。有効な CSS プロパティーの値はすべて Sass 式でもありますが、Sass 式はプレーンな CSS 値よりもはるかに強力です。Sass 式は mixin や関数への引数として渡され、@if 規則で制御フローに使用され、算術演算で操作されます。Sassの式の構文をSassScriptと呼びます。
 
-#### Literals
+#### 文字
 
-The simplest expressions just represent static values:
+最も単純な式は、静的な値を表すだけです。
 
-- Numbers, which may or may not have units, like 12 or 100px.
-- Strings, which may or may not have quotes, like "Helvetica Neue" or bold.
-- Colors, which can be referred to by their hex representation or by name, like #c6538c or blue.
-- The boolean literals true or false.
-- The singleton null.
-- Lists of values, which may be separated by spaces or commas and which may be enclosed in square brackets or no brackets at all, like 1.5em 1em 0 2em, Helvetica, Arial, sans-serif, or [col1-start].
-- Maps that associate values with keys, like ("background": red, "foreground": pink).
+- 数字。12や100pxのような単位を持つこともあれば、持たないこともある。
+- 文字列。"Helvetica Neue "やboldのように引用符があってもなくてもよい。
+- 色。16進数表現か、#c6538cやblueのような名前で参照することができる。
+- ブーリアンリテラルのtrueとfalse。
+- シングルトン null。
+- 1.5em 1em 0 2em, Helvetica, Arial, sans-serif, [col1-start] のように、スペースやカンマで区切ったり、角括弧で囲んだり、括弧をつけない値のリスト。
+- ("background": red, "foreground": pink)のように、キーと値を関連付けるマップ。
 
-#### Operations
+#### 演算子
 
-Sass defines syntax for a number of operations:
+Sass では、多くの操作のためのシンタックスを定義しています。
 
-- == and != are used to check if two values are the same.
-- +, -, *, /, and % have their usual mathematical meaning for numbers, with special behaviors for units that matches the use of units in scientific math.
-- <, <=, >, and >= check whether two numbers are greater or less than one another.
-- and, or, and not have the usual boolean behavior. Sass considers every value “true” except for false and null.
-- +, -, and / can be used to concatenate strings.
-- ( and ) can be used to explicitly control the precedence order of operations.
+- ==と!=は、2つの値が同じかどうかを確認するために使用されます。
+- +, -, *, /, %は、数値に対する通常の数学的意味を持ち、科学的数学における単位の使用と一致するような単位に対する特別な動作があります。
+- <, <=, >, >=は、2つの数値が互いに大きいか小さいかをチェックする。
+- and, or, and not は通常のブーリアン演算を行います。Sassはfalseとnullを除くすべての値を「真」と見なします。
+- +,-と / は、文字列の連結に使用できます。
+- ( と ) は、操作の優先順位を明示的に制御するために使用されます。
 
-#### Other Expressions
+#### その他の表現
 
-- Variables, like $var.
-- Function calls, like nth($list, 1) or var(--main-bg-color), which may call Sass core library functions or user-defined functions, or which may be compiled directly to CSS.
-- Special functions, like calc(1px + 100%) or url(http://myapp.com/assets/logo.png), that have their own unique parsing rules.
-- The parent selector, &.
-- The value !important, which is parsed as an unquoted string.
+- 変数 ($var など)。
+- nth($list, 1) や var(-main-bg-color) のような関数呼び出し。Sass コアライブラリ関数やユーザー定義関数を呼び出したり、CSS に直接コンパイルされることがあります。
+- calc(1px + 100%) や url(http://myapp.com/assets/logo.png) などの特殊な関数は、独自の解析規則を持っています。
+- 親セレクタ、&。
+- importantは、引用符で囲まれていない文字列として解析されます。
 
-## Comments
+## コメント
 
-The way Sass comments work differs substantially between SCSS and the indented syntax. Both syntaxes support two types of comments: comments defined using /* */ that are (usually) compiled to CSS, and comments defined using // that are not.
+Sassコメントの動作方法は、SCSSとインデント構文とで大きく異なります。どちらの構文も 2 種類のコメントをサポートしています。（通常）CSS にコンパイルされる /* */ を使用して定義されたコメントと、そうでない // を使用して定義されたコメントです。
 
-### In SCSS
+### SCSSでは
 
-Comments in SCSS work similarly to comments in other languages like JavaScript. Single-line comments start with //, and go until the end of the line. Nothing in a single-line comment is emitted as CSS; as far as Sass is concerned, they may as well not exist. They’re also called silent comments, because they don’t produce any CSS.
+SCSSのコメントは、JavaScriptなどの他の言語のコメントと似たような働きをします。単一行コメントは // で始まり、行末まで続きます。単一行コメントには何も含まれませんが、CSS として出力されます。Sass に関する限り、これらは存在しないも同然です。これらは CSS を生成しないため、サイレント・コメントとも呼ばれます。
 
-Multi-line comments start with /* and end at the next */. If a multi-line comment is written somewhere that a statement is allowed, it’s compiled to a CSS comment. They’re also called loud comment, by contrast with silent comments. A multi-line comment that’s compiled to CSS may contain interpolation, which will be evaluated before the comment is compiled.
+複数行のコメントは /* で始まり、次の */ で終わります。もし、複数行コメントが許される場所に書かれた場合、それはCSSコメントにコンパイルされます。無声コメントと対比して、ラウドコメントとも呼ばれます。CSS にコンパイルされる複数行のコメントには補間が含まれることがありますが、これはコメントがコンパイルされる前に評価されます。
 
-By default, multi-line comments be stripped from the compiled CSS in compressed mode. If a comment begins with /*!, though, it will always be included in the CSS output.
+デフォルトでは、圧縮モードでコンパイルされた CSS から複数行のコメントが取り除かれます。ただし、コメントが /*!で始まる場合は、常に CSS の出力に含まれます。
 
 ::: code-group
 
 ```scss [SCSS]
-// This comment won't be included in the CSS.
+// このコメントはCSSには含まれません。
 
-/* But this comment will, except in compressed mode. */
+/* しかし、このコメントは、圧縮モード以外では、そうなります。 */
 
-/* It can also contain interpolation:
+/* また、補間を含むことも可能です。
  * 1 + 1 = #{1 + 1} */
 
-/*! This comment will be included even in compressed mode. */
+/*! このコメントは、圧縮モードでも含まれます。 */
 
-p /* Multi-line comments can be written anywhere
-   * whitespace is allowed. */ .sans {
-  font: Helvetica, // So can single-line comments.
+p /* 複数行のコメントは、空白が許される場所であれば
+   * どこにでも書くことができます。 */ .sans {
+  font: Helvetica, // 一行コメントも可能です。
         sans-serif;
 }
 ```
 
 ```css [CSS]
-/* But this comment will, except in compressed mode. */
-/* It can also contain interpolation:
+/* しかし、このコメントは、圧縮モード以外では、そうなります。 */
+/* また、補間を含むことも可能です。
  * 1 + 1 = 2 */
-/*! This comment will be included even in compressed mode. */
+/*! このコメントは、圧縮モードでも含まれます。 */
 p .sans {
   font: Helvetica, sans-serif;
 }
@@ -215,13 +217,13 @@ p .sans {
 
 :::
 
-### In Sass
+### Sassで
 
-Comments in the indented syntax work a little differently: they’re indentation-based, just like the rest of the syntax. Like SCSS, silent comments written with // are never emitted as CSS, but unlike SCSS everything indented beneath the opening // is also commented out.
+インデント構文でのコメントは、他の構文と同じようにインデントに基づいて動作します。SCSS と同様、// で書かれた無言のコメントは CSS として出力されませんが、SCSS とは異なり、冒頭の // の下にインデントされたものはすべてコメントアウトされます。
 
-Indented syntax comments that start with /* work with indentation the same way, except that they are compiled to CSS. Because the extend of the comment is based on indentation, the closing */ is optional. Also like SCSS, /* comments can contain interpolation and can start with /*! to avoid being stripped in compressed mode.
+で始まるインデントされた構文のコメントは、CSS にコンパイルされることを除いて、インデントと同じように動作します。コメントの拡張はインデントに基づいて行われるため、最後の */ は省略可能です。また、SCSS と同様に、/* コメントは補間を含むことができ、圧縮モードで除去されるのを避けるために /*!
 
-Comments can also be used within expressions in the indented syntax. In this case, they have exactly the same syntax as they do in SCSS.
+コメントは、インデントされた構文の式の中で使用することもできます。この場合、SCSS と全く同じ構文になります。
 
 ::: code-group
 
@@ -252,22 +254,22 @@ p .sans {
 
 :::
 
-### Documentation Comments
+### ドキュメンテーション コメント
 
-When writing style libraries using Sass, you can use comments to document the mixins, functions, variables, and placeholder selectors that your library provides, as well as the library itself. These are comments are read by the SassDoc tool, which uses them to generate beautiful documentation. Check out the Susy grid engine’s documentation to see it in action!
+Sass を使用してスタイル・ライブラリを記述する場合、ライブラリ自体だけでなく、ライブラリが提供するミキシン、関数、変数、プレースホルダー・セレクターを文書化するためにコメントを使用することができます。これらのコメントは、SassDoc ツールによって読み込まれ、美しいドキュメントを生成するために使用されます。Susy グリッドエンジンのドキュメントをチェックして、実際に使用しているところをご覧ください。
 
-Documentation comments are silent comments, written with three slashes (///) directly above the thing you’re documenting. SassDoc parses text in the comments as Markdown, and supports many useful annotations to describe it in detail.
+ドキュメント・コメントは、無言のコメントであり、ドキュメント対象の直上に 3 つのスラッシュ (///) で記述されます。SassDoc はコメント内のテキストを Markdown として解析し、詳細を記述するための多くの便利な注釈をサポートします。
 
 SCSS
 
 ```scss
-/// Computes an exponent.
+/// 指数を計算する。
 ///
 /// @param {number} $base
-///   The number to multiply by itself.
+///   掛け合わせる数値。
 /// @param {integer (unitless)} $exponent
-///   The number of `$base`s to multiply together.
-/// @return {number} `$base` to the power of `$exponent`.
+///   掛け合わせる`$base`の数。
+/// @return {number} `base` に `$exponent` のべき乗を乗じたものです。
 @function pow($base, $exponent) {
   $result: 1;
   @for $_ from 1 through $exponent {
@@ -277,15 +279,15 @@ SCSS
 }
 ```
 
-## Special Functions
+## 特殊機能
 
-CSS defines many functions, and most of them work just fine with Sass’s normal function syntax. They’re parsed as function calls, resolved to plain CSS functions, and compiled as-is to CSS. There are a few exceptions, though, which have special syntax that can’t just be parsed as a SassScript expression. All special function calls return unquoted strings.
+CSS は多くの関数を定義していますが、そのほとんどは Sass の通常の関数構文で問題なく動作します。これらは関数呼び出しとして解析され、プレーンな CSS 関数に解決され、そのまま CSS にコンパイルされます。しかし、いくつかの例外があります。それは、SassScript 式として解析することができない特別な構文を持っているものです。特殊な関数呼び出しはすべて引用符で囲まれていない文字列を返します。
 
 ## url()
 
-The url() function is commonly used in CSS, but its syntax is different than other functions: it can take either a quoted or unquoted URL. Because an unquoted URL isn’t a valid SassScript expression, Sass needs special logic to parse it.
+url() 関数は CSS でよく使用されますが、その構文は他の関数とは異なります：url() は引用された URL か引用されていない URL のどちらかを取ることができます。引用符で囲まれていないURLは有効なSassScript式ではないため、Sassはそれをパースするための特別なロジックを必要とします。
 
-If the url()‘s argument is a valid unquoted URL, Sass parses it as-is, although interpolation may also be used to inject SassScript values. If it’s not a valid unquoted URL—for example, if it contains variables or function calls—it’s parsed as a normal plain CSS function call.
+url() の引数が有効な引用符で囲まれていない URL である場合、Sass はそれをそのままパースしますが、SassScript の値を埋め込むために補間が使用されることもあります。有効な引用符で囲まれていない URL でない場合、例えば変数や関数呼び出しが含まれている場合、通常の CSS 関数呼び出しとしてパースされます。
 
 ::: code-group
 
@@ -293,7 +295,7 @@ If the url()‘s argument is a valid unquoted URL, Sass parses it as-is, althoug
 $roboto-font-path: "../fonts/roboto";
 
 @font-face {
-    // This is parsed as a normal function call that takes a quoted string.
+    // これは、引用符で囲まれた文字列を受け取る通常の関数呼び出しとして解析されます。
     src: url("#{$roboto-font-path}/Roboto-Thin.woff2") format("woff2");
 
     font-family: "Roboto";
@@ -301,8 +303,7 @@ $roboto-font-path: "../fonts/roboto";
 }
 
 @font-face {
-    // This is parsed as a normal function call that takes an arithmetic
-    // expression.
+    // これは、算術式を受け取る通常の関数呼び出しとして解析される。
     src: url($roboto-font-path + "/Roboto-Light.woff2") format("woff2");
 
     font-family: "Roboto";
@@ -310,7 +311,7 @@ $roboto-font-path: "../fonts/roboto";
 }
 
 @font-face {
-    // This is parsed as an interpolated special function.
+    // これは、補間された特殊関数として解析される。
     src: url(#{$roboto-font-path}/Roboto-Regular.woff2) format("woff2");
 
     font-family: "Roboto";
@@ -340,25 +341,25 @@ $roboto-font-path: "../fonts/roboto";
 
 ### element(), progid:…(), and expression()
 
-Compatibility (calc()):
+互換性 (calc()):
 
 - Dart Sass: since <1.40.0
 - LibSass: ✗
 - Ruby Sass: ✗
 - ▶
 
-Compatibility (clamp()):
+互換性 (clamp()):
 
 - Dart Sass: since >=1.31.0 <1.40.0
 - LibSass: ✗
 - Ruby Sass: ✗
 - ▶
 
-The element() function is defined in the CSS spec, and because its IDs could be parsed as colors, they need special parsing.
+element() 関数は CSS 仕様で定義されており、その ID は色として解析される可能性があるため、特別な解析が必要である。
 
-expression() and functions beginning with progid: are legacy Internet Explorer features that use non-standard syntax. Although they’re no longer supported by recent browsers, Sass continues to parse them for backwards compatibility.
+expression() と progid: で始まる関数は Internet Explorer のレガシー機能で、非標準の構文が使用されています。これらは最近のブラウザではサポートされていませんが、Sassは後方互換性を保つために、これらの関数を引き続き解析します。
 
-Sass allows any text in these function calls, including nested parentheses. Nothing is interpreted as a SassScript expression, with the exception that interpolation can be used to inject dynamic values.
+Sass は、ネストされた括弧を含め、これらの関数呼び出しで任意のテキストを許可します。SassScript の式として解釈されるものはありません。ただし、動的な値を挿入するために補間を使用することは可能です。
 
 ::: code-group
 
