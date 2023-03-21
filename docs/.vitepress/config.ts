@@ -1,3 +1,5 @@
+import { defineConfig } from 'vitepress'
+
 export default {
     lang: 'ja',
     title: 'みが市',
@@ -9,6 +11,11 @@ export default {
     head: [['meta', { name: 'theme-color', content: '#3c8772' }]],
 
     themeConfig: {
+        algolia: {
+            appId: '6RMNO3KIZD',
+            apiKey: '6d916c9a6884bbb39ab2d4440ecf0b21',
+            indexName: 'dev_dolphilia_com'
+        },
         //logo: '/my-logo.svg'
         siteTitle: 'みが市立図書館',
         socialLinks: [
