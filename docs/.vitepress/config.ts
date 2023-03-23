@@ -12,9 +12,9 @@ export default {
 
     themeConfig: {
         algolia: {
-            appId: '6RMNO3KIZD',
-            apiKey: '6d916c9a6884bbb39ab2d4440ecf0b21',
-            indexName: 'dev_dolphilia_com'
+            appId: 'BT9F9T40EX',
+            apiKey: 'aaf30df920537ae115546a12a1554f6b',
+            indexName: 'dolphilia'
         },
         //logo: '/my-logo.svg'
         siteTitle: 'みが市立図書館',
