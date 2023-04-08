@@ -1126,6 +1126,7 @@ export default {
                     text: 'お絵かき',
                     collapsed: false,
                     items: [
+                        { text: 'AIイラストに対抗する', link: '/essay/ai-illust-ni-taikou-suru' },
                         { text: 'AI画像生成との付き合い方', link: '/essay/ai-gazou-seisei' },
                         { text: 'ライブ配信のマナー', link: '/essay/raibu-haishin-no-mana' },
                         { text: 'お絵描き時短テクニック', link: '/essay/sho-tokatto-ya-sukuriputo' },
