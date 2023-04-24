@@ -31,12 +31,14 @@ valgrind --tool=massif` による測定は比較的正確ですが（GC torture 
 
 コールバック指向のコードにありがちな、無名関数インスタンスを大量に生成するプログラムを例にしてみましょう：
 
-    function test() {
-        for (var i = 0; i < 10000; i++) {
-            var ignored = function () {};
-        }
+```js
+function test() {
+    for (var i = 0; i < 10000; i++) {
+        var ignored = function () {};
     }
-    test();
+}
+test();
+```
 
 このような無名関数は、それぞれデフォルトの `.prototype` オブジェクト（`.constructor`参照を使用して関数を指す）との参照ループにあるため、関数は参照カウントでは収集されず、マークアンドスイープで解放されます。マークアンドスイープは定期的に実行されますが、割り当てに失敗した場合は緊急マークアンドスイープが発動されます。
 
@@ -115,29 +117,33 @@ Duktapeをx64でデフォルトのままコンパイルすると（ローメモ�
 
 具体例として、関数内の空ループ：
 
-    $ cat test.js
-    function test() {
-        for (var i = 0; i < 1e7; i++) {
-        }
+```sh
+$ cat test.js
+function test() {
+    for (var i = 0; i < 1e7; i++) {
     }
-    test();
+}
+test();
 
-    $ time ./duk.O2.140 test.js
-    real   0m0.256s
-    user   0m0.256s
-    sys    0m0.000s
+$ time ./duk.O2.140 test.js
+real   0m0.256s
+user   0m0.256s
+sys    0m0.000s
+```
 
 関数外での空ループ：
 
-    $ cat test.js
-    // Note that 'i' is actually a property of the global object.
-    for (var i = 0; i < 1e7; i++) {
-    }
+```sh
+$ cat test.js
+// Note that 'i' is actually a property of the global object.
+for (var i = 0; i < 1e7; i++) {
+}
 
-    $ time ./duk.O2.140 _test.js
-    real   0m4.325s
-    user   0m4.319s
-    sys    0m0.004s
+$ time ./duk.O2.140 _test.js
+real   0m4.325s
+user   0m4.319s
+sys    0m0.004s
+```
 
 グローバルコード内のループは、関数内よりも20倍遅く実行されます。実用的なコードの性能差は、変数アクセスが何回行われるかに依存します。
 

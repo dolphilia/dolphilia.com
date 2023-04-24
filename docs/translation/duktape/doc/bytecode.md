@@ -1,110 +1,105 @@
 # Duktapeバイトコード形式
 
-## Overview
+## 概要
 
-Duktape has API functions to dump a compiled function into bytecode and load (reinstantiate) a function from a bytecode dump. Bytecode dump/load allows code to be compiled offline, compiled code to be cached and reused, compiled code to be moved from one Duktape heap to another, etc. However, Duktape bytecode format is version specific so it is *not* a version neutral code distribution format like Java bytecode. (The term \"bytecode\" is used here and in other Duktape documentation even though it\'s a bit inaccurate: the serialization format includes many other fields besides bytecode instructions.)
+Duktapeには、コンパイルした関数をバイトコードにダンプしたり、バイトコードダンプから関数をロード（再定義）するためのAPI関数があります。バイトコードダンプ/ロードにより、コードをオフラインでコンパイルしたり、コンパイルしたコードをキャッシュして再利用したり、コンパイルしたコードをあるDuktapeヒープから別のヒープに移動させたりすることができます。ただし、Duktapeバイトコード・フォーマットはバージョンに依存するため、Javaバイトコードのようなバージョンに依存しないコード配布フォーマットではありません。(「バイトコード」という用語は、ここや他のDuktapeのドキュメントで使われていますが、少し不正確です：シリアル化フォーマットには、バイトコード命令以外にも多くのフィールドがあります)
 
-Duktape bytecode is **version specific** and (potentially) **config option specific**, and may change arbitrarily even in minor releases (but is guaranteed not to change in a patch release, as long as config options are kept the same). In other words, the bytecode format is not part of the ordinary versioning guarantees. If you compile code into bytecode offline, you must ensure such code is recompiled whenever Duktape source is updated. In this sense Duktape bytecode differs fundamentally from e.g. Java bytecode which is used as a version neutral distribution format.
+Duktapeのバイトコードは**バージョン固有**であり、（潜在的に）**設定オプション固有**であり、マイナーリリースでも任意に変更される可能性があります（ただし、パッチリリースでは、設定オプションが同じである限り、変更しないことが保証されています）。言い換えれば、バイトコード形式は通常のバージョン保証の一部ではありません。オフラインでコードをバイトコードにコンパイルする場合、Duktapeのソースが更新されるたびに、そのようなコードが再コンパイルされるようにしなければなりません。この意味で、Duktapeのバイトコードは、バージョン中立の配布形式として使用されるJavaバイトコードなどとは根本的に異なります。
 
-Duktape bytecode is **unvalidated** which means that loading untrusted or broken bytecode may cause a crash or other memory unsafe behavior, leading to potentially exploitable vulnerabilities. Calling code is responsible for ensuring that bytecode for a different Duktape version is not loaded, and that the bytecode input is not truncated or corrupted. (Validating bytecode is quite difficult, because one would also need to validate the actual bytecode which might otherwise refer to non-existent registers or constants, jump out of bounds, etc.)
+Duktapeのバイトコードは**unvalidated**であるため、信頼されていない、あるいは壊れたバイトコードをロードすると、クラッシュや他のメモリの安全でない動作を引き起こし、潜在的に悪用可能な脆弱性につながることがあります。呼び出し側のコードは、異なるDuktapeバージョンのバイトコードがロードされないこと、およびバイトコード入力が切り詰められたり破損したりしないことを保証する責任があります。(バイトコードの検証は非常に難しく、存在しないレジスタや定数を参照したり、境界を飛び越えたりする可能性のある実際のバイトコードも検証する必要があるためです)
 
-The bytecode format is **platform neutral**, so that it\'s possible to compile the bytecode on one platform and load it on another, even if the platforms have different byte order. This is useful to support offline compilation in cross compilation.
+バイトコード形式は**プラットフォームニュートラル**であり、あるプラットフォームでバイトコードをコンパイルし、別のプラットフォームでそれをロードすることが可能である。これはクロスコンパイルにおけるオフラインコンパイルをサポートするために有用である。
 
-There are a few limitations on what kind of functions can be dumped into bytecode, and what information is lost in the process. See separate section on limitations below. The following API test case provides concrete examples on usage and current limitations:
+どのような種類の関数をバイトコードにダンプできるか、また、その過程でどのような情報が失われるかについては、いくつかの制限があります。以下の制限に関する別のセクションを参照してください。以下のAPIテストケースは、使用方法と現在の制限について具体的な例を示しています：
 
 - `api-testcases/test-dump-load-basic.c`
 
-## Working with bytecode
+## バイトコードで作業する
 
-The `duk_dump_function()` API call is used to convert a function into a buffer containing bytecode:
+関数をバイトコードを含むバッファに変換するには、`duk_dump_function()` APIコールを使用します：
 
     duk_eval_string(ctx, "(function myfunc() { print('hello world'); })");
     duk_dump_function(ctx);
     /* -> stack top contains bytecode for 'myfunc' */
 
-The `duk_load_function()` API call does the reverse, converting a buffer containing bytecode into a function object:
+`duk_load_function()`はその逆で、バイトコードを含むバッファを関数オブジェクトに変換するAPIコールである：
 
     /* ... push bytecode to value stack top */
     duk_load_function(ctx);
     /* -> stack top contains function */
 
-The Duktape command line tool \"duk\" can also be used to compile a file into bytecode:
+また、ファイルをバイトコードにコンパイルするために、Duktapeコマンドラインツール︓「duk」を使用することができます：
 
     ./duk -c /tmp/program.bin program.js
 
-The input source is compiled as an ECMAScript program and the bytecode will be for the \"program function\". The command line tool doesn\'t support compiling individual functions, and is mostly useful for playing with bytecode.
+入力されたソースはECMAScriptプログラムとしてコンパイルされ、バイトコードは "プログラム関数 "に対応したものになります。コマンドラインツールは、個々の関数のコンパイルには対応しておらず、バイトコードで遊ぶのに便利です。
 
-The command line tool can also execute bytecode functions; it will just load a function and call it without arguments, as if a program function was being executed:
+コマンドラインツールはバイトコード関数を実行することもできます。プログラムの関数が実行されているかのように、関数をロードして引数なしで呼び出すだけです：
 
     ./duk -b /tmp/program.bin
 
-## When to use bytecode dump/load
+## バイトコードダンプ/ロードを使用する場合
 
-Generally speaking, there are two main motivations for using a bytecode dump/load mechanism:
+一般に、バイトコードダンプ/ロード機構を使用する動機は主に2つあります：
 
-- Performance
-- Obfuscation
+- パフォーマンス
+- 難読化
 
-Duktape\'s bytecode format improves performance compared to compilation, but is not ideal for obfuscation as discussed in more detail below.
+Duktapeのバイトコード形式は、コンパイルに比べてパフォーマンスが向上しますが、以下で詳しく説明するように、難読化には適していません。
 
-### Performance
+### パフォーマンス
 
-Whenever compilation performance is *not* an issue, it is nearly always preferable to compile functions from source rather than using bytecode dump/load. Compiling from source is memory safe, version compatible, and has no semantic limitations like bytecode.
+コンパイルの性能が問題でない場合は、バイトコードダンプ/ロードを使用するよりも、ソースから関数をコンパイルすることがほとんど常に望ましいです。ソースからのコンパイルはメモリ安全で、バージョン互換性があり、バイトコードのような意味上の制限もありません。
 
-There are some applications where compilation is a performance issue. For example, a certain function may be compiled and executed over and over again in short lived Duktape global contexts or even separate Duktape heaps (which prevents reusing a single function object). Caching the compiled function bytecode and instantiating the function by loading the bytecode is much faster than recompiling it for every execution.
+コンパイルが性能上の問題となるアプリケーションもあります。例えば、ある関数がコンパイルされ、短命のDuktapeグローバル・コンテキスト、あるいは別々のDuktapeヒープ（1つの関数オブジェクトを再利用できない）で何度も何度も実行されることがあります。コンパイルされた関数のバイトコードをキャッシュし、バイトコードをロードして関数をインスタンス化することは、実行のたびに再コンパイルするよりもはるかに高速です。
 
 ### Obfuscation
 
-Obfuscation is another common reason to use bytecode: it\'s more difficult to reverse engineer source code from bytecode than e.g. minified code. However, when doing so, you should note the following:
+難読化は、バイトコードを使用するもう一つの一般的な理由です。バイトコードからソースコードをリバースエンジニアリングするのは、例えば最小化されたコードよりも困難です。しかし、難読化する際には、以下の点に注意する必要があります：
 
-- Some minifiers support obfuscation which may be good enough and avoids the bytecode limitations and downsides.
-- For some targets source code encryption may be a better option than relying on bytecode for obfuscation.
-- Although Duktape bytecode doesn\'t currently store source code, it does store all variable names (`_Varmap`) and formal argument names (`_Formals`) which are needed in some functions. It may also be possible source code is included in bytecode at some point to support debugging. In other words, **obfuscation is not a design goal for the bytecode format**.
+- ミニファイアの中には難読化をサポートするものがあり、バイトコードの制限や欠点を回避することができますので、十分な効果が期待できます。
+- ターゲットによっては、難読化のためにバイトコードに依存するよりも、ソースコードの暗号化の方が良い選択肢になるかもしれません。
+- Duktapeのバイトコードは現在ソースコードを保存しませんが、一部の関数で必要となるすべての変数名（`_Varmap`）と正式な引数名（`_Formals`）は保存されます。また、デバッグをサポートするために、ある時点でバイトコードにソースコードが含まれる可能性もある。言い換えれば、**難読化はバイトコードフォーマットの設計目標ではありません**。
 
 That said, concrete issues to consider when using bytecode for obfuscation:
 
-- Variable names in the `_Varmap` property: this cannot be easily avoided in general but a minifier may be able to rename variables.
-- Function name in the `name` property: this can be deleted or changed before dumping a function, but note that some functions (such as self-recursive functions) may depend on the property being present and correct.
-- Function filename in the `fileName` property: this can also be deleted or changed before dumping a function. You can avoid introducing a filename at all by using `duk_compile()` (rather than e.g. `duk_eval_string()`) to compile the function.
-- Line number information in the `_Pc2line` property: this can be deleted or changed, or you can configure Duktape not to store this information in the first place (using option `DUK_USE_PC2LINE`). Without line information tracebacks will of course be less useful.
+- `_Varmap`プロパティの変数名：これは一般的に簡単に回避することはできませんが、minifierは変数の名前を変更できるかもしれません。
+- `name`プロパティの関数名：これは関数をダンプする前に削除または変更することができますが、一部の関数（自己再帰関数など）は、このプロパティが存在し、正しいかどうかに依存する場合があることに注意してください。
+- `fileName`プロパティの関数ファイル名：これも関数をダンプする前に削除または変更することができます。関数のコンパイルに `duk_compile()` (例えば `duk_eval_string()` ではなく) を使用することで、ファイル名を導入することを全く避けることができます。
+- 行番号情報は `_Pc2line` プロパティに格納されます。この情報は削除または変更することができますし、そもそもこの情報を格納しないように Duktape を設定することもできます（`DUK_USE_PC2LINE` オプションを使用）。ライン情報がない場合、トレースバックはもちろん有用ではありません。
 
-## When not to use bytecode dump/load
+## バイトコードダンプ/ロードを使用しない場合
 
-Duktape bytecode is **not** a good match for:
+Duktape bytecodeは **not** にマッチしています：
 
-- Distributing code
-- Minimizing code size
+- コードの配布
+- コードサイズの最小化
 
-### Distributing code
+### コードの配布
 
-It\'s awkward to use a version specific bytecode format for code distribution. This is especially true for ECMAScript, because the language itself is otherwise well suited for writing backwards compatible code, detecting features at run-time, etc.
+コード配布にバージョン固有のバイトコード形式を使用するのは厄介だ。特にECMAScriptの場合、言語自体が後方互換性のあるコードを書いたり、実行時に機能を検出したりするのに適しているため、この傾向が顕著です。
 
-It\'s also awkward for code distribution that the bytecode load operation relies on calling code to ensure the loaded bytecode is trustworthy and uncorrupted. In practice this means e.g. cryptographic signatures are needed to avoid tampering.
+また、バイトコードロード操作は、ロードされたバイトコードが信頼でき、破損していないことを保証するために呼び出しコードに依存するため、コードの配布には厄介です。実際には、改ざんを防ぐために暗号化署名などが必要です。
 
-### Minimizing code size
+### コードサイズの最小化
 
-The bytecode format is designed to be fast to dump and load, while still being platform neutral. It is *not* designed to be compact (and indeed is not).
+バイトコード形式は、プラットフォームに依存せず、ダンプとロードを高速に行うように設計されています。コンパクトになるようには設計されていません（実際、そうです）。
 
-For example, for a simple Mandelbrot function (`mandel()` in
-`dist-files/mandel.js`):
+例えば、単純なマンデルブロ関数（`dist-files/mandel.js`の`mandel()`）の場合：
 
-  -------------------------------------------------------------------
-  Format                      Size (bytes)     Gzipped size (bytes)
-  --------------------------- ---------------- ----------------------
-  Original source             884              371
+Format                    | Size (bytes) | Gzipped size (bytes)
+--------------------------|--------------|---------------------
+Original source           | 884          | 371
+Bytecode dump             | 809          | 504
+UglifyJS2-minified source | 364          | 267
 
-  Bytecode dump               809              504
+コードサイズを最小化するためには、圧縮または非圧縮のバイトコードに依存するよりも、ミニファイアと通常の圧縮を使用する方がはるかに良いアイデアです。
 
-UglifyJS2-minified source   364              267
-  -------------------------------------------------------------------
+## バイトコードの制限
 
-For minimizing code size, using a minifier and ordinary compression is a much better idea than relying on compressed or uncompressed bytecode.
+### 関数の辞書的環境が失われる
 
-## Bytecode limitations
-
-### Function lexical environment is lost
-
-A function loaded from bytecode always works as if it was defined in the global environment so that any variable lookups not bound in the function itself will be resolved through the global object. If you serialize `bar` created as:
+バイトコードからロードされた関数は、常にグローバル環境で定義されたかのように動作し、関数自体にバインドされていない変数のルックアップは、グローバルオブジェクトを介して解決されます。として作成された `bar` をシリアライズすると、以下のようになります：
 
     function foo() {
         var myValue = 123;
@@ -118,7 +113,7 @@ A function loaded from bytecode always works as if it was defined in the global 
         return bar;
     }
 
-and then load it back, it will behave as if it was originally created as:
+として作成し、再度読み込むと、元々作成されていたような挙動をします：
 
     function bar() {
         // myValue will be read from global object
@@ -126,7 +121,7 @@ and then load it back, it will behave as if it was originally created as:
         print(myValue);
     }
 
-If the original function was established using a function declaration, the declaration itself is not restored when a function is loaded. This may be confusing. For example, if you serialize `foo` declared as:
+元の関数が関数宣言を使って確立されていた場合、関数がロードされても宣言自体は復元されません。このため、混乱することがあります。例えば、`foo`と宣言されたものをシリアライズした場合：
 
     function foo() {
         // Prints 'function' before dump/load; 'foo' is looked up from
@@ -135,7 +130,7 @@ If the original function was established using a function declaration, the decla
         print(typeof foo);
     }
 
-and then load it back, it will behave as:
+という挙動になり、それをロードし直すと、そのような挙動になります：
 
     var loadedFunc = (function() {
         // Prints 'undefined' after dump/load; 'foo' is looked up from
@@ -145,9 +140,9 @@ and then load it back, it will behave as:
         print(typeof foo);
     });
 
-### No function name binding for function declarations
+### 関数宣言の関数名バインディングがない
 
-Function name binding for function expressions is supported, e.g. the following function would work:
+関数式の関数名バインディングに対応しており、例えば以下の関数が動作します：
 
     // Can dump and load this function, the reference to 'count' will
     // be resolved using the automatic function name lexical binding
@@ -155,7 +150,7 @@ Function name binding for function expressions is supported, e.g. the following 
 
     var func = function count(n) { print(n); if (n > 0) { count(n - 1); } };
 
-However, for technical reasons functions that are established as global declarations work a bit differently:
+しかし、技術的な理由により、グローバル宣言として確立された関数は、少し違った働きをします：
 
     // Can dump and load this function, but the reference to 'count'
     // will lookup globalObject.count instead of automatically
@@ -164,143 +159,143 @@ However, for technical reasons functions that are established as global declarat
 
     function count(n) { print(n); if (n > 0) { count(n - 1); } };
 
-(The NAMEBINDING flag controls creation of a lexical environment which contains the function expression name binding. In Duktape 1.2 the flag is only set for function templates, not function instances; this was changed for Duktape 1.3 so that the NAMEBINDING flag could be detected when loading bytecode, and a lexical environment can then be created based on the flag.)
+(NAMEBINDINGフラグは、関数式の名前バインディングを含む字句環境の作成を制御します。Duktape 1.2では、このフラグは関数インスタンスではなく関数テンプレートに対してのみ設定されます。Duktape 1.3では、バイトコードのロード時にNAMEBINDINGフラグを検出し、そのフラグに基づいて字句環境を作成できるように変更されました)
 
-### Custom internal prototype is lost
+### カスタム内部プロトタイプが失われる
 
-A custom internal prototype is lost, and `Function.prototype` is used on bytecode load.
+カスタム内部プロトタイプは失われ、バイトコードロード時に `Function.prototype` が使用されます。
 
-### Custom external prototype is lost
+### カスタム外部プロトタイプが失われる
 
-A custom external prototype (`.prototype` property) is lost, and a default empty prototype is created on bytecode load.
+カスタム外部プロトタイプ（`.prototype`プロパティ）は失われ、バイトコードのロード時にデフォルトの空のプロトタイプが作成されます。
 
-### Finalizer on the function is lost
+### 機能上のファイナライザーが失われる
 
-A finalizer on the function being serialized is lost, no finalizer will exist after a bytecode load.
+シリアライズされる関数のファイナライザが失われ、バイトコードロード後にファイナライザは存在しない。
 
-### Only specific function object properties are kept
+### 特定の関数オブジェクトのプロパティのみが保持されます
 
-Only specific function object properties, i.e. those needed to correctly revive a function, are kept. These properties have type and value limitations:
+特定の関数オブジェクトのプロパティ、すなわち、関数を正しく復活させるために必要なプロパティのみが保持されます。これらのプロパティには、型と値の制限があります：
 
-- .length: uint32, non-number values replaced by 0
-- .name: string required, non-string values replaced by empty string
-- .fileName: string required, non-string values replaced by empty string
-- .\_Formals: internal property, value is an array of strings
-- .\_Varmap: internal property, value is an object mapping identifier names to register numbers
+- .length: uint32、数値以外の値は0に置き換わる
+- .name: 文字列必須、文字列以外の値は空文字列に置き換わる
+- .fileName: 文字列必須、文字列以外の値は空文字列に置換されます。
+- .\_Formals: 内部プロパティで、値は文字列の配列です。
+- .\_Varmap: 内部プロパティ、値は識別子名とレジスタ番号をマッピングしたオブジェクト。
 
-### Bound functions are not supported
+### バウンド機能には対応していません
 
-Currently a `TypeError` is thrown when trying to serialize a bound function object.
+現在、バインドされた関数オブジェクトをシリアライズしようとすると `TypeError` がスローされます。
 
-### CommonJS modules don\'t work well with bytecode dump/load
+### CommonJS modules don't work well with bytecode dump/load
 
-CommonJS modules cannot be trivially serialized because they\'re normally evaluated by embedding the module source code inside a temporary function wrapper (see `modules.rst` for details). User code does not have access to the temporary wrapped function. This means that:
+CommonJSモジュールは、通常、モジュールのソースコードを一時的な関数ラッパーに埋め込んで評価されるため、トリビアルにシリアライズすることはできません（詳細は `modules.rst` を参照）。ユーザーコードは、一時的にラップされた関数にアクセスすることができません。これは、次のことを意味します：
 
-- If you compile and serialize the module source, the module will have incorrect scope semantics.
-- You could add the function wrapper and compile the wrapped function instead.
-- Module support for bytecode dump/load will probably need future work.
+- モジュールのソースをコンパイルしてシリアライズすると、モジュールのスコープセマンティクスが不正確になります。
+- 関数のラッパーを追加して、代わりにラップされた関数をコンパイルすることができます。
+- バイトコードダンプ/ロードに対するモジュールのサポートは、おそらく将来の作業が必要でしょう。
 
-## Bytecode format
+## バイトコード形式
 
-A function is serialized into a platform neutral byte stream. Multibyte values are in network order (big endian), and don\'t have any alignment guarantees.
+関数は、プラットフォームに依存しないバイトストリームにシリアライズされます。多バイトの値はネットワーク順（ビッグエンディアン）であり、アライメント保証はない。
 
-Because the exact format is version specific, it\'s not documented in full detail here. Doing so would mean tedious documentation updates whenever bytecode was changed, and documentation would then easily fall out of date. The exact format is ultimately defined by the source code, see:
+正確なフォーマットはバージョンに依存するため、ここでは完全な詳細については文書化されていません。そうすると、バイトコードが変更されるたびに面倒な文書の更新が必要になり、文書が古くなりやすくなります。正確なフォーマットは、最終的にはソースコードで定義されます：
 
 - `src-input/duk_api_bytecode.c`
 - `tools/dump_bytecode.py`
 
-As a simplified summary of the bytecode format:
+バイトコード形式の簡略化したまとめとして：
 
-- A single 0xBF marker byte which never occurs in a valid extended UTF-8 string. (A version byte used to follow the marker; it was removed in Duktape 2.2 because it hadn\'t been bumped and because it really provided no version guarantees.)
-- The marker is followed by a serialized function. The function may contain inner functions which are serialized recursively (without duplicating the two-byte header).
+- 有効な拡張UTF-8文字列では決して出現しない0xBFのマーカーバイトです。(以前はバージョンバイトがマーカーに続いていたが、Duktape 2.2ではバンプされていないことと、バージョン保証がないことから削除された)
+- マーカの後には、シリアライズされた関数が続きます。この関数は、（2バイトのヘッダーを重複させることなく）再帰的にシリアライズされる内部関数を含むことができます。
 
-The function serialization format is tedious and best looked up directly from source code.
+関数のシリアライズ形式は面倒なので、ソースコードから直接調べるのが一番です。
 
-NOTE: The top level function is a function instance, but all inner functions are function templates. There are some difference between the two which must be taken into account in bytecode serialization code.
+注：トップレベルの関数は関数インスタンスですが、すべての内部関数は関数テンプレートです。この2つの間には、バイトコード直列化コードで考慮しなければならないいくつかの違いがあります。
 
-## Security and memory safety
+## セキュリティとメモリの安全性
 
-Duktape bytecode must only be loaded from a trusted source: loading broken or maliciously crafted bytecode may lead to memory unsafe behavior, even exploitable behavior.
+Duktapeのバイトコードは、信頼できるソースからのみロードする必要があります。壊れたバイトコードや悪意を持って細工されたバイトコードをロードすると、メモリが安全でない動作や、悪用可能な動作につながる可能性もあります。
 
-Because bytecode is version specific, it is generally unsafe to load bytecode provided by a network peer \-- unless you can somehow be certain the bytecode is specifically compiled for your Duktape version.
+バイトコードはバージョンに依存するため、ネットワーク・ピアから提供されたバイトコードをロードすることは、Duktapeのバージョン用に特別にコンパイルされたバイトコードであることが何らかの形で確認できない限り、一般的に安全ではありません。
 
-## Design notes
+## デザインノート
 
-### Eval and program code
+### Evalとプログラムコード
 
-ECMAScript specification recognizes three different types of code: program code, eval code, and function code, with slightly different scope and variable binding semantics. The serialization mechanism supports all three types.
+ECMAScript仕様では、プログラムコード、evalコード、ファンクションコードの3種類のコードを認識し、スコープと変数バインディングのセマンティクスが若干異なっています。シリアライゼーション機構は、この3つのタイプのすべてをサポートします。
 
-### Version specific vs. version neutral
+### バージョン固有とバージョン中立
 
-Duktape bytecode instruction format is already version specific and can change between even minor releases, so it\'s quite natural for the serialization format to also be version specific.
+Duktapeのバイトコード命令形式は、すでにバージョンに依存し、マイナーリリースでも変更される可能性があります。
 
-Providing a version neutral format would be possible when Duktape bytecode no longer changes in minor versions (not easy to see when this would be the case) or by doing some kind of recompilation for bytecode.
+バージョンニュートラルなフォーマットの提供は、Duktapeのバイトコードがマイナーバージョンで変更されなくなった時（これがいつになるかは簡単ではない）、あるいはバイトコードに対して何らかの再コンパイルを行うことで可能となる。
 
-### Config option specific
+### コンフィグオプション固有
 
-Some Duktape options may affect what function metadata is available. E.g. you can disable line number information (pc2line) which might then be left out of the bytecode dump altogether. Attempting to load such a dump in a Duktape environment compiled with line number information enabled might then fail due to a format error.
+Duktapeのオプションの中には、どのような関数メタデータが利用できるかに影響を与えるものがあります。例えば、行番号情報(pc2line)を無効にすると、バイトコードダンプから完全に除外される可能性があります。行番号情報を有効にしてコンパイルしたDuktape環境で、このようなダンプをロードしようとすると、フォーマット・エラーで失敗するかもしれません。
 
-(In the initial master merge there are no config option specific format differences, but there may be such differences in later Duktape versions if it\'s convenient to do so.)
+(最初のマスターマージでは、設定オプションによるフォーマットの違いはありませんが、Duktapeの後のバージョンでは、都合によりそのような違いが出てくるかもしれません)
 
-### Endianness
+### エンディアン
 
-Network endian was chosen because it\'s also used elsewhere in Duktape (e.g. the debugger protocol) as the default, portable endianness.
+ネットワーク・エンディアンが選ばれたのは、Duktapeの他の場所（デバッガ・プロトコルなど）でも、デフォルトで移植可能なエンディアンとして使われているからです。
 
-Faster bytecode dump/load could be achieved by using native endianness and (if necessary) padding to achieve proper alignment. This additional speed improvement was considered less important than portability.
+バイトコードのダンプ/ロードを高速化するには、ネイティブのエンディアンを使用し、（必要に応じて）パディングを使用して適切なアライメントを達成する必要があります。この追加の速度向上は、移植性よりも重要度が低いと考えられていた。
 
-### Platform neutrality
+### プラットフォーム中立性
 
-Supporting cross compilation is a useful feature so that bytecode generated on one platform can be loaded on another, as long as they run the same Duktape version.
+クロスコンパイルをサポートすることで、あるプラットフォームで生成されたバイトコードを、同じDuktapeのバージョンが動作する限り、別のプラットフォームで読み込むことができる便利な機能です。
 
-The cost of being platform neutral is rather small. The essential features are normalizing endianness and avoiding alignment assumptions. Both can be quite easily accommodated with relatively little run-time cost.
+プラットフォームニュートラルであることの代償は、むしろ小さい。本質的な特徴は、エンディアンの正規化とアライメントの仮定を回避することです。この2つは、比較的小さなランタイムコストで非常に簡単に対応することができます。
 
-### Bytecode header
+### バイトコードヘッダー
 
-The initial 0xBF byte is used because it can never appear in valid UTF-8 (even extended UTF-8) so that using a random string accidentally as bytecode input will fail.
+初期値の0xBFバイトは、有効なUTF-8（拡張UTF-8でも）では決して出現しないため、バイトコード入力として誤ってランダムな文字列を使用すると失敗するため、使用されています。
 
-### Memory safety and bytecode validation
+### メモリの安全性とバイトコードの検証
 
-The bytecode load primitive is memory unsafe, to the extent that trying to load corrupted (truncated and/or modified) bytecode may lead to memory unsafe behavior (even exploitable behavior). To keep bytecode loading fast and simple, there are even no bounds checks when parsing the input bytecode.
+バイトコードロードプリミティブは、破損した（切り詰められた、あるいは変更された）バイトコードをロードしようとすると、メモリに安全でない動作（悪用可能な動作さえも）につながる可能性があるため、メモリに安全でない。バイトコードロードを高速かつ単純に保つために、入力バイトコードを解析する際の境界チェックもない。
 
-This might seem strange but is intentional: while it would be easy to do basic syntax validation for the serialized data when it is loaded, it still wouldn\'t guarantee memory safety. To do so one would also need to validate the bytecode opcodes, otherwise memory unsafe behavior may happen at run time.
+シリアライズされたデータをロードする際に基本的な構文検証を行うことは簡単ですが、それでもメモリ安全性を保証することはできません。そうするためには、バイトコードのオペコードも検証する必要があります。そうしないと、実行時にメモリ安全でない動作が発生する可能性があります。
 
-Consider the following example: a function being loaded has `nregs` 100, so that 100 slots are allocated from the value stack for the function. If the function bytecode then executed:
+ロードされる関数には `nregs` 100 があり、その関数のために値スタックから100個のスロットが割り当てられると考える。その後、関数のバイトコードが実行された場合：
 
     LDREG 1, 999   ; read reg 999, out of bounds
     STREG 1, 999   ; write reg 999, out of bounds
 
-Similar issues exist for constants; if the function has 100 constants:
+定数についても同様の問題があり、関数に100個の定数があるとします：
 
     LDCONST 1, 999 ; read constant 999, out of bounds
 
-In addition to direct out-of-bounds references there are also \"indirect\" opcodes which e.g. load a register index from another register. Validating these would be a lot more difficult and would need some basic control flow algorithm, etc.
+境界外直接参照に加えて、例えばレジスタのインデックスを別のレジスタからロードする「間接参照」オペコードも存在します。これらを検証するのはもっと難しく、基本的な制御フローのアルゴリズムなどが必要です。
 
-Overall it would be quite difficult to implement bytecode validation that would correctly catch broken and perhaps maliciously crafted bytecode, and it\'s not very useful to have a partial solution in place.
+全体として、壊れたバイトコードや悪意を持って作られたバイトコードを正しく検出するバイトコード検証を実装するのはかなり難しいでしょう。
 
-Even so there is a very simple header signature for bytecode which ensures that obviously incorrect values are rejected early. The signature ensures that no ordinary string data can accidentally be loaded as byte code (the initial byte 0xBF is invalid extended UTF-8). Any bytes beyond the marker are unvalidated.
+それでも、バイトコード用の非常にシンプルなヘッダ署名があり、明らかに不正な値が早期に拒否されるようになっています。この署名は、通常の文字列データが誤ってバイトコードとして読み込まれないようにするものです（最初のバイト0xBFは拡張UTF-8では無効です）。マーカーを超えたバイトは検証されない。
 
-## Future work
+## 今後の課題
 
-### Full value serialization
+### フルバリューシリアライズ
 
-Bytecode dump/load is restricted to a subset of function values. It would be more elegant to support generic value dump/load. However, there are several practical issues:
+バイトコードダンプ/ロードは、関数値のサブセットに制限されています。汎用的な値のダンプ/ロードをサポートする方がよりエレガントでしょう。しかし、いくつかの実用的な問題があります：
 
-- Arbitrary object graphs would need to be supported, which is quite challenging.
-- There\'d have to be some mechanism to \"revive\" any native values on load. For example, for a native object representing an open file, the revive operation would reopen the file and perhaps seek the file to the correct offset.
+- 任意のオブジェクトグラフをサポートする必要があり、これは非常に困難である。
+- ロード時にネイティブの値を復活させるメカニズムも必要だ。例えば、開いているファイルを表すネイティブオブジェクトの場合、復活操作はファイルを開き直し、おそらく正しいオフセットにファイルをシークする。
 
-### Support bound functions
+### バウンドファンクションに対応
 
-Currently a TypeError is thrown for bound functions. As a first step, it\'s probably better to follow the bound chain and serialize the final target function instead, i.e. bound status would be lost during serialization. This is more in line with serializing with loss of some metadata rather than throwing an error.
+現在、バインドされた関数に対してTypeErrorが投げられます。最初のステップとして、バウンドチェーンに従って、代わりに最終的なターゲット関数をシリアライズする方が良いかもしれません、つまり、バウンド状態はシリアライズ中に失われます。これは，エラーを投げるよりも，メタデータを失いながらシリアライズすることに近いと思います．
 
-As the second step, it would be nice to serialize the bound `this` and argument values. However, proper generic value serialization would be needed to do that.
+第二段階として、バインドされた `this` と引数の値をシリアライズすることができればよいでしょう。しかし、そのためには、適切な汎用値のシリアライズが必要であろう。
 
-### Caching CommonJS modules
+### CommonJS モジュールのキャッシュ化
 
-Caching CommonJS modules would be very useful. Figure out how to do that when reworking the module mechanism.
+CommonJSのモジュールのキャッシュは非常に便利です。モジュール機構を作り直すときに、それを行う方法を考えましょう。
 
-### Figure out debugger overlap
+### デバッガーのオーバーラップを把握する
 
-The debugger protocol has its own value serialization format (with somewhat different goals):
+デバッガプロトコルは、独自の値のシリアライズフォーマット（やや異なる目標を持つ）を持っています：
 
-- Would it be sensible to share value serialization format between dump/load and debugger protocol?
-- Should function values be serialized in the debugger protocol in the bytecode dump/load format? Would that be useful for the debugger (not immediately apparent why)?
+- ダンプ/ロードとデバッガ・プロトコルの間で値のシリアライズ形式を共有することは賢明でしょうか？
+- デバッガ・プロトコルで関数値をバイトコード・ダンプ/ロード・フォーマットでシリアライズすべきでしょうか？それはデバッガにとって有用でしょうか（その理由はすぐには分かりませんが）？

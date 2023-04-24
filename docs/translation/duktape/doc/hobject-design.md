@@ -6,89 +6,82 @@ The `duk_hobject` type represents an object with key-value properties,
 and is the most important type from an implementation point of view. It
 provides objects for various purposes:
 
--   Objects with E5 normal object semantics
--   Objects with E5 array object exotic behavior
--   Objects with E5 string object exotic behavior
--   Objects with E5 arguments object exotic behavior
--   Objects with no E5 semantics, for internal use
+- Objects with E5 normal object semantics
+- Objects with E5 array object exotic behavior
+- Objects with E5 string object exotic behavior
+- Objects with E5 arguments object exotic behavior
+- Objects with no E5 semantics, for internal use
 
 This document discusses the `duk_hobject` object in detail, including:
 
--   Requirements overview
--   Features of ECMAScript E5 objects
--   Internal data structure and algorithms
--   Enumeration guarantees
--   ECMAScript property behavior (default and exotic)
--   Design notes, future work
+- Requirements overview
+- Features of ECMAScript E5 objects
+- Internal data structure and algorithms
+- Enumeration guarantees
+- ECMAScript property behavior (default and exotic)
+- Design notes, future work
 
 The details of property-related algorithms in E5 are pretty intricate
 and are described separately in `hobject-algorithms.rst`.
 
 The following parts of ECMAScript E5 are useful background:
 
-  -----------------------------------------------------------------------
-  Section     Description
-  ----------- -----------------------------------------------------------
-  8.6         Object type, internal properties, property attributes
-
-  8.10        Property descriptors
-
-  8.12        Default property access methods
-
-  10.6        Arguments object exotic behavior
-
-  15.4.5.1    Array object exotic behavior
-
-  15.5.5.2    String object exotic behavior
-  -----------------------------------------------------------------------
+| Section  | Description                                           |
+|----------|-------------------------------------------------------|
+| 8.6      | Object type, internal properties, property attributes |
+| 8.10     | Property descriptors                                  |
+| 8.12     | Default property access methods                       |
+| 10.6     | Arguments object exotic behavior                      |
+| 15.4.5.1 | Array object exotic behavior                          |
+| 15.5.5.2 | String object exotic behavior                         |
 
 See also the following documentation:
 
--   `hobject-algorithms.rst`: detailed derivation of object algorithms
--   `hobject-enumeration.rst`: more discussion on enumeration
--   `error-objects.rst`: error object properties
--   `function-objects.rst`: function template and instance properties
+- `hobject-algorithms.rst`: detailed derivation of object algorithms
+- `hobject-enumeration.rst`: more discussion on enumeration
+- `error-objects.rst`: error object properties
+- `function-objects.rst`: function template and instance properties
 
 ## Requirements overview
 
 ECMAScript object compatibility requires:
 
--   Properties with a string key and a value that is either a plain data
+- Properties with a string key and a value that is either a plain data
     value or an accessor (getter/setter)
--   Property attributes which control the behavior of individual
+- Property attributes which control the behavior of individual
     properties (e.g. enumerability and writability)
--   Object extensibility flag which controls addition of new properties
--   Prototype-based inheritance of properties along a loop-free
+- Object extensibility flag which controls addition of new properties
+- Prototype-based inheritance of properties along a loop-free
     prototype chain
--   Some very basic enumeration guarantees for both mutating and
+- Some very basic enumeration guarantees for both mutating and
     non-mutating enumeration
--   Object internal properties (at a conceptual level)
+- Object internal properties (at a conceptual level)
 
 Additional practical requirements include:
 
--   Additional enumeration guarantees (e.g. enumeration order matches
+- Additional enumeration guarantees (e.g. enumeration order matches
     key insertion order); see separate discussion on enumeration
--   Minimal memory footprint, especially for objects with few properties
+- Minimal memory footprint, especially for objects with few properties
     which dominate common use
--   Near constant property lookup performance, even for large objects
--   Near constant amortized property insert performance, even for large
+- Near constant property lookup performance, even for large objects
+- Near constant amortized property insert performance, even for large
     objects
--   Fast read/write access for array entries, in particular avoiding
+- Fast read/write access for array entries, in particular avoiding
     string interning whenever possible
--   Sparse array support (e.g. `var x=[]; x[0]=1; x[1000000]=2;`): must
+- Sparse array support (e.g. `var x=[]; x[0]=1; x[1000000]=2;`): must
     be compliant, shouldn\'t allocate megabytes of memory, but does not
     have to be fast
--   Support long-lived objects with an arbitrary number of key
+- Support long-lived objects with an arbitrary number of key
     insertions and deletions (implies \"compaction\" of keys / ordering
     structure)
 
 There are unavoidable trade-offs involved, the current trade-off
 preferences are roughly as follows (most important to least important):
 
-1.  Compliance
-2.  Compactness
-3.  Performance
-4.  Low complexity
+1. Compliance
+2. Compactness
+3. Performance
+4. Low complexity
 
 Compliance is a must-have goal for all object features. Performance is
 only really relevant for common idioms. Rare cases need to be compliant
@@ -101,32 +94,32 @@ don\'t perform very well but are still compliant.
 
 An ECMAScript object consists of:
 
--   A set of externally visible *named properties*
--   A set of (conceptual) *internal properties*
+- A set of externally visible *named properties*
+- A set of (conceptual) *internal properties*
 
 The externally visible named properties are characterized by:
 
--   A string key
-    -   16-bit characters (any 16-bit unsigned integer codepoints may be
+- A string key
+  - 16-bit characters (any 16-bit unsigned integer codepoints may be
         used)
-    -   Even array indices are strings, e.g. `x[0]` really means
+  - Even array indices are strings, e.g. `x[0]` really means
         `x["0"]`
--   A property value which may be:
-    -   A *data property*, a plain ECMAScript value
-    -   An *accessor property*, a setter/getter function pair invoked
+- A property value which may be:
+  - A *data property*, a plain ECMAScript value
+  - An *accessor property*, a setter/getter function pair invoked
         for property accesses
--   Property attributes which control property accesses:
-    -   For data properties:
-        -   `[[Configurable]]`
-        -   `[[Enumerable]]`
-        -   `[[Value]]`
-        -   `[[Writable]]`
-    -   For accessor properties:
-        -   `[[Configurable]]`
-        -   `[[Enumerable]]`
-        -   `[[Get]]`
-        -   `[[Set]]`
--   The `[[Extensible]]` internal property determines whether new (own)
+- Property attributes which control property accesses:
+  - For data properties:
+    - `[[Configurable]]`
+    - `[[Enumerable]]`
+    - `[[Value]]`
+    - `[[Writable]]`
+  - For accessor properties:
+    - `[[Configurable]]`
+    - `[[Enumerable]]`
+    - `[[Get]]`
+    - `[[Set]]`
+- The `[[Extensible]]` internal property determines whether new (own)
     keys can be added to an object. Many other internal properties
     exist.
 
@@ -140,12 +133,12 @@ Property attributes affect property access algorithms internally. They
 are also externally visible and can be manipulated through built-in
 methods. The property attributes are:
 
--   `[[Configurable]]`
--   `[[Enumerable]]`
--   `[[Value]]`
--   `[[Writable]]`
--   `[[Get]]`
--   `[[Set]]`
+- `[[Configurable]]`
+- `[[Enumerable]]`
+- `[[Value]]`
+- `[[Writable]]`
+- `[[Get]]`
+- `[[Set]]`
 
 New properties added to objects by an assignment are by default data
 properties with the following attributes: `[[Writable]]=true`,
@@ -179,9 +172,9 @@ methods.
 Property descriptors are classified into several categories based on
 what keys they contain:
 
--   Data property descriptor: contains `[[Value]]` or `[[Writable]]`
--   Accessor property descriptor: contains `[[Set]]` or `[[Get]]`
--   Generic property descriptor: a descriptor which is neither a data
+- Data property descriptor: contains `[[Value]]` or `[[Writable]]`
+- Accessor property descriptor: contains `[[Set]]` or `[[Get]]`
+- Generic property descriptor: a descriptor which is neither a data
     nor an accessor property descriptor, i.e. does not contain
     `[[Value]]`, `[[Writable]]`, `[[Set]]`, or `[[Get]]`
 
@@ -194,9 +187,9 @@ a descriptor.
 A property descriptor is *fully populated* if it contains all the keys
 of its type, i.e.:
 
--   A fully populated data descriptor contains all of the following:
+- A fully populated data descriptor contains all of the following:
     `[[Configurable]]`, `[[Enumerable]]`, `[[Value]]`, `[[Writable]]`
--   A fully populated accessor descriptor contains all of the following:
+- A fully populated accessor descriptor contains all of the following:
     `[[Configurable]]`, `[[Enumerable]]`, `[[Get]]`, `[[Set]]`
 
 The property attributes stored in the object for a certain property
@@ -312,17 +305,17 @@ The prototype chain affects most property access algorithms with the
 general principle that if a property is not found in a certain object,
 the prototype chain is then searched in ascending order. To simplify:
 
--   Property read operations return the value found in the first object
+- Property read operations return the value found in the first object
     in the prototype chain containing the property. If an accessor
     property is found, the getter is called.
--   Property write operations first check the prototype chain to see
+- Property write operations first check the prototype chain to see
     whether the property exists. If so, the property may prevent the
     write (if a non-writable data property), cause a setter call (if an
     accessor property), or allow the write. The write is allowed and not
     captured by a setter, the property is added to the *original target
     object* (instead of an object possibly higher up in the prototype
     chain).
--   Property delete operations do not consult the prototype chain and
+- Property delete operations do not consult the prototype chain and
     only have an effect on the target object.
 
 The non-mutability of the prototype chain is not very explicit in the
@@ -392,27 +385,15 @@ should be avoided whenever possible.)
 
 The following table lists the possible coercions:
 
-  -----------------------------------------------------------------------
-  Property name   `ToString`        Valid array index?
-  --------------- ----------------- -------------------------------------
-  `undefined`     `"undefined"`     no
-
-  `null`          `"null"`          no
-
-  `false`         `"false"`         no
-
-  `true`          `"true"`          no
-
-  a number        various           yes, if a whole number in the range
-                                    \[0,2\*\*32-2\]
-
-  a string        same              yes, if a \"canonical\"
-                                    representation for a whole number in
-                                    the range \[0,2\*\*32-2\] (`"2"` is
-                                    valid, while `"0.2e1"` is not)
-
-  an object       various           depends on coerced string value
-  -----------------------------------------------------------------------
+Property name | `ToString`    | Valid array index?
+--------------|---------------|--------------------------------------------------------------------------------------------------------------------------------
+`undefined`   | `"undefined"` | no
+`null`        | `"null"`      | no
+`false`       | `"false"`     | no
+`true`        | `"true"`      | no
+a number      | various       | yes, if a whole number in the range \[0,2\*\*32-2\]
+a string      | same          | yes, if a \"canonical\" representation for a whole number in the range \[0,2\*\*32-2\] (`"2"` is valid, while `"0.2e1"` is not)
+an object     | various       | depends on coerced string value
 
 Note that for instance `"0.2e1"` which numerically represents 2 is not a
 valid array index: `ToString(ToUint32("0.2e1"))` produces `"2"`, but
@@ -427,50 +408,35 @@ therefore automatically coerced to a string first.
 The requirements for a valid array length are implicit in E5 Section
 15.4.5.1, steps 3.c to 3.d:
 
--   Step 3.c: Let `newLen` be `ToUint32(Desc.[[Value]])`.
--   Step 3.d: If `newLen` is not equal to `ToNumber(Desc.[[Value]])`,
+- Step 3.c: Let `newLen` be `ToUint32(Desc.[[Value]])`.
+- Step 3.d: If `newLen` is not equal to `ToNumber(Desc.[[Value]])`,
     throw a `RangeError` exception
 
 The requirements boils down to (for input value `X`):
 
--   `ToUint32(X)` == `ToNumber(X)`
+- `ToUint32(X)` == `ToNumber(X)`
 
 The requirements are seemingly similar to the array index requirements,
 but in fact allow a wider set of values, such as:
 
--   `true` represents array length `1`, but is not a valid array index
--   `"0.2e1"` represents array length `2`, but is not a valid array
+- `true` represents array length `1`, but is not a valid array index
+- `"0.2e1"` represents array length `2`, but is not a valid array
     index
--   `0xffffffff` represents array length 2\*\*32-1, but is not a valid
+- `0xffffffff` represents array length 2\*\*32-1, but is not a valid
     array index
 
 A potential `length` value `X` is treated as follows (see E5 Sections
 9.3 and 9.6 for definitions of the coercions `ToNumber` and `ToUint32`):
 
-  -----------------------------------------------------------------------
-  Property value  `ToNumber`     `ToUint32`     Valid array length?
-  --------------- -------------- -------------- -------------------------
-  `undefined`     `NaN`          `+0`           no
-
-  `null`          `+0`           `+0`           yes, length `0`
-
-  `false`         `+0`           `+0`           yes, length `0`
-
-  `true`          `1`            `1`            yes, length `1`
-
-  a number        various        various        yes, if whole number in
-                                                the range \[0,2\*\*32-1\]
-
-  a string        various        various        yes, if representation of
-                                                a whole number in the
-                                                range \[0,2\*\*32-1\]
-                                                (does not need to be
-                                                canonical, e.g. `"2"`,
-                                                `"2.0"`, `"0.2e1"` are
-                                                all acceptable
-
-  an object       various        various        depends on coerced values
-  -----------------------------------------------------------------------
+Property value | `ToNumber` | `ToUint32` | Valid array length?
+---------------|------------|------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------
+`undefined`    | `NaN`      | `+0`       | no
+`null`         | `+0`       | `+0`       | yes, length `0`
+`false`        | `+0`       | `+0`       | yes, length `0`
+`true`         | `1`        | `1`        | yes, length `1`
+a number       | various    | various    | yes, if whole number in the range \[0,2\*\*32-1\]
+a string       | various    | various    | yes, if representation of  a whole number in the  range \[0,2\*\*32-1\]  (does not need to be  canonical, e.g. `"2"`,  `"2.0"`, `"0.2e1"` are  all acceptable
+an object      | arious     | arious     | depends on coerced values
 
 As an example of using a non-number as Array length:
 
@@ -491,6 +457,7 @@ together with the current implementation for enumerating object keys.
 ```{=LaTeX}
 \newpage
 ```
+
 ## Structure overview
 
 The memory layout of an `duk_hobject` is illustrated below:
@@ -527,16 +494,16 @@ The layout is automatically selected by Duktape during compilation
 
 The heap header structure `duk_heaphdr` contains:
 
--   flags with both heap level flags (`DUK_HEAPHDR_FLAG_*` in
+- flags with both heap level flags (`DUK_HEAPHDR_FLAG_*` in
     `duk_heaphdr.h`) and object specific flags (`DUK_HOBJECT_FLAG_*` in
     `duk_hobject.h`)
--   heap allocated list linkage
--   reference counter field
+- heap allocated list linkage
+- reference counter field
 
 The object specific part of `duk_hobject` contains:
 
--   property allocation: A data structure for storing properties
--   internal prototype field for fast prototype chain walking; other
+- property allocation: A data structure for storing properties
+- internal prototype field for fast prototype chain walking; other
     internal properties are stored in the property allocation
 
 Some `duk_hobject` sub-types share the beginning of the `duk_hobject`
@@ -548,14 +515,14 @@ The property allocation part is a single memory allocation containing
 all the object properties, both external and internal. It is subdivided
 internally into the following parts:
 
--   *Entry part* stores ordered key-value properties with arbitrary
+- *Entry part* stores ordered key-value properties with arbitrary
     property attributes (flags), and supports accessor properties
     (getter/setter properties), i.e., full E5 semantics
--   *Array part* (optional) stores plain values with default property
+- *Array part* (optional) stores plain values with default property
     attributes (writable, enumerable, configurable) for valid array
     indices (`"0"`, `"1"`, \..., `"4294967294"`); does not support
     accessor properties
--   *Hash part* (optional) provides accelerated key lookups for the
+- *Hash part* (optional) provides accelerated key lookups for the
     entry part, mapping a key into an entry part index
 
 Internal properties are stored in the entry part, and are only
@@ -583,30 +550,30 @@ section of code.
 
 Notes:
 
--   For a newly allocated object with no properties, there is no
+- For a newly allocated object with no properties, there is no
     property allocation, and the `p` pointer is `NULL`. It may also
     become `NULL` later if all object properties are deleted and the
     object is then compacted.
--   The array part is assumed to be comprehensive, i.e. if the array
+- The array part is assumed to be comprehensive, i.e. if the array
     part exists, all valid array index keys must reside in the array
     part. If this invariant would need to be violated, the array part is
     abandoned and its entries moved into the entry part.
--   The array part entries are assumed to have default property
+- The array part entries are assumed to have default property
     attributes (writable, configurable, enumerable). If this invariant
     would need to be violated, the array part is also abandoned.
--   The array part is also abandoned if the array part would become too
+- The array part is also abandoned if the array part would become too
     sparse, i.e. it would take too much memory compared to the number of
     entries actually present. This behavior is not compliance related.
--   A certain key can be present at most once (in either the entry or
+- A certain key can be present at most once (in either the entry or
     array part). This invariant must be enforced when adding new keys
     into the object. Other implementation code can simply assume it.
--   The default attributes for new properties depend on how they are
+- The default attributes for new properties depend on how they are
     inserted:
-    -   For ordinary assignment, the defaults are defined in the
+  - For ordinary assignment, the defaults are defined in the
         `[[Put]]` algorithm (E5 Section 8.12.5, step 6): writable,
         enumerable, configurable. Note that these differ from the
         official default values defined in E5 Section 8.6.2.
-    -   For `[[DefineOwnProperty]]` the defaults are defined in E5
+  - For `[[DefineOwnProperty]]` the defaults are defined in E5
         Section 8.12.9 step 4, which refers to the official \"default
         attribute values\" in E5 Section 8.6.2: non-writable,
         non-enumerable, non-configurable.
@@ -626,6 +593,7 @@ part. It is only used for objects with at least
 ```{=LaTeX}
 \newpage
 ```
+
 ### Layout
 
 The entry part consists of three separate arrays arranged sequentially:
@@ -689,10 +657,10 @@ is considered reachable and must be incref\'d on insertion.
 Flags are represented by an `duk_u8` field, with flags defined in
 `duk_hobject.h`. The current flags are:
 
--   `DUK_PROPDESC_FLAG_WRITABLE`
--   `DUK_PROPDESC_FLAG_ENUMERABLE`
--   `DUK_PROPDESC_FLAG_CONFIGURABLE`
--   `DUK_PROPDESC_FLAG_ACCESSOR`
+- `DUK_PROPDESC_FLAG_WRITABLE`
+- `DUK_PROPDESC_FLAG_ENUMERABLE`
+- `DUK_PROPDESC_FLAG_CONFIGURABLE`
+- `DUK_PROPDESC_FLAG_ACCESSOR`
 
 The value field is a union of (1) a plain value, and (2) an accessor
 value which contains `get` and `set` function pointers. The
@@ -720,13 +688,13 @@ resized, improving hash part performance.
 
 Notes:
 
--   This layout of three separate arrays has been chosen so that a
+- This layout of three separate arrays has been chosen so that a
     linear key scan is efficient, e.g. works nicely with cache lines and
     prefetches, which is important because \"small\" objects don\'t have
     a hash part at all. Linear scan is more space efficient and often
     also faster than a hash lookup, which does one or more random
     accesses to the hash part when going through the probe sequence.
--   Objects in dynamic languages often don\'t guarantee a key
+- Objects in dynamic languages often don\'t guarantee a key
     enumeration order, which allows objects to be implemented with easy
     and efficient \"pure\" hash tables. Although ECMAScript E5 does not
     require a particular key ordering for enumeration, a practical
@@ -757,20 +725,20 @@ future work to make it work better especially with high load factors.
 The hash part is an array of `h_size` `duk_u32` values. Each value is
 either an index to the entry part, or one of two markers:
 
--   `UNUSED`: entry is currently unused
--   `DELETED`: entry has been deleted
+- `UNUSED`: entry is currently unused
+- `DELETED`: entry has been deleted
 
 Hash table size (`h_size`) is selected relative to the maximum number of
 inserted elements `N` (equal to `e_size` in practice) in two steps:
 
-1.  Find lowest N so that `2 ** N >= e_size`.
-2.  Use `2 ** (N + 1)` as hash size. This guarantees load factor is
+1. Find lowest N so that `2 ** N >= e_size`.
+2. Use `2 ** (N + 1)` as hash size. This guarantees load factor is
     lower than 0.5 after resize.
 
 The probe sequence for a certain key is guaranteed to walk through every
 hash table entry. Currently the probe sequence is simply:
 
--   `(X + i) % h_size` where i=0,1,\...,h_size-1.
+- `(X + i) % h_size` where i=0,1,\...,h_size-1.
 
 This isn\'t ideal for avoiding clustering (double hashing would be
 better) but is cache friendly and works well enough with low load
@@ -824,6 +792,7 @@ also resizes and rehashes the hash part, purging any `DELETED` entries.
 ```{=LaTeX}
 \newpage
 ```
+
 ## Array part
 
 ### Layout
@@ -873,18 +842,18 @@ be true while `3 in obj` would be false.
 
 Notes:
 
--   The array part is an optimized structure for reading and writing
+- The array part is an optimized structure for reading and writing
     array indexed properties efficiently. It can be used for *any*
     object, not just the ECMAScript `Array` object, and ECMAScript
     `Array` exotic behaviors are unrelated to the array part\'s
     existence.
--   A non-`Array` object with an array part does not get the `Array`
+- A non-`Array` object with an array part does not get the `Array`
     related exotic behaviors (like automatic interaction between array
     indexed elements and the `length` property).
--   An `Array` object may be created without an array part, or may have
+- An `Array` object may be created without an array part, or may have
     its array part abandoned. The `Array` exotic behaviors must keep on
     working even if the `Array` object has no array part.
--   The `Array` `length` property is stored as an ordinary property in
+- The `Array` `length` property is stored as an ordinary property in
     the entries part, and has no relation with array part size
     (`a_size`).
 
@@ -894,18 +863,18 @@ The array entries are assumed to be data properties with default
 attributes (writable, configurable, enumerable). This has the following
 implications:
 
--   When a new property with an array index outside the currently
+- When a new property with an array index outside the currently
     allocated array part is being added (e.g. as part of a property
     write), we must either:
 
-    1.  extend the array allocation to cover the new entry; or
-    2.  abandon the entire array part, moving all array part entries to
+    1. extend the array allocation to cover the new entry; or
+    2. abandon the entire array part, moving all array part entries to
         the entry part.
 
     The first option may not be viable if the array were to become very
     sparse (e.g. when executing: `var a = []; a[1000000000] = 1`).
 
--   When a property in the array part would become an accessor property
+- When a property in the array part would become an accessor property
     (getter/setter) or would need to have incompatible attributes, the
     entire array part must be abandoned.
 
@@ -978,11 +947,11 @@ results with existing ECMAScript implementations:
 
 The reason why a separate array part exists is to:
 
--   Store normal array structures compactly: normal arrays are dense and
+- Store normal array structures compactly: normal arrays are dense and
     have default properties
--   Provide relatively fast access to array elements: avoid entry or
+- Provide relatively fast access to array elements: avoid entry or
     hash part lookup
--   Avoid string interning of array index keys for numeric indices
+- Avoid string interning of array index keys for numeric indices
 
 ECMAScript array indices are always strings, so conceptually arrays map
 string indices of the form \"0\", \"1\", etc to arbitrary values.
@@ -1007,10 +976,10 @@ chain, the details of property access algorithms etc. Currently the
 \"fast path\" behavior applies to a very narrow set of circumstances.
 See the following functions in `duk_hobject_props.c`:
 
--   `duk_hobject_get_value_u32()`
--   `duk_hobject_get_value_tval()`
--   `duk_hobject_has_property_u32()`
--   `duk_hobject_has_property_tval()`
+- `duk_hobject_get_value_u32()`
+- `duk_hobject_get_value_tval()`
+- `duk_hobject_has_property_u32()`
+- `duk_hobject_has_property_tval()`
 
 There is currently no fast path for array writes, which means the key is
 temporarily interned for the duration of the array write. The array
@@ -1032,23 +1001,23 @@ current resize algorithm is `realloc_props()` in `duk_hobject_props.c`.
 
 The property allocation is currently resized e.g. when:
 
--   The entry part runs out during insertion of a new property.
--   The array part needs to be extended during insertion of a new
+- The entry part runs out during insertion of a new property.
+- The array part needs to be extended during insertion of a new
     property.
--   The array part needs to be abandoned due to:
-    -   a property insert which would result in a too sparse array part;
-    -   a property insert incompatible with the array part assumptions;
+- The array part needs to be abandoned due to:
+  - a property insert which would result in a too sparse array part;
+  - a property insert incompatible with the array part assumptions;
         or
-    -   a property modification incompatible with the array part
+  - a property modification incompatible with the array part
         assumptions.
--   The object is compacted, i.e. its active entry and array part
+- The object is compacted, i.e. its active entry and array part
     properies are counted, and an optimal (small) new size is allocated.
 
 The resizing algorithm:
 
--   Allocates a new memory area for properties (in-place resizing is not
+- Allocates a new memory area for properties (in-place resizing is not
     supported). This may trigger a garbage colleciton, and may fail.
--   If array abandoning is requested, existing array properties are
+- If array abandoning is requested, existing array properties are
     first moved into the beginning of the new entry part to keep the
     enumeration ordering identical to that before abandonding (array
     indices are normally enumerated before other entry keys). The array
@@ -1056,10 +1025,10 @@ The resizing algorithm:
     interning which may trigger garbage collection and may also fail.
     Any temporary values must thus be reachable and correctly referenced
     counted for every intern call.
--   Existing entry part properties are moved into the new entry part.
+- Existing entry part properties are moved into the new entry part.
     Any `NULL` keys are skipped, so that the entry part keys are
     \"compacted\".
--   If the new allocation has a hash part, the new entry part keys are
+- If the new allocation has a hash part, the new entry part keys are
     hashed into the new hash part. Note that an existing hash part (of
     the current allocation) is irrelevant and is ignored here; in any
     case, the new hash part contains no `DELETED` entries.
@@ -1072,13 +1041,13 @@ incref\'d.
 
 Some complications:
 
--   The tricky reachability issues related to array abandoning are
+- The tricky reachability issues related to array abandoning are
     handled by using the current thread\'s value stack as a place to
     store temporaries; the value stack has an existing process for
     cleanup if an error occurs. This is not the whole story, though; see
     code for details.
 
--   The allocation calls required during resizing (for the new memory
+- The allocation calls required during resizing (for the new memory
     area, string interning, and value stack resizing) may cause a
     garbage collection. The garbage collection may attempt to resize any
     object as part of an \"emergency GC\" compaction. This needs to be
@@ -1108,15 +1077,15 @@ The current implementation can be found in `duk_hobject_enum.c`.
 E5 Section 12.6.4: \"The for-in statement\" contains the main
 requirements for enumeration in the E5 specification:
 
--   The mechanics and order of enumerating the properties \[\...\] is
+- The mechanics and order of enumerating the properties \[\...\] is
     not specified.
--   Properties of the object being enumerated may be deleted during
+- Properties of the object being enumerated may be deleted during
     enumeration. If a property that has not yet been visited during
     enumeration is deleted, then it will not be visited.
--   If new properties are added to the object being enumerated during
+- If new properties are added to the object being enumerated during
     enumeration, the newly added properties are not guaranteed to be
     visited in the active enumeration.
--   Enumerating the properties of an object includes enumerating
+- Enumerating the properties of an object includes enumerating
     properties of its prototype, and the prototype of the prototype, and
     so on, recursively; but a property of a prototype is not enumerated
     if it is \"shadowed\" because some previous object in the prototype
@@ -1126,14 +1095,14 @@ E5 Section 15.2.3.7: \"Object.defineProperties ( O, Properties )\"
 requires that when multiple properties are defined with
 `Object.defineProperties()`, the order should be kept:
 
--   If an implementation defines a specific order of enumeration for the
+- If an implementation defines a specific order of enumeration for the
     for-in statement, that same enumeration order must be used to order
     the list elements in step 3 of this algorithm.
 
 E5 Section 15.2.3.14: \"Object.keys ( O )\" requires that the \"for-in\"
 enumeration order should also be used for `Object.keys()`:
 
--   If an implementation defines a specific order of enumeration for the
+- If an implementation defines a specific order of enumeration for the
     for-in statement, that same enumeration order must be used in step 5
     of this algorithm.
 
@@ -1167,40 +1136,40 @@ where it might just as well, while being fully E5 compliant, print:
 Similarly, much existing code assumes that properties are enumerated in
 the order they were inserted. See, for instance:
 
--   <http://code.google.com/p/chromium/issues/detail?id=2605>
+- <http://code.google.com/p/chromium/issues/detail?id=2605>
 
--   <http://ejohn.org/blog/javascript-in-chrome/>
+- <http://ejohn.org/blog/javascript-in-chrome/>
 
     \"However, specification is quite different from implementation. All
     modern implementations of ECMAScript iterate through object
     properties in the order in which they were defined. Because of this
     the Chrome team has deemed this to be a bug and will be fixing it.\"
 
--   `hobject-enumeration.rst` for practical testing results with actual
+- `hobject-enumeration.rst` for practical testing results with actual
     implementations.
 
 We impose the following additional requirements for compatibility:
 
--   Non-array-index keys should be enumerated in their insertion order.
--   The keys for `Array` elements should be enumerated in an ascending
+- Non-array-index keys should be enumerated in their insertion order.
+- The keys for `Array` elements should be enumerated in an ascending
     order, and before non-array-index keys.
-    -   This is currently provided for all objects with an array part.
+  - This is currently provided for all objects with an array part.
         ECMAScript `Array` instances should thus always have an array
         part (at least when they are created).
-    -   If an object has an array part which is abandoned, e.g. because
+  - If an object has an array part which is abandoned, e.g. because
         the array becomes too sparse, the enumeration ordering reverts
         to enumerating entries in insertion order (regardless of whether
         the property is a valid array index or not).
--   All keys of a certain object should be enumerated (including both
+- All keys of a certain object should be enumerated (including both
     array index and non-array-index keys) before proceeding to the
     prototype. Keys already enumerated must not be repeated during
     enumeration even if they occur again in the prototype chain.
--   If an entry is deleted during enumeration before it has appeared in
+- If an entry is deleted during enumeration before it has appeared in
     the enumeration sequence, it must not turn up later in the
     enumeration.
--   A certain key must never appear twice in the enumeration sequence,
+- A certain key must never appear twice in the enumeration sequence,
     despite any mutation.
--   A key which was present during the \"initialization\" of the
+- A key which was present during the \"initialization\" of the
     enumeration (before the first key was enumerated) must not be
     omitted from the enumeration sequence, if they are not deleted
     during enumeration (before they have appeared in the enumeration
@@ -1208,12 +1177,12 @@ We impose the following additional requirements for compatibility:
 
 Note the following *non-requirements*:
 
--   New entries added during enumeration are not required to show up
+- New entries added during enumeration are not required to show up
     during the enumeration in progress.
-    -   The current implementation will *never* enumerate such keys.
+  - The current implementation will *never* enumerate such keys.
         This is not desirable as such, but is a side effect of the
         (simplistic) implementation strategy.
-    -   The same behavior seems to apply to smjs, Rhino, and V8 at the
+  - The same behavior seems to apply to smjs, Rhino, and V8 at the
         time of writing.
 
 ### Implementation issues
@@ -1223,17 +1192,17 @@ which maintains some iteration pointers or indices to the target object
 and steps through object properties and the (immutable) prototype chain
 on request. However, this approach has many practical difficulties:
 
--   Object mutation may cause the internal structure of the target
+- Object mutation may cause the internal structure of the target
     object (or any object in its prototype chain) to change.
-    -   This poses a problem for any approach based on maintaining an
+  - This poses a problem for any approach based on maintaining an
         index to the array/entry part, as an index may be invalidated by
         internal data structure maintenance such as compaction of keys.
-    -   This problem can be avoided if the object is \"frozen\" for
+  - This problem can be avoided if the object is \"frozen\" for
         enumeration, but this requires awkward book-keeping, which must
         work even if errors are thrown, threads yield (and perhaps never
         resume, or are garbage collected) etc.
--   Any keys may be deleted during enumeration.
-    -   This poses a problem for any approach based on maintaining a key
+- Any keys may be deleted during enumeration.
+  - This poses a problem for any approach based on maintaining a key
         based state, e.g. \"current key\". The key in question may be
         deleted; how can one then find the next key in the sequence?
 
@@ -1302,11 +1271,11 @@ following:
 
 The enumerator object takes advantage of two features:
 
-1.  Keys inserted into an object maintain their order in the entry part
+1. Keys inserted into an object maintain their order in the entry part
     (even during resizes). Thus, we can insert keys into the enumerator
     and trust that their order is maintained. The entry part is always
     gap-free, i.e. there are no NULL keys in the sequence.
-2.  Inserting enumerated keys as properties instead of array entries
+2. Inserting enumerated keys as properties instead of array entries
     allows duplicate keys to be handled correctly. Duplicate keys may
     occur when the prototype chain is walked. The first occurrence is
     recorded in its correct position, and any later occurrences are
@@ -1329,30 +1298,30 @@ cause problems in a resize, when the entry part was compacted.
 
 The current implementation has some nice qualities:
 
--   It is very simple and robust, and avoids any issues with mutation
+- It is very simple and robust, and avoids any issues with mutation
     (except that keys added during mutation are never enumerated, which
     is not nice but a common feature in other implementations, too).
--   It has small code space.
--   It has minimal impact on anything else, e.g. it requires no
+- It has small code space.
+- It has minimal impact on anything else, e.g. it requires no
     co-operation from the object, such as avoiding key compaction until
     enumeration is over.
 
 However, it has many drawbacks:
 
--   It has a relatively large memory footprint for the enumerator.
+- It has a relatively large memory footprint for the enumerator.
     Because the keys are stored as key-value properties (not as array
     entries), each enumerated key takes about 13 bytes on a typical
     32-bit architecture (4 bytes for key, 8 bytes for value, 1 byte for
     flags).
-    -   This footprint could be reduced somewhat by using the
+  - This footprint could be reduced somewhat by using the
         property-based approach to generate the enumeration sequence
         (eliminating duplicate keys etc), and then converting that to an
         array; array entries typically take 8 bytes. But this would
         temporarily increase memory footprint even more.
--   Numeric key indices of an array part or the virtual numeric key
+- Numeric key indices of an array part or the virtual numeric key
     indices of a `String` object are interned and are reachable
     simultaneously during enumeration.
--   Execution of program code stops while the enumerator is initially
+- Execution of program code stops while the enumerator is initially
     created. This probably has little impact in most cases, but it might
     be an issue if a very large object is being enumerated (consider for
     instance enumerating a very large array).
@@ -1394,10 +1363,10 @@ careful consideration to work correctly.
 Duktape implements E5 internal properties in differing ways, depending
 on the property in question:
 
--   concretely stored internal properties
--   `duk_hobject` header flags
--   `duk_hobject` structure fields (only internal prototype currently)
--   implicit behaviors in specification algorithms based on e.g. object
+- concretely stored internal properties
+- `duk_hobject` header flags
+- `duk_hobject` structure fields (only internal prototype currently)
+- implicit behaviors in specification algorithms based on e.g. object
     flags, type, or class
 
 The current approach for storing internal properties which are not
@@ -1414,18 +1383,18 @@ names don\'t conflict with Duktape\'s internal properties.
 
 To avoid complications:
 
--   Internal properties MUST NOT be enumerable
-    -   Duktape prevents enumeration of internal properties regardless
+- Internal properties MUST NOT be enumerable
+  - Duktape prevents enumeration of internal properties regardless
         of their `[[Enumerable]]` attribute. This makes it easier for
         user code to read/write internal properties as ordinary put/get
         primitives can be used.
--   Internal properties MUST NOT be visible in any other way either,
+- Internal properties MUST NOT be visible in any other way either,
     e.g. through `Object.getOwnPropertyNames()` which outputs also
     non-enumerable properties
-    -   Duktape prevents this in each relevant built-in function.
--   User ECMAScript code should not be given references to internal
+  - Duktape prevents this in each relevant built-in function.
+- User ECMAScript code should not be given references to internal
     strings, i.e. strings other than valid UTF-8/CESU-8 encodings
--   Untrusted ECMAScript code should have no access to buffer values or
+- Untrusted ECMAScript code should have no access to buffer values or
     buffer constructors because it\'s easy to create an internal
     property name with buffers
 
@@ -1443,87 +1412,32 @@ and how they are mapped to the `duk_hobject` implementation. The double
 brackets are omitted from the specification property names (e.g.
 `[[Class]]` is listed as \"Class\").
 
-  ------------------------------------------------------------------------
-  Property            Implementation
-  ------------------- ----------------------------------------------------
-  Prototype           `duk_hobject` struct `prototype` field.
-
-  Class               `duk_hobject` flags field, encoded as a number.
-
-  Extensible          `duk_hobject` flag `DUK_HOBJECT_FLAG_EXTENSIBLE`.
-
-  Get                 Not stored, implicit in algorithms.
-
-  GetOwnProperty      Not stored, implicit in algorithms.
-
-  GetProperty         Not stored, implicit in algorithms.
-
-  Put                 Not stored, implicit in algorithms.
-
-  CanPut              Not stored, implicit in algorithms.
-
-  HasProperty         Not stored, implicit in algorithms.
-
-  Delete              Not stored, implicit in algorithms.
-
-  DefaultValue        Not stored, implicit in algorithms.
-
-  DefineOwnProperty   Not stored, implicit in algorithms.
-
-  PrimitiveValue      Internal property `_Value`.
-
-  Construct           Not stored, implicit in algorithms. `duk_hobject`
-                      flag `DUK_HOBJECT_FLAG_CONSTRUCTABLE` indicates
-                      whether the object is a constructor, i.e.
-                      conceptually implements the internal `[[Construct]]`
-                      function. Note that all callable objects are not
-                      constructable.
-
-  Call                Not stored, implicit in algorithms. `duk_hobject`
-                      macro `DUK_HOBJECT_IS_CALLABLE` determines whether
-                      the object is callable, i.e. conceptually implements
-                      the internal `[[Call]]` function. The check is made
-                      using (other) object type flags, there is no
-                      dedicated \"callable\" flag.
-
-  HasInstance         Not stored, implicit in algorithms.
-
-  Scope               Internal `duk_hcompfunc` fields `lex_env` and
-                      `var_env`. Unlike E5, global and eval code are also
-                      compiled into functions, hence two scope fields are
-                      needed.)
-
-  FormalParameters    Internal property `_Formals`.
-
-  Code                An ECMAScript function (`duk_hcompfunc`) has a
-                      pointer to compiled bytecode and associated data
-                      (such as constants), see `duk_hcompfunc.h`. A C
-                      function (`duk_hnatfunc`) has a pointer to a a C
-                      function and some related control data, see
-                      `duk_hnatfunc.h`. Lightfunc C function pointer is
-                      embedded in the tagged `duk_tval` directly.
-
-  TargetFunction      `duk_hobject` flag `DUK_HOBJECT_FLAG_BOUND` is set,
-                      and the internal property `_Target` is set to the
-                      target function.
-
-  BoundThis           `duk_hobject` flag `DUK_HOBJECT_FLAG_BOUND` is set
-                      and the internal property `_This` is set to the
-                      `this` binding.
-
-  BoundArguments      `duk_hobject` flag `DUK_HOBJECT_FLAG_BOUND` is set
-                      and the internal property `_Args` is set to a list
-                      of bound arguments.
-
-  Match               Not stored, implicit in algorithms. Object type
-                      (class number is DUK_HOBJECT_CLASS_REGEXP)
-                      determines whether `[[Match]]` is conceptually
-                      supported. The compiled regexp and its flags are
-                      stored as the `_Bytecode` internal property, whose
-                      value is an internal string.
-
-  ParameterMap        Internal property `_Map`.
-  ------------------------------------------------------------------------
+Property          | Implementation
+------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Prototype         | `duk_hobject` struct `prototype` field.
+Class             | `duk_hobject` flags field, encoded as a number.
+Extensible        | `duk_hobject` flag `DUK_HOBJECT_FLAG_EXTENSIBLE`.
+Get               | Not stored, implicit in algorithms.
+GetOwnProperty    | Not stored, implicit in algorithms.
+GetProperty       | Not stored, implicit in algorithms.
+Put               | Not stored, implicit in algorithms.
+CanPut            | Not stored, implicit in algorithms.
+HasProperty       | Not stored, implicit in algorithms.
+Delete            | Not stored, implicit in algorithms.
+DefaultValue      | Not stored, implicit in algorithms.
+DefineOwnProperty | Not stored, implicit in algorithms.
+PrimitiveValue    | Internal property `_Value`.
+Construct         | Not stored, implicit in algorithms. `duk_hobject` flag `DUK_HOBJECT_FLAG_CONSTRUCTABLE` indicates whether the object is a constructor, i.e. conceptually implements the internal `[[Construct]]` function. Note that all callable objects are not constructable.
+Call              | Not stored, implicit in algorithms. `duk_hobject` macro `DUK_HOBJECT_IS_CALLABLE` determines whether the object is callable, i.e. conceptually implements the internal `[[Call]]` function. The check is made using (other) object type flags, there is no dedicated \"callable\" flag.
+HasInstance       | Not stored, implicit in algorithms.
+Scope             | Internal `duk_hcompfunc` fields `lex_env` and `var_env`. Unlike E5, global and eval code are also compiled into functions, hence two scope fields are needed.)
+FormalParameters  | Internal property `_Formals`.
+Code              | An ECMAScript function (`duk_hcompfunc`) has a pointer to compiled bytecode and associated data (such as constants), see `duk_hcompfunc.h`. A C function (`duk_hnatfunc`) has a pointer to a a C function and some related control data, see `duk_hnatfunc.h`. Lightfunc C function pointer is embedded in the tagged `duk_tval` directly.
+TargetFunction    | `duk_hobject` flag `DUK_HOBJECT_FLAG_BOUND` is set, and the internal property `_Target` is set to the target function.
+BoundThis         | `duk_hobject` flag `DUK_HOBJECT_FLAG_BOUND` is set and the internal property `_This` is set to the `this` binding.
+BoundArguments    | `duk_hobject` flag `DUK_HOBJECT_FLAG_BOUND` is set and the internal property `_Args` is set to a list of bound arguments.
+Match             | Not stored, implicit in algorithms. Object type (class number is DUK_HOBJECT_CLASS_REGEXP) determines whether `[[Match]]` is conceptually supported. The compiled regexp and its flags are stored as the `_Bytecode` internal property, whose value is an internal string.
+ParameterMap      | Internal property `_Map`
 
 ## Exotic behavior and virtual properties
 
@@ -1561,70 +1475,70 @@ contents, not the \"PDF page number\").
 
 Section 8.6.2, pages 32-33 summarizes exotic behavior and refers to:
 
--   Array objects: `[[DefineOwnProperty]]`, E5 Section 15.4.5.1
--   String objects: `[[GetOwnProperty]]`, E5 Section 15.5.5.2
--   Arguments objects: `[[Get]]`, `[[GetOwnProperty]]`,
+- Array objects: `[[DefineOwnProperty]]`, E5 Section 15.4.5.1
+- String objects: `[[GetOwnProperty]]`, E5 Section 15.5.5.2
+- Arguments objects: `[[Get]]`, `[[GetOwnProperty]]`,
     `[DefineOwnProperty]]`, `[[Delete]]`, E5 Section 10.6 (the exotic
     behavior of a non-strict arguments object is pretty intricate and is
     discussed separately in `arguments-object.rst`)
--   Function objects: `[[Get]]`, E5 Section 15.3
+- Function objects: `[[Get]]`, E5 Section 15.3
 
 Exotic behavior for `[[Get]]`:
 
--   The `arguments` object: E5 Section 10.5
-    -   If `arguments.caller` has a value, which is a strict function
+- The `arguments` object: E5 Section 10.5
+  - If `arguments.caller` has a value, which is a strict function
         object, the `[[Get]]` operation fails after standard lookup is
         complete.
-    -   Note that the exotic behavior occurs at the level of `[[Get]]`
+  - Note that the exotic behavior occurs at the level of `[[Get]]`
         and is *not* visible through property descriptors, e.g. through
         `[[GetProperty]]` or `[[GetOwnProperty]]`.
-    -   Exotic behavior only applies to non-strict arguments objects.
--   The `Function` object: E5 Section 15.3.5.4
-    -   Same exotic behavior for `caller` property as for `arguments`
+  - Exotic behavior only applies to non-strict arguments objects.
+- The `Function` object: E5 Section 15.3.5.4
+  - Same exotic behavior for `caller` property as for `arguments`
         object.
 
 Exotic behavior for `[[GetOwnProperty]]`:
 
--   `String` object array-index properties: E5 Section 15.5.5.2
-    -   Covers properties which are valid array indexes as specified in
+- `String` object array-index properties: E5 Section 15.5.5.2
+  - Covers properties which are valid array indexes as specified in
         E5 Section 15.4, i.e. P for which `ToString(ToUint32(P)) == P`
         and `ToUint32(P) != 0xffffffff`.
-    -   ECMAScript E5.1 extended behavior to all number-like properties,
+  - ECMAScript E5.1 extended behavior to all number-like properties,
         and thus allows strings longer than 4G characters.
--   `Array` `length` property: E5 Section 15.4.5
-    -   May be implemented as a concrete property or as a virtual
+- `Array` `length` property: E5 Section 15.4.5
+  - May be implemented as a concrete property or as a virtual
         property. Currently implemented as a concrete property.
--   The `arguments` object: E5 Section 10.5
-    -   The `[[Value]]` of a property descriptor may be overridden for
+- The `arguments` object: E5 Section 10.5
+  - The `[[Value]]` of a property descriptor may be overridden for
         \"magically bound\" properties (some numeric indices).
-    -   Exotic behavior only applies to non-strict arguments objects.
+  - Exotic behavior only applies to non-strict arguments objects.
 
 Exotic behavior for `[[DefineOwnProperty]]`:
 
--   `Array` `length` property: E5 Section 15.4.5.1
-    -   Has side effects on array elements (deleting elements above
+- `Array` `length` property: E5 Section 15.4.5.1
+  - Has side effects on array elements (deleting elements above
         newly written length).
--   `Array` index properties: E5 Section 15.4.5.1
-    -   Has the side effect of automatically updating array `length`.
--   The `arguments` object: E5 Section 10.6
-    -   Automatic interaction with \"magically bound\" variables (some
+- `Array` index properties: E5 Section 15.4.5.1
+  - Has the side effect of automatically updating array `length`.
+- The `arguments` object: E5 Section 10.6
+  - Automatic interaction with \"magically bound\" variables (some
         numeric indices). May also remove magic binding.
-    -   Exotic behavior only applies to non-strict arguments objects.
+  - Exotic behavior only applies to non-strict arguments objects.
 
 Exotic behavior for `[[Delete]]`:
 
--   The `arguments` object: E5 Section 10.6
-    -   Automatic interaction with \"magically\" bound variables (some
+- The `arguments` object: E5 Section 10.6
+  - Automatic interaction with \"magically\" bound variables (some
         numeric indices), may remove magic binding.
-    -   Exotic behavior only applies to non-strict arguments objects.
+  - Exotic behavior only applies to non-strict arguments objects.
 
 When implementing exotic or virtual properties, property attributes must
 be respected normally. Exotic or virtual properties may have specific
 initial attributes, but these are not fixed and may be changed later by
 user code. The *only* properties which are \"truly fixed\" are:
 
--   Non-configurable, non-writable data properties
--   Non-configurable accessor properties
+- Non-configurable, non-writable data properties
+- Non-configurable accessor properties
 
 In particular, a data property which is non-configurable but writable
 *can* be changed to non-writable (see E5 Section, step 10). The property
@@ -1639,67 +1553,34 @@ specification, along with their (initial) property attributes in the
 columns W(ritable), E(numerable), and C(onfigurable): `y` means
 \"true\", `n` means \"false\", `a` means \"any\":
 
-  ---------------------------------------------------------------------
-  Object       Property    W   E   C   Notes
-  ------------ ----------- --- --- --- --------------------------------
-  `Array`      `length`    y   n   n   Write may affect array elements
-  instance                             (indices above new length are
-                                       deleted)
-
-  `Array`      array       a   a   a   Write may affect array `length`
-  instance     indices                 (if new index is above existing
-                                       length)
-
-  `String`     `length`    n   n   n   No exotic behavior as such, but
-  instance                             easy to implement as a virtual
-                                       property because not writable or
-                                       configurable.
-
-  `String`     array       n   y   n   No exotic behavior as such, but
-  instance     indices                 maps individual characters to
-               inside                  indicates; affects enumeration.
-               string                  
-               length                  
-
-  plain string `length`    n   n   n   See notes below.
-  value                                
-
-  plain string array       n   y   n   See notes below.
-  value        indices                 
-               inside                  
-               string                  
-               length                  
-
-  Arguments    some        y   y   y   Some numeric indices of an
-  object,      numeric                 arguments object \"magically
-  non-strict   indices                 bind\" to formal arguments. Only
-                                       affects a non-strict arguments
-                                       object.
-
-  Arguments    `caller`    a   a   a   If *value* of `caller` property
-  object,                              is a strict function, `[[Get]]`
-  non-strict                           fails (but `[[GetOwnProperty]]`
-                                       does not!). Only affects a
-                                       non-strict arguments object.
-  ---------------------------------------------------------------------
+Object                       | Property                           | W | E | C | Notes
+-----------------------------|------------------------------------|---|---|---|--------------------------------------------------------------------------------------------------------------------------------------------------------
+`Array` instance             | `length`                           | y | n | n | Write may affect array elements (indices above new length are deleted)
+`Array` instance             | array indices                      | a | a | a | Write may affect array `length` (if new index is above existing length)
+`String` instance            | `length`                           | n | n | n | No exotic behavior as such, but easy to implement as a virtual property because not writable or configurable.
+`String` instance            | array indices inside string length | n | y | n | No exotic behavior as such, but maps individual characters to indicates; affects enumeration.
+plain string value           | `length`                           | n | n | n | See notes below.
+plain string value           | array indices inside string length | n | y | n | See notes below.
+Arguments object, non-strict | some numeric indices               | y | y | y | Some numeric indices of an arguments object \"magically bind\" to formal arguments. Only affects a non-strict arguments object.
+Arguments object, non-strict | `caller`                           | a | a | a | If *value* of `caller` property is a strict function, `[[Get]]` fails (but `[[GetOwnProperty]]` does not!). Only affects a non-strict arguments object.
 
 Notes:
 
--   The exotic properties for `String` instances (which are objects)
+- The exotic properties for `String` instances (which are objects)
     also apply in practice to plain strings, because properties of plain
     strings can also be accessed (the string is automatically promoted
     to a temporary object; the implementation handles this without an
     actual temporary object being created).
--   The `caller` property of a non-strict arguments object is curious:
+- The `caller` property of a non-strict arguments object is curious:
     it has exotic behavior but no such property is established for
     non-strict argument objects. (This is why its property attributes
     are listed as \"any\" above.)
--   The only exotic properties which are easy to implement as fully
+- The only exotic properties which are easy to implement as fully
     virtual, stateless properties are the `String` instance `length` and
     array index properties, because they are non-configurable and
     non-writable. They are enumerable, though, which must be taken into
     account in enumeration.
--   The array `length` property has an initial value which is a valid
+- The array `length` property has an initial value which is a valid
     array length (32-bit unsigned integer). The exotic behavior of the
     property ensures that whatever values are assigned to it, they are
     either rejected or coerced into a valid array length (32-bit
@@ -1710,70 +1591,25 @@ Notes:
 The following table summarizes the implementation of exotic properties
 at the moment.
 
-  -----------------------------------------------------------------------
-  Object       Property     Description
-  ------------ ------------ ---------------------------------------------
-  `Array`      `length`     Stored as a concrete property.
-  instance                  `DUK_HOBJECT_FLAG_EXOTIC_ARRAY` enables
-                            exotic behavior in:
-                            `duk_hobject_put_value()`,
-                            `duk_hobject_object_define_property()`.
+Object                       | Property                            | Description
+-----------------------------|-------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+`Array` instance             | `length`                            | Stored as a concrete property. `DUK_HOBJECT_FLAG_EXOTIC_ARRAY` enables exotic behavior in: `duk_hobject_put_value()`, `duk_hobject_object_define_property()`.
+`Array` instance             | array indices                       | Stored as conrete properties in array part or entry part (if array part abandoned). `DUK_HOBJECT_FLAG_EXOTIC_ARRAY` enables exotic behavior in: `duk_hobject_put_value()`, `duk_hobject_object_define_property()`.
+`String` instance            | `length`                            | Virtual property computed from the string length of the internal `_Value` property. `DUK_HOBJECT_FLAG_EXOTIC_STRINGOBJ` enables exotic behavior in: `get_own_property_desc()`.
+`String` instance            | array indices inside string length  | Virtual properties computed by looking up characters of the internal `_Value` property. `DUK_HOBJECT_FLAG_EXOTIC_STRINGOBJ` enables exotic behavior in: `get_own_property_desc()`.
+plain string value           | `length`                            | Exotic handling in property access code, return string character length without promoting the plain string value to a temporary `String` instance.
+plain string value           | array indices  inside string length | Exotic handling in property access code, return individual character value without promoting the plain string value to a temporary `String` instance.
+Arguments object, non-strict | some numeric indices                | Stored as concrete property values. `DUK_HOBJECT_FLAG_EXOTIC_ARGUMENTS` enables exotic behavior in: `get_own_property_desc()`, `duk_hobject_get_value()`, `duk_hobject_put_value()`, `duk_hobject_delete_property()`, `duk_hobject_object_define_property()`.
+Arguments object, non-strict | `caller`                            | Stored as a concrete property `DUK_HOBJECT_FLAG_EXOTIC_ARGUMENTS` enables exotic behavior in: `duk_hobject_get_value()`. This exotic behavior only affects `[[Get]]`, it is not visible through e.g. property descriptors or `[[GetOwnProperty]]`.
 
-  `Array`      array        Stored as conrete properties in array part or
-  instance     indices      entry part (if array part abandoned).
-                            `DUK_HOBJECT_FLAG_EXOTIC_ARRAY` enables
-                            exotic behavior in:
-                            `duk_hobject_put_value()`,
-                            `duk_hobject_object_define_property()`.
-
-  `String`     `length`     Virtual property computed from the string
-  instance                  length of the internal `_Value` property.
-                            `DUK_HOBJECT_FLAG_EXOTIC_STRINGOBJ` enables
-                            exotic behavior in:
-                            `get_own_property_desc()`.
-
-  `String`     array        Virtual properties computed by looking up
-  instance     indices      characters of the internal `_Value` property.
-               inside       `DUK_HOBJECT_FLAG_EXOTIC_STRINGOBJ` enables
-               string       exotic behavior in:
-               length       `get_own_property_desc()`.
-
-  plain string `length`     Exotic handling in property access code,
-  value                     return string character length without
-                            promoting the plain string value to a
-                            temporary `String` instance.
-
-  plain string array        Exotic handling in property access code,
-  value        indices      return individual character value without
-               inside       promoting the plain string value to a
-               string       temporary `String` instance.
-               length       
-
-  Arguments    some numeric Stored as concrete property values.
-  object,      indices      `DUK_HOBJECT_FLAG_EXOTIC_ARGUMENTS` enables
-  non-strict                exotic behavior in:
-                            `get_own_property_desc()`,
-                            `duk_hobject_get_value()`,
-                            `duk_hobject_put_value()`,
-                            `duk_hobject_delete_property()`,
-                            `duk_hobject_object_define_property()`.
-
-  Arguments    `caller`     Stored as a concrete property.
-  object,                   `DUK_HOBJECT_FLAG_EXOTIC_ARGUMENTS` enables
-  non-strict                exotic behavior in:
-                            `duk_hobject_get_value()`. This exotic
-                            behavior only affects `[[Get]]`, it is not
-                            visible through e.g. property descriptors or
-                            `[[GetOwnProperty]]`.
-  -----------------------------------------------------------------------
 
 Notes:
 
--   The only virtual properties are `String` object `length` and array
+- The only virtual properties are `String` object `length` and array
     index properties. These are easy to implement as virtual properties
     because they are non-configurable and non-writable. However, they
     *are* enumerable which affects enumeration handling.
--   If array `length` becomes non-writable, the exotic behavior ensures
+- If array `length` becomes non-writable, the exotic behavior ensures
     no elements above the specified length can ever be inserted. The
     array part could thus be compacted without risk of it being extended
     afterwards.
@@ -1814,17 +1650,17 @@ is a valid value:
 
 The following internal objects are currently used:
 
--   Function templates which are \"instantiated\" into concrete closures
--   A declarative environment record
--   An object environment record
--   Function formals name list
--   Function variable map
+- Function templates which are \"instantiated\" into concrete closures
+- A declarative environment record
+- An object environment record
+- Function formals name list
+- Function variable map
 
 Internal objects don\'t always need ECMAScript properties like:
 
--   Enumeration order
--   Property attributes
--   Prototype chain
+- Enumeration order
+- Property attributes
+- Prototype chain
 
 The current implementation does not take advantage of these: internal
 objects are handled just like ECMAScript objects.
@@ -1835,15 +1671,15 @@ The creation of function instances is described in E5 Section 13.2. Each
 function instance (each closure created from a function expression or
 declaration) has the following properties:
 
--   `length`
--   `prototype`: points to a fresh object which has a `constructor`
+- `length`
+- `prototype`: points to a fresh object which has a `constructor`
     property pointing back to the function
--   `caller`: thrower (strict functions only)
--   `arguments`: thrower (strict functions only)
+- `caller`: thrower (strict functions only)
+- `arguments`: thrower (strict functions only)
 
 There is considerable variance in practical implementations:
 
--   smjs:
+- smjs:
 
         // the "name" property is non-standard; "arguments" and "caller" are
         // present for a non-strict function
@@ -1871,7 +1707,7 @@ There is considerable variance in practical implementations:
         js> Object.getOwnPropertyDescriptor(f, 'name')
         ({configurable:false, enumerable:false, value:"foo", writable:false})
 
--   nodejs (v8):
+- nodejs (v8):
 
         // "name" is non-standard; "arguments" and "caller" are present
         // for even a non-strict function
@@ -1908,7 +1744,7 @@ There is considerable variance in practical implementations:
           enumerable: false,
           configurable: false }
 
--   rhino:
+- rhino:
 
         // "name" is non-standard, "arity" is non-standard, "arguments"
         // is present (but "caller" is not)
@@ -1951,7 +1787,7 @@ custom object behavior extensions and full object virtualization, see
 <http://www.lua.org/pil/13.html> for a description of Lua metatables.
 There is a similar mechanism in ECMAScript 6 called \"Proxy object\":
 
--   <http://www.ecma-international.org/ecma-262/6.0/index.html#sec-proxy-object-internal-methods-and-internal-slots>
+- <http://www.ecma-international.org/ecma-262/6.0/index.html#sec-proxy-object-internal-methods-and-internal-slots>
 
 The ES2015 Proxy object is of course a natural target for
 implementation, but it\'s not clear what the underlying mechanism should
@@ -1962,28 +1798,28 @@ provide non-standard additional features?
 
 Nice-to-have features:
 
--   Sufficient for creating arbitrary \"host objects\"
--   Sufficient for providing array-like access to byte buffers
--   Allow \"full virtualization\" of E5 semantics
+- Sufficient for creating arbitrary \"host objects\"
+- Sufficient for providing array-like access to byte buffers
+- Allow \"full virtualization\" of E5 semantics
 
 Some notes:
 
--   Should interact reasonably with the E5 object model, e.g. property
+- Should interact reasonably with the E5 object model, e.g. property
     descriptors.
--   Should metatable behavior only affect non-existent properties (as in
+- Should metatable behavior only affect non-existent properties (as in
     Lua)? To apply it to all properties, simply use an empty table.
--   May require raw access functions for dealing with the underlying
+- May require raw access functions for dealing with the underlying
     properties.
--   What\'s the best level for capturing operations?
+- What\'s the best level for capturing operations?
     a.  Concrete, exposed operations like getprop, putprop, hasprop,
         delprop, Object.getOwnPropertyDescriptor(),
         Object.defineProperty(), etc?
     b.  Specification functions like `[[GetOwnProperty]]`,
         `[[DefineProperty]]` etc?
--   In addition, should cover:
-    -   Enumeration
-    -   Getting object `[[Class]]`
-    -   Garbage collection =\> finalizer
+- In addition, should cover:
+  - Enumeration
+  - Getting object `[[Class]]`
+  - Garbage collection =\> finalizer
 
 ### ES2015 features
 
@@ -1992,7 +1828,7 @@ object model.
 
 For instance, there are keyed collections:
 
--   <http://www.ecma-international.org/ecma-262/6.0/index.html#sec-keyed-collection>
+- <http://www.ecma-international.org/ecma-262/6.0/index.html#sec-keyed-collection>
 
 The `Map` object provides an arbitrary collection of key/value pairs,
 where keys and values can be arbitrary ECMAScript objects. This is very
@@ -2011,8 +1847,8 @@ them.
 There are various proposals for typed access to an underlying buffer.
 For instance:
 
--   <http://www.khronos.org/registry/typedarray/specs/latest/>
--   <http://nodejs.org/docs/v0.4.7/api/buffers.html>
+- <http://www.khronos.org/registry/typedarray/specs/latest/>
+- <http://nodejs.org/docs/v0.4.7/api/buffers.html>
 
 See `buffers.txt`.
 
@@ -2051,29 +1887,29 @@ footprint of 8000 extra bytes on a 32-bit platform.
 
 Some hash algorithm goals:
 
--   Minimal memory allocation
--   High load factor (minimizes memory use)
--   Small code space
+- Minimal memory allocation
+- High load factor (minimizes memory use)
+- Small code space
 
 Closed hashing (open addressing) provides fixed allocation, but requires
 a \"probe sequence\" to deal with hash collisions. Options for dealing
 with collisions include:
 
--   <http://en.wikipedia.org/wiki/Linear_probing>
--   <http://en.wikipedia.org/wiki/Quadratic_probing>
--   <http://en.wikipedia.org/wiki/Double_hashing>
--   <http://en.wikipedia.org/wiki/Cuckoo_hashing>
+- <http://en.wikipedia.org/wiki/Linear_probing>
+- <http://en.wikipedia.org/wiki/Quadratic_probing>
+- <http://en.wikipedia.org/wiki/Double_hashing>
+- <http://en.wikipedia.org/wiki/Cuckoo_hashing>
 
 Notes on current solution:
 
--   Linear probing is more cache efficient but requires a lower load (=
+- Linear probing is more cache efficient but requires a lower load (=
     higher allocated size relative to used size) to avoid \'clustering\'
     issues. Current approach prefers compact object size over cache
     efficiency.
--   Slightly better probe would be: `probe_steps[(hash >> 16) % 32]`.
+- Slightly better probe would be: `probe_steps[(hash >> 16) % 32]`.
     This could possibly correlate less with the initial hash value, but
     requires an extra shift operation. Most likely not worth it.
--   The current algorithm is not very good, as it requires the load
+- The current algorithm is not very good, as it requires the load
     factor to be relatively low (around 70-80%) to be efficient. Much
     better results are possible. This is definite future work.
 
@@ -2091,13 +1927,13 @@ The current approach is to maintain a simple, ordered entry part, and
 then provide an optional hash table on top of that. This has some nice
 properties:
 
--   The entry part maintains key ordering trivially.
--   The hash part is optional, which minimizes object size. For small
+- The entry part maintains key ordering trivially.
+- The hash part is optional, which minimizes object size. For small
     objects a linear scan of keys is also relatively efficient because
     the keys are adjacent in memory (being in the own \"sub array\").
--   The hash part is non-critical. For instance, it could be dumped in
+- The hash part is non-critical. For instance, it could be dumped in
     an emergency out of memory situation without losing any information.
--   It would be relatively straightforward to support multiple hash
+- It would be relatively straightforward to support multiple hash
     algorithms for e.g. different object sizes. In particular, it might
     be useful to have a variant for medium size objects, where entry
     part indices could be 8-bit or 16-bit values (instead of 32-bit).
@@ -2115,10 +1951,10 @@ preserve property ordering, no exotic behaviors, etc.
 However, the extra cost of having another object data structure does not
 seem worth it. The effects are:
 
--   Code size is increased by several kilobytes.
--   Internal objects data size decreases slightly (no need to track
+- Code size is increased by several kilobytes.
+- Internal objects data size decreases slightly (no need to track
     property attributes, for instance).
--   Internal object property lookup is slightly more performant.
+- Internal object property lookup is slightly more performant.
 
 Currently it seems to make more sense to use the same object abstraction
 but to provide \"short cut\" raw property accessors for faster / simpler
@@ -2135,9 +1971,9 @@ For instance, the array part could be \"frozen\" and entries above the
 allocated size could reside in the entry part. This is an easy and
 relatively straightforward policy too:
 
--   If the \"frozen\" flag is set, never resize the array part (except
+- If the \"frozen\" flag is set, never resize the array part (except
     perhaps to abandon it entirely).
--   If an array index key is not found from the array part, and the
+- If an array index key is not found from the array part, and the
     \"frozen\" flag is *not* set, no need to look at the entry part
     (this would be the common case). If the \"frozen\" flag is set, need
     to look at the entry part, too.
@@ -2149,10 +1985,10 @@ deletions.
 
 ### Array size management improvements
 
--   When to do compaction checks (e.g. property deletion)?
--   Periodic actual density checks (relative to e_size + a_size to keep
+- When to do compaction checks (e.g. property deletion)?
+- Periodic actual density checks (relative to e_size + a_size to keep
     average cost limited)?
--   Triggered density checks?
+- Triggered density checks?
 
 ### More fast paths for array indexing
 
@@ -2165,26 +2001,26 @@ in the prototype chain.
 How to do the prototype chain check required by `[[Put]]` efficiently?
 In other hands, how to the check *without interning the index* that:
 
--   The property does not exist in any ancestor.
--   Or if it exists in an ancestor, the write is not prevented by a
+- The property does not exist in any ancestor.
+- Or if it exists in an ancestor, the write is not prevented by a
     non-writable property or \"captured\" by an accessor property.
 
 Some approaches:
 
--   Rework the property lookup to do lazy interning in general.
--   Add an object flag `DUK_HOBJECT_FLAG_NO_ARRIDX_PROPS`.
-    -   If set, the flag guarantees that the object has no concrete or
+- Rework the property lookup to do lazy interning in general.
+- Add an object flag `DUK_HOBJECT_FLAG_NO_ARRIDX_PROPS`.
+  - If set, the flag guarantees that the object has no concrete or
         virtual array indexed properties.
-    -   The prototype walking check can then simply check that no object
+  - The prototype walking check can then simply check that no object
         in the prototype chain has this flag cleared. The flag must be
         cleared for e.g. `String` objects which have virtual array
         indexed properties.
-    -   Unfortunately the `Array` prototype is itself an array, see E5
+  - Unfortunately the `Array` prototype is itself an array, see E5
         Section 15.4.4. However, it normally has no array elements, so
         it could have the flag set initially, and if someone set an
         array index to the prototype (which does not really make sense)
         the flag would be cleared, wrecking performance.
-    -   Whenever adding a new property (by whichever means) and the key
+  - Whenever adding a new property (by whichever means) and the key
         is an array index, the flag must be cleared for the target
         object.
 
@@ -2296,13 +2132,13 @@ internal reorganizations (hash part resizing, array part reallocation or
 dropping, compactions) can cause enumeration to fail. There are at least
 three basic approaches to manage these:
 
-1.  Freeze the object when one or more enumerations are in progress.
+1. Freeze the object when one or more enumerations are in progress.
     However, to do this, enumerations must be tracked which complicates
     execution.
-2.  Design the data structures to work with enumeration (especially
+2. Design the data structures to work with enumeration (especially
     mutation during enumeration) so that the object does not need to
     know that enumerations are in progress. This is difficult.
-3.  Create a snapshot of keys to-be-enumerated when the enumerator is
+3. Create a snapshot of keys to-be-enumerated when the enumerator is
     created. This wastes memory but is guaranteed to work - although
     newly added keys will not show up in the enumeration (which is
     compliant behavior).

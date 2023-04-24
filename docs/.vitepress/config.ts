@@ -689,7 +689,6 @@ export default {
                     text: 'ドキュメント',
                     collapsed: true,
                     items: [
-                        {text: 'はじめに', link: '/translation/duktape/doc/'},
                         {text: 'API設計ガイドライン', link: '/translation/duktape/doc/api-design-guidelines.md'},
                         {text: '引数オブジェクト', link: '/translation/duktape/doc/arguments-object.md'},
                         {text: 'ベンチマークノート', link: '/translation/duktape/doc/benchmarking-notes.md'},
