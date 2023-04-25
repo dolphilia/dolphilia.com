@@ -1,678 +1,440 @@
-# Error objects
+# エラーオブジェクト
 
-Standard ECMAScript `Error` instances are quite barebones: they only
-contain a `name` and a `message`. Most ECMAScript implementations,
-including Duktape, provide additional error properties like file name,
-line number, and traceback. ECMAScript allows throwing of arbitrary
-values, although most user code throws objects inheriting from the
-`Error` constructor.
+標準的な ECMAScript の `Error` インスタンスは、 `name` と `message` を含むだけで、非常に素っ気ないものです。Duktape を含むほとんどの ECMAScript 実装は、ファイル名、行番号、トレースバックなどの追加のエラープロパティを提供します。ECMAScriptは任意の値を投げることができるが、ほとんどのユーザーコードは `Error` コンストラクタを継承したオブジェクトを投げる。
 
-This document describes how Duktape creates and throws `Error` objects,
-what properties such objects have, and what error message verbosity
-levels are available. The internal traceback data format and the
-mechanism for providing human readable tracebacks is also covered.
+このドキュメントでは、Duktape がどのようにして `Error` オブジェクトを作成し、投げるのか、そのようなオブジェクトが持つプロパティは何か、そしてどのようなエラーメッセージの冗長性レベルが利用可能かについて説明しています。また、内部トレースバックデータフォーマットと、人間が読めるトレースバックを提供するメカニズムについても説明します。
 
-Also see the user documentation which covers the exposed features in a
-more approachable way.
+また、公開されている機能をより分かりやすく解説したユーザードキュメントもご覧ください。
 
-## Error message verbosity levels
+## エラーメッセージの冗長性レベル
 
-There are three levels of error message verbosity, controlled by
-indicated defines:
+エラーメッセージの冗長性は3段階あり、指示された定義によって制御されます：
 
-  -------------------------------------------------------------------------------------------------
-  DUK_USE_VERBOSE_ERRORS   DUK_USE_PARANOID_ERRORS   Description
-  ------------------------ ------------------------- ----------------------------------------------
-  set                      not set                   Verbose messages with offending keys/values
-                                                     included, e.g.
-                                                     `number required, found 'xyzzy' (index -3)`.
-                                                     This is the default behavior.
+DUK_USE_VERBOSE_ERRORS | DUK_USE_PARANOID_ERRORS | Description
+-----------------------|-------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+set                    | not set                 | 例えば、`number required, found 'xyzzy' (index -3)`のように、問題のあるキー/値を含むメッセージを表示します。これはデフォルトの動作です。
+set                    | set                     | 例えば、`number required, found string (index -3)`のように、問題のあるキー/値を含まない冗長なメッセージです。エラーメッセージに含まれるキー/値がセキュリティ上問題となる可能性があると考えられる場合に有用です。
+not set                | ignored                 | エラーオブジェクトは実際のエラーメッセージを持たない。エラーコードを文字列に変換したものが `.message` で提供される。メモリが非常に少ないターゲットに有用である。
 
-  set                      set                       Verbose messages with offending keys/values
-                                                     not included, e.g.
-                                                     `number required, found string (index -3)`.
-                                                     Useful when keys/values in error messages are
-                                                     considered a potential security issue.
+今後の課題：
 
-  not set                  ignored                   Error objects won\'t have actual error
-                                                     messages; error code converted to a string is
-                                                     provided in `.message`. Useful for very low
-                                                     memory targets.
-  -------------------------------------------------------------------------------------------------
+- エラーメッセージ文字列が存在しても、最小限の数の異なるメッセージ文字列が存在するような低メモリのエラーメッセージがあれば便利でしょう。例えば、`duk_require_xxx()`の型の不一致によるすべてのエラーは `"unexpected type"` となり、すべてのスタックインデックスのエラーは `"invalid argument"` となる。
 
-Future work:
+## 誤差補強の概要
 
--   It would be useful to have low memory error messages where error
-    message strings were present, but there would be a minimal number of
-    different message strings. For example, all errors from
-    `duk_require_xxx()` type mismatches could result in
-    `"unexpected type"` and all stack index errors could result in
-    `"invalid argument"`.
+Duktapeでは、エラーオブジェクトを(1)生成時、(2)投げられる直前で拡張することができます。オブジェクトは一度しか生成されませんが、何度も投げたり、投げ直したりすることができます（ただし、オブジェクトの生成に関するコーナーケースもあります。）
 
-## Error augmentation overview
+`Error` のインスタンスが生成されたとき：
 
-Duktape allows error objects to be augmented at (1) their creation, and
-(2) when they are just about the be thrown. Augmenting an error object
-at its creation time is usually preferable to augmenting it when it is
-being thrown: an object is only created once but can be thrown and
-rethrown multiple times (however, there are corner cases related to
-object creation too, see below for details).
+- Duktape はまず、トレースバックまたはファイル/ライン情報 (アクティブな設定オプションに依存) をエラーオブジェクトに追加します。
+- 次に、`Duktape.errCreate`が設定されていれば、それを呼び出してエラーをさらに拡張したり、完全に置き換えたりします。このコールバックは、実装内部では**エラーハンドラ**と呼ばれています。ユーザは必要に応じてエラーハンドラを設定することができますが、デフォルトでは設定されていません。
 
-When an instance of `Error` is created:
+`Error` のインスタンスであるエラー値のみが拡張され、他の種類の値 (オブジェクトであっても) はそのままであることに注意してください。ユーザーエラーハンドラーは `Error` インスタンスでのみ呼び出されます。
 
--   Duktape first adds traceback or file/line information (depending on
-    active config options) to the error object.
--   Then, if `Duktape.errCreate` is set, it is called to augment the
-    error further or replace it completely. The callback is called an
-    **error handler** inside the implementation. The user can set an
-    error handler if desired, by default it is not set.
+**任意の値**が投げられたとき（または再投げられたとき）：
 
-Note that only error values which are instances of `Error` are
-augmented, other kinds of values (even objects) are left alone. A user
-error handler only gets called with `Error` instances.
+- `Duktape.errThrow`が設定されている場合、投げられた値を補強または置き換えるために呼び出されます。ユーザは必要に応じてエラーハンドラを設定することができますが、デフォルトでは設定されていません。
 
-When **any value** is thrown (or re-thrown):
+`Error` インスタンスだけでなく、すべての値が `Duktape.errThrow` に渡され処理されることに注意してください。エラーハンドラはまた、ユーザーコンテキストで適切な方法で再投与を処理する必要があります。
 
--   If `Duktape.errThrow` is set, it is called to augment or replace the
-    value thrown. The user can set an error handler if desired, by
-    default it is not set.
+## エラーオブジェクトの作成
 
-Note that all values are given to `Duktape.errThrow` to process, not
-just `Error` instances, so the user error handler must be careful to
-handle all value types properly. The error handler also needs to handle
-re-throwing in whatever way is appropriate in the user context.
+エラーは複数の方法で作成することができます：
 
-## Error object creation
+- ECMAScriptのコードから、通常は(常にではないが)`throw`ステートメントと結びついたエラーを作成する、例えば：
 
-Errors can be created in multiple ways:
+```js
+throw new Error('my error');
+```
 
--   From ECMAScript code by creating an error, usually (but not always)
-    tied to a `throw` statement, e.g.:
+この場合、Errorオブジェクトは、（`new Error(...)`で）Errorオブジェクトを生成したファイルのファイルと行をキャプチャする必要があります。
 
-        throw new Error('my error');
+- Duktape APIを使用したCコードから、例えば：
 
-    In this case the Error object should capture the file and line of
-    the file creating the Error object (with `new Error(...)`).
+```c
+duk_error(ctx, DUK_ERR_RANGE_ERROR, "invalid argument: %d", argvalue);
+```
 
--   From C code using the Duktape API, e.g.:
+このような場合、throwサイトの`__FILE__`と`__LINE__`が非常に便利です。エラーオブジェクトを生成するAPIコールはマクロとして実装され、`__FILE__`と`__LINE__`を便利に捕捉することができます。これは有用なトレースバックを作成するために非常に重要です。
 
-        duk_error(ctx, DUK_ERR_RANGE_ERROR, "invalid argument: %d", argvalue);
+- Duktapeの実装内部から、通常は `DUK_ERROR()` マクロを使って、例えば次のようにします：
 
-    In these cases the `__FILE__` and `__LINE__` of the throw site are
-    very useful. API calls which create an error object are implemented
-    as macros to capture `__FILE__` and `__LINE__` conveniently. This is
-    very important to create useful tracebacks.
+```C
+DUK_ERROR(thr, DUK_ERR_TYPE_ERROR, "invalid argument: %d", argvalue);
+```
 
--   From inside the Duktape implementation, usually with the
-    `DUK_ERROR()` macro, e.g.:
+このような場合、スローサイトの `__FILE__` と `__LINE__` はスタックトレースに含まれますが、エラーオブジェクトの `.fileName` と `.lineNumber` のエラーソースとして、"blamed "されません：ファイル/ラインはDuktape内部で、ユーザーコードにとって最も有用なものではありません。
 
-        DUK_ERROR(thr, DUK_ERR_TYPE_ERROR, "invalid argument: %d", argvalue);
+基本的な `DUK_ERROR()` マクロと同様に動作する、特定のエラー用のヘルパーマクロがいくつか用意されています。
 
-    In these cases the `__FILE__` and `__LINE__` of the throw site are
-    included in the stack trace, but are not \"blamed\" as the source of
-    the error for the Error object\'s `.fileName` and `.lineNumber`: the
-    file/line is Duktape internal and not the most useful for user code.
+Duktape APIを使用して、またはDuktapeの実装内部からエラーが投げられた場合、投げられた値は常に`Error`のインスタンスであるため、拡張されます。エラーの生成とスローは同時に行われます。
 
-    There are several helper macros for specific errors which work
-    similarly to the basic `DUK_ERROR()` macro.
+ECMAScriptのコードからエラーが投げられる場合、状況は異なります。ユーザーコードが、エラーの生成とエラーのスローを分離することを妨げるものは何もない：
 
-When errors are thrown using the Duktape API or from inside the Duktape
-implementation, the value thrown is always an instance of `Error` and is
-therefore augmented. Error creation and throwing happens at the same
-time.
+```js
+var err = new Error('value too large');
+if (arg >= 100) {
+    throw err;
+}
+```
 
-When errors are thrown from ECMAScript code the situation is different.
-There is nothing preventing user code from separating the error creation
-and error throwing from each other:
+実際、ユーザーはエラーを投げるつもりはなくても、トレースバックにアクセスしたいと思うかもしれません：
 
-    var err = new Error('value too large');
-    if (arg >= 100) {
-        throw err;
+```js
+var err = new Error('currently here');
+print('debug: reached this point\n' + err.stack);
+```
+
+上述したように、通常、エラーはスローされたときではなく、作成されたときに増強するのが望ましいです。エラーを再度スローすると、何度も増強される可能性があり（以前の値を上書きする）、エラーによっては、スローされないかもしれませんが、トレースバック情報を持つことで恩恵を受けられます。
+
+Duktapeの組み込みの拡張機能（基本的にトレースバックの追加）は、エラー作成時に行われます。オプションのエラーハンドラにより、エラー作成時とスローされる直前の両方を追加で処理することができます。
+
+具体的には、コンストラクタを呼び出したとき（つまり `new Foo()` ）、呼び出し元のコードに返されようとする最終結果が検査されます。これは、コンストラクタ呼び出しの標準的な処理に対する変更であり、オブジェクトが生成されるたびに一律に適用されます（残念ながら、いくつかのオーバーヘッドが発生します）。最終的な値が `Error` インスタンスである場合、つまりその内部プロトタイプチェーンが `Error.prototype` を含んでいる場合です：
+
+- オブジェクトが拡張可能である場合、その値はDuktapeの組み込み拡張機能によってエラー情報（例えばtraceata）で拡張される。
+- `Duktape.errCreate`がセットされている場合、エラーはユーザーコールバックによってさらに処理されます。この処理を行うためにオブジェクトは拡張可能である必要はありませんが、それでも `Error` インスタンスである必要があることに注意してください。
+
+Duktapeは、オブジェクトに既に同じ名前のフィールドがある場合、追加フィールドの追加を拒否します。例えば、作成されたオブジェクトに `_Tracedata` フィールドがある場合、拡張処理によって上書きされることはありません。(ユーザーエラーハンドラにはそのような制限はなく、エラー値を完全に置き換えることができます)。
+
+特定のオブジェクトが2回構築されることはありませんが、現在のアプローチでは、特別な場合にエラーオブジェクトがその生成中に2回拡張される可能性があります。これは、例えば次のように実現できます：
+
+```js
+function Constructor() {
+    return new Error('my error');
+}
+
+var e = new Constructor();
+```
+
+ここで、エラーオーガメント（Duktape\独自のオーガメント処理とユーザーエラーハンドラを含む）が2回発生することになる：
+
+1. `new Error('my error')`が実行されると、結果が増大される。ユーザーエラーハンドラ（`errCreate`）が存在する場合、それが呼び出される。
+2. `new Constructor()`の呼び出しが戻ると、返されたエラー値がコンストラクタに与えられたデフォルトオブジェクトを置き換えます。置換された値（すなわち `new Error('my error')` の結果）は増強される。
+
+この動作の問題を回避するため、Duktapeの拡張コードでは、すでにフィールドが存在する場合は、エラーにフィールドを追加することを拒否しています。これにより、上記のステップ2でトレースバックデータが上書きされることがないようにします。ユーザーの `errCreate` エラーハンドラは、同じエラーオブジェクトに対する複数の呼び出しに適切に対処する必要があります。最も簡単なのは、次のような方法です：
+
+```js
+Duktape.errCreate = function (e) {
+    if ('timestamp' in e) {
+        return e;  // only touch once
     }
+    e.timestamp = new Date();
+    return e;
+}
+```
 
-In fact, the user may never intend to throw the error but may still want
-to access the traceback:
+作成中に拡張することの欠点は、エラー情報がエラーをスローする実際の `throw` ステートメントを正確に反映しない可能性があることです。特に、ユーザーコードは、実際にエラーがスローされる場所や時間とは全く異なる場所で、全く異なる時間にエラー値を作成する可能性があります。ユーザーコードは、同じエラー値を複数回投げることもあります。
 
-    var err = new Error('currently here');
-    print('debug: reached this point\n' + err.stack);
+エラーオブジェクトは `Error` コンストラクタ（またはサブクラスのコンストラクタ）を通常の関数として呼び出すことによっても作成することができます。標準では、これは意味的にコンストラクタ呼び出しと同等です。Duktapeは、組み込みのエラーコンストラクタを呼び出して作成されたエラーを、通常の関数呼び出しで補強することもできます。しかし、ユーザーが作成したErrorのサブクラスは、この挙動を示さない。例えば、以下のような感じです：
 
-As discussed above, it\'s usually preferable to augment errors when they
-are created rather than when they are thrown: re-throwing an error might
-cause it to be augmented multiple times (overwriting previous values),
-and some errors may never even be thrown but would still benefit from
-having traceback information.
+```js
+MyError = function(msg) { this.message = msg; this.name = 'MyError'; return this; }
+MyError.prototype = Error.prototype;
 
-Duktape\'s built-in augmentation (essentially adding a traceback)
-happens at error creation time; optional error handlers allow user to
-additionally process errors both at their creation and just before they
-are thrown.
+var e1 = new Error('test 1');    // augmented, constructor call
+var e2 = Error('test 2');        // augmented, special handling
+var e3 = new MyError('test 3');  // augmented, constructor call
+var e4 = MyError('test 4');      // not augmented
 
-In more concrete terms, when a constructor call is made (i.e.
-`new Foo()`) the final result which is about to be returned to calling
-code is inspected. This is a change to the standard handling of
-constructor calls and applies uniformly whenever any object is created
-(and unfortunately carries some overhead). If the final value is an
-`Error` instance, i.e. its internal prototype chain contains
-`Error.prototype`:
-
--   If the object is also extensible, the value gets augmented with
-    error information (e.g. tracedata) by Duktape\'s built-in
-    augmentation.
--   If `Duktape.errCreate` is set, the error gets further processed by a
-    user callback; note that the object doesn\'t need to be extensible
-    for this to happen, but it still must be an `Error` instance.
-
-Duktape refuses to add additional fields to the object if it already
-contains fields of the same name. For instance, if the created object
-has a `_Tracedata` field, it won\'t get overwritten by the augmentation
-process. (User error handler has no such restrictions, and it may
-replace the error value entirely.)
-
-Although a particular object is never as such constructed twice, the
-current approach may lead to an error object being augmented twice
-during its creation in special cases. This can be achieved e.g. as
-follows:
-
-    function Constructor() {
-        return new Error('my error');
-    }
-
-    var e = new Constructor();
-
-Here, error augmentation (including Duktape\'s own augmentation handling
-and a user error handler) would happen twice:
-
-1.  When `new Error('my error')` executes, the result gets augmented. If
-    a user error handler (`errCreate`) exists, it is called.
-2.  When the `new Constructor()` call returns, the returned error value
-    replaces the default object given to the constructor. The
-    replacement value (i.e. the result of `new Error('my error')`) gets
-    augmented.
-
-To avoid issues with this behavior, Duktape\'s augmentation code refuses
-to add any field to an error if it\'s already present. This ensures that
-traceback data is not overwritten in step 2 above. A user `errCreate`
-error handler must also deal properly with multiple calls for the same
-error object. It is easiest to do something like:
-
-    Duktape.errCreate = function (e) {
-        if ('timestamp' in e) {
-            return e;  // only touch once
-        }
-        e.timestamp = new Date();
-        return e;
-    }
-
-The downside of augmenting during creation is that the error information
-may not accurately reflect the actual `throw` statement which throws the
-error. In particular, user code may create an error value in a
-completely different place at a completely different time than where and
-when the error is actually thrown. User code may even throw the same
-error value multiple times.
-
-Error objects can also be created by calling the `Error` constructor (or
-a constructor of a subclass) as a normal function. In the standard this
-is semantically equivalent to a constructor call. Duktape will also
-augment an error created by calling a built-in error constructor with a
-normal function call. However, any Error sub-classes created by the user
-don\'t exhibit this behavior. For instance:
-
-    MyError = function(msg) { this.message = msg; this.name = 'MyError'; return this; }
-    MyError.prototype = Error.prototype;
-
-    var e1 = new Error('test 1');    // augmented, constructor call
-    var e2 = Error('test 2');        // augmented, special handling
-    var e3 = new MyError('test 3');  // augmented, constructor call
-    var e4 = MyError('test 4');      // not augmented
-
-    print(e1.stack);
-    print(e2.stack);
-    print(e3.stack);
-    print(e4.stack);
+print(e1.stack);
+print(e2.stack);
+print(e3.stack);
+print(e4.stack);
+```
 
 Prints out:
 
-    Error: test 1
-            global test.js:4 preventsyield
-    Error: test 2
-            Error (null) native strict preventsyield
-            global test.js:5 preventsyield
-    MyError: test 3
-            global test.js:6 preventsyield
-    undefined
+```sh
+Error: test 1
+        global test.js:4 preventsyield
+Error: test 2
+        Error (null) native strict preventsyield
+        global test.js:5 preventsyield
+MyError: test 3
+        global test.js:6 preventsyield
+undefined
+```
 
-Note that because of internal details, the traceback is different for
-the `Error` constructor when it is called as a normal function.
+なお、内部的な詳細のため、`Error`コンストラクタを通常の関数として呼び出した場合のトレースバックは異なる。
 
-Fixing this behavior so that even user errors get augmented when called
-with a non-constructor call seems difficult. It would be difficult to
-detect when augmentation is appropriate and it would also add overhead
-to every normal function call.
+この挙動を修正し、非コンストラクタコールで呼び出されたときにユーザーエラーもオーグメントされるようにするのは難しいようです。増強が適切かどうかを検出するのは難しいでしょうし、通常の関数呼び出しのたびにオーバーヘッドを追加することになります。
 
-## Error throwing
+## エラースロー
 
-When **any error value** is thrown, an optional user error handler set
-to `Duktape.errThrow` can process or replace the error value. This
-applies to all types, because any value can be thrown.
+任意のエラー値**が投げられた場合、`Duktape.errThrow`に設定されたオプションのユーザーエラーハンドラは、エラー値を処理または置き換えることができます。どんな値でも投げられるので、これはすべての型に適用されます。
 
-The user error handler must deal with the following:
+ユーザーエラーハンドラーは、以下のような対応をしなければなりません：
 
--   Restricting error value modification to only relevant values, e.g.
-    only to `Error` instances.
--   Dealing with re-throwing properly.
+- エラー値の変更を関連する値のみに制限する（例：`Error`インスタンスにのみ）。
+- 再スローを適切に処理する。
 
-For example, the following would add a timestamp to an error object on
-their first throw:
+例えば、次のようにすると、エラーオブジェクトが最初に投げられたときに、タイムスタンプが追加されます：
 
-    Duktape.errThrow = function (e) {
-        if (!(e instanceof Error)) {
-            return e;  // only touch errors
-        }
-        if ('timestamp' in e) {
-            return e;  // only touch once
-        }
-        e.timestamp = new Date();
-        return e;
+```js
+Duktape.errThrow = function (e) {
+    if (!(e instanceof Error)) {
+        return e;  // only touch errors
     }
+    if ('timestamp' in e) {
+        return e;  // only touch once
+    }
+    e.timestamp = new Date();
+    return e;
+}
+```
 
-## Specifying error handlers
+## エラーハンドラを指定する
 
-### Current approach
+### 現在の取り組み
 
-The current create/throw error handlers are stored in
-`Duktape.errCreate` and `Duktape.errThrow`. This has several advantages:
+現在のcreate/throwエラーハンドラは `Duktape.errCreate` と `Duktape.errThrow` に格納されています。これにはいくつかの利点があります：
 
--   The `Duktape` object is easy to access from both C and ECMAScript
-    code without additional API bindings.
--   It works relatively well with sandboxing: the `Duktape` object can
-    be moved to a stash (not accessible from user code) during sandbox
-    init, and error handlers can be controlled through the stash from C
-    code.
--   The scope for the error handlers is all threads sharing the same
-    `Duktape` built-in - i.e., threads sharing the same global
-    environment. This means that the error handlers are automatically
-    effective in resumed threads, for instance, which is probably a good
-    default behavior.
+- `Duktape` オブジェクトは、追加の API バインディングなしで C と ECMAScript の両方のコードから簡単にアクセスすることができます。
+- サンドボックスの開始時に `Duktape` オブジェクトを（ユーザーコードからアクセスできない）隠し場所に移動し、C コードから隠し場所を通してエラーハンドラを制御することができます。
+- エラーハンドラのスコープは、同じ `Duktape` 組み込みを共有するすべてのスレッド、つまり、同じグローバル環境を共有するスレッドです。これは、例えば再開されたスレッドではエラーハンドラが自動的に有効になることを意味し、おそらくこれは良いデフォルトの動作である。
 
-### Design alternatives
+### デザインの選択肢
 
-There are several alternatives to the current approach, though. One
-could store the error handler(s) in:
+しかし、現在の方法にはいくつかの代替案があります。一つは、エラーハンドラ(複数)を
 
--   Internal data structures, e.g. `thr->errcreate` and `thr->errthrow`.
-    This would be stronger from a sandboxing point-of-view, but would
-    require custom bindings to get/set the handlers. Also memory
-    management would need to know about the fields.
--   Calling thread\'s value stack (in a caller\'s frame), only for the
-    duration of a specific protected call. This model is used by Lua and
-    was also used by Duktape up to 0.9.0. The downside is that protected
-    calls need to manage error handlers which are quite rarely used.
--   Global object. This seems overall worse than using the `Duktape`
-    object, as it would be worse for sandboxing with no apparent
-    advantages.
--   Thread object. This would require some extra code to \"inherit\"
-    error handler(s) to a resumed thread (as that seems like a good
-    default behavior).
--   Global stash. Good for sandboxing, but would only be accessible from
-    C code by default. This seems like one of the best alternatives for
-    the current behavior.
--   Thread stash. Good for sandboxing, error handler \"inherit\" issue.
+- 内部データ構造、例えば `thr->errcreate` や `thr->errthrow` などです。これはサンドボックスの観点からはより強力ですが、ハンドラを取得/設定するためのカスタムバインディングが必要になります。また、メモリ管理もフィールドについて知っておく必要がある。
+- 特定の保護された呼び出しの間だけ、スレッドの値スタックを呼び出す（呼び出し元のフレームで）。このモデルはLuaで使用されており、Duktapeでも0.9.0まで使用されていた。欠点は、保護された呼び出しが、かなり稀に使用されるエラー・ハンドラを管理する必要があることです。
+- グローバル・オブジェクト。これは `Duktape` オブジェクトを使うよりも全体的に悪いと思われます。なぜなら、サンドボックスのために悪くなり、明らかな利点がないからです。
+- スレッドオブジェクト。これは、再開されたスレッドにエラーハンドラを継承するための余分なコードが必要になります（それは良いデフォルトの動作のように思えるので）。
+- グローバルスタッシュ。サンドボックス化には良いが、デフォルトではCコードからしかアクセスできない。これは、現在の動作に対する最良の選択肢の1つであると思われます。
+- スレッドスタッシュ。サンドボックス化には良いが、エラーハンドラ "inherit "の問題がある。
 
-## Error object properties
+## エラーオブジェクトのプロパティ
 
-The following table summarizes properties of `Error` objects constructed
-within the control of the implementation, with default Duktape config
-options (in particular, tracebacks enabled):
+次の表は、Duktapeのデフォルトの設定オプション（特に、トレースバックが有効）で、実装の制御範囲内で構築された`Error`オブジェクトのプロパティをまとめたものです：
 
-  --------------------------------------------------------------------------
-  Property       Standard   Inherited   Description
-  -------------- ---------- ----------- ------------------------------------
-  name           yes        yes         e.g. `TypeError` for a TypeError
-                                        (usually inherited)
+Property    | Standard | Inherited | Description
+------------|----------|-----------|-------------------------------------------------------------------
+name        | yes      | yes       | 例：`TypeError`はTypeErrorを表す（通常は継承される）。
+message     | yes      | no        | 自前メッセージ
+fileName    | no       | yes       | 構築されたファイル名（継承されたアクセサー）
+lineNumber  | no       | yes       | 構築されたファイルの行（継承されたアクセサー）。
+stack       | no       | yes       | printableスタックトレースバック文字列(継承アクセサー)
+\_Tracedata | no       | no        | スタックトレースバックデータ、内部生形式（自身の内部プロパティ）
 
-  message        yes        no          message given when constructing (or
-                                        empty) (own property)
+`Error.prototype`は、以下の非標準的なプロパティを含む：
 
-  fileName       no         yes         name of the file where constructed
-                                        (inherited accessor)
+Property   | Standard | Description
+-----------|----------|-------------------------------------------------------------------------
+stack      | no       | accessor property for getting a printable traceback based on \_Tracedata
+fileName   | no       | accessor property for getting a filename based on \_Tracedata
+lineNumber | no       | accessor property for getting a linenumber based on \_Tracedata
 
-  lineNumber     no         yes         line of the file where constructed
-                                        (inherited accessor)
-
-  stack          no         yes         printable stack traceback string
-                                        (inherited accessor)
-
-  \_Tracedata    no         no          stack traceback data, internal raw
-                                        format (own, internal property)
-  --------------------------------------------------------------------------
-
-The `Error.prototype` contains the following non-standard properties:
-
-  -----------------------------------------------------------------------
-  Property          Standard   Description
-  ----------------- ---------- ------------------------------------------
-  stack             no         accessor property for getting a printable
-                               traceback based on \_Tracedata
-
-  fileName          no         accessor property for getting a filename
-                               based on \_Tracedata
-
-  lineNumber        no         accessor property for getting a linenumber
-                               based on \_Tracedata
-  -----------------------------------------------------------------------
-
-All of the accessors are in the prototype in case the object instance
-does not have an \"own\" property of the same name. This allows for
-flexibility in minimizing the property count of error instances while
-still making it possible to provide instance-specific values when
-appropriate. Note that the setters allow user code to write an
-instance-specific value as an \"own property\" of the error object, thus
-shadowing the accessors in later reads.
+オブジェクト・インスタンスが同名のownプロパティを持っていない場合に備えて、アクセサーはすべてプロトタイプに用意されています。これにより、エラーインスタンスのプロパティ数を最小限に抑えつつ、必要に応じてインスタンス固有の値を提供することができる柔軟性を持たせています。また、セッターを使用することで、ユーザーコードがインスタンス固有の値をエラーオブジェクトの "own property "として書き込むことができ、後の読み込みでアクセッサがシャドウされることに注意してください。
 
 Notes:
 
--   The `stack` property name is from V8 and behavior is close to V8. V8
-    allows user code to write to the `stack` property but does not
-    create an own property of the same name. The written value is still
-    visible when `stack` is read back later.
--   The `fileName` and `lineNumber` property names are from Rhino.
--   In Duktape 1.3.0 and prior user code couldn\'t directly write
-    `.fileName`, `.lineNumber`, or `.stack` because the inherited setter
-    would capture and ignore such writes. User code could use
-    `Object.defineProperty()` or `duk_def_prop()` to create overriding
-    properties. In Duktape 1.4.0 the setter was changed to make writes
-    work transparently: they\'re still captured by the setter, but the
-    setter automatically creates the own property.
--   The `_Tracedata` has an internal format which may change from
-    version to version (even build to build). It should never be
-    serialized or used outside the life cycle of a Duktape heap.
--   In size-optimized builds traceback information may be omitted. In
-    such cases `fileName` and `lineNumber` are concrete own properties,
-    and `.stack` is an inherited property which returns a `ToString()`
-    coerced error string, e.g. `TypeError: my error message`.
--   In size-optimized builds errors created by the Duktape
-    implementation will not have a useful `message` field. Instead,
-    `message` is set to a string representation of the error `code`.
-    Exceptions thrown from user code will carry `message` normally.
--   The `_Tracedata` property contains function references to functions
-    in the current callstack. Because such references are a potential
-    sandboxing concern, the tracedata is stored in an internal property.
+- `stack`プロパティの名前はV8からのもので、動作もV8に近い。V8では、ユーザーコードが `stack` プロパティに書き込むことはできますが、同じ名前の独自のプロパティを作成することはありません。書き込まれた値は、後で `stack` が読み返されたときにも表示されます。
+- `fileName`と`lineNumber`のプロパティ名はRhinoに由来します。
+- Duktape 1.3.0以前のバージョンでは、ユーザーコードは `.fileName`, `.lineNumber`, `.stack` を直接書き込むことができませんでした。なぜなら、継承されたセッターはこのような書き込みを捕捉して無視するためです。ユーザーコードは `Object.defineProperty()` や `duk_def_prop()` を使って、オーバーライドするプロパティを作成することができました。Duktape 1.4.0 では、セッターが変更され、書き込みが透過的に動作するようになりました：書き込みはセッターによって捕捉されますが、セッターは自動的に自身のプロパティを作成します。
+- `Tracedata`は内部フォーマットを持っており、バージョンごとに（あるいはビルドごとに）変更される可能性があります。Duktape ヒープのライフサイクル以外では、決してシリアライズしたり、使用したりしてはいけません。
+- サイズを最適化したビルドでは、トレースバック情報が省略されることがあります。そのような場合、`fileName` と `lineNumber` は具体的な自身のプロパティであり、`.stack` は `ToString()` で強制されたエラー文字列、例えば `TypeError: my error message` を返す継承プロパティである。
+- サイズを最適化したビルドでは、Duktape の実装によって作成されたエラーは、有用な `message` フィールドを持ちません。代わりに `message` には、エラー `code` の文字列表現が設定されます。ユーザーコードから投げられた例外は、通常 `message` を持ちます。
+- `Tracedata` プロパティは、現在のコールスタックにある関数への参照を含んでいます。このような参照はサンドボックス化の懸念があるため、トレースデータは内部プロパティに格納されます。
 
-## Choosing .fileName and .lineNumber to blame for an error
+## エラーの原因となる.fileNameと.lineNumberを選択すること
 
-### Overview of the issue
+### 問題の概要
 
-When an error is created/thrown, it\'s not always clear which file/line
-to \"blame\" as the source of the error: the `.fileName` and
-`.lineNumber` properties of the Error object should be useful for the
-application programmer to pinpoint the most likely cause of the error.
+エラーが発生したとき、どのファイルや行をエラーの発生源とするかは、必ずしも明確ではありません： エラーオブジェクトの `.fileName` と `.lineNumber` プロパティは、アプリケーションプログラマがエラーの原因を特定するために役立つはずです。
 
-The relevant file/line pairs are:
+該当するファイル・行のペアは
 
--   **The \_\_FILE\_\_ and \_\_LINE\_\_ of the C call site**. While
-    these often refer to a line in a Duktape/C function, it\'s possible
-    for the Duktape/C function to call into a helper in a different file
-    which throws the error. The C call site may also be inside Duktape,
-    e.g. if user code calls `duk_require_xxx()` which then throws using
-    the internal `DUK_ERROR()` macro. Finally, it\'s also possible to
-    throw an error when no callstack entries are present; the C call
-    site information will still be available.
--   **The file/line of a source text being compiled**. This is only
-    relevant for errors thrown during compilation (typically
-    SyntaxErrors but may be other errors too).
--   **Actual callstack entries (activations) leading up to the error**.
-    These may be Duktape/C and ECMAScript functions. The functions have
-    a varying set of properties: for example, ECMAScript functions have
-    both a `.name` and a `.fileName` property by default, while
-    Duktape/C functions don\'t. It\'s possible to add and remove
-    properties after function creation.
+- **The \_\_FILE\_\_ and \_\_LINE\_\_ of the C call site**. これらはDuktape/C関数の一行を指すことが多いのですが、Duktape/C関数が別のファイルのヘルパーを呼び出してエラーを発生させることもありえます。例えば、ユーザー・コードが `duk_require_xxx()` を呼び出し、内部マクロ `DUK_ERROR()` を使ってスローする場合、Cの呼び出し先はDuktape内部である可能性もあります。最後に、コールスタックエントリが存在しない場合にエラーを投げることも可能です; Cコールサイト情報はまだ利用可能です。
+- **コンパイル中のソーステキストのファイル/ライン**. これは、コンパイル中に投げられたエラー（通常はSyntaxErrorsですが、他のエラーもありえます）にのみ関連します。
+- **エラーに至るまでのコールスタックエントリー（アクティベーション）の実際**. これらはDuktape/C関数とECMAScript関数を使用することができます。例えば、ECMAScriptの関数はデフォルトで `.name` と `.fileName` の両方のプロパティを持ちますが、Duktape/Cの関数にはありません。関数の作成後にプロパティを追加したり削除したりすることも可能です。
 
-The following SyntaxError illustrates all the relevant file/line
-sources:
+次のSyntaxErrorは、関連するすべてのファイル/行のソースを示しています：
 
-    duk> try { eval('\n\nfoo='); } catch (e) { print(e.stack); print(e.fileName, e.lineNumber); }
-    SyntaxError: parse error (line 3)
-            input:3                                        <-- file/line of source text (SyntaxError)
-            duk_js_compiler.c:3612                         <-- __FILE__ / __LINE__ of DUK_ERROR() call site
-            eval  native strict directeval preventsyield   <-- innermost activation, eval() function
-            global input:1 preventsyield                   <-- second innermost activation, caller of eval()
-    input 3   <-- .fileName and .lineNumber blames source text for SyntaxError
+```sh
+duk> try { eval('\n\nfoo='); } catch (e) { print(e.stack); print(e.fileName, e.lineNumber); }
+SyntaxError: parse error (line 3)
+        input:3                                        <-- file/line of source text (SyntaxError)
+        duk_js_compiler.c:3612                         <-- __FILE__ / __LINE__ of DUK_ERROR() call site
+        eval  native strict directeval preventsyield   <-- innermost activation, eval() function
+        global input:1 preventsyield                   <-- second innermost activation, caller of eval()
+input 3   <-- .fileName and .lineNumber blames source text for SyntaxError
+```
 
-From the application point of view the most relevant file/line is
-usually the closest \"user function\", as opposed to \"infrastructure
-function\", in the callstack. The following are often not useful for
-blaming:
+アプリケーションから見て、最も関連性の高いファイル/行は、通常、コールスタック内で最も近い "ユーザー機能"（"インフラ機能 "とは異なる）です。以下は、非難するのに有用でないことが多い：
 
--   Any Duktape/C or ECMAScript functions which are considered
-    infrastructure functions, such as errors checkers, one-to-one system
-    call wrappers, etc.
--   C call sites inside Duktape; these are essentially always
-    infrastructure functions.
--   Any Duktape/C or ECMAScript functions missing a `.fileName`
-    property. Such functions should be ignored even if they\'re user
-    functions because the resulting file/line information would be
-    pointless.
+- Duktape/CまたはECMAScriptの関数で、エラーチェッカー、1対1のシステムコールラッパーなど、インフラストラクチャー関数とみなされるものすべて。
+- Duktape内のCコールサイト、これらは基本的に常にインフラストラクチャ関数です。
+- Duktape/CまたはECMAScriptの関数で、`.fileName`プロパティがないもの。このような関数は、たとえユーザー関数であっても無視されるべきで、結果として得られるファイル/ライン情報が無意味になるからです。
 
-For this ideal outcome to be possible, Duktape needs to be able to
-determine whether or not a function should be ignored for blaming. This
-is not yet possible; subsections below describe the current behavior.
+この理想的な結果を実現するためには、Duktapeが、ある関数を無視した非難を行うべきかどうかを判断できるようにする必要があります。これはまだ可能ではありません。以下のサブセクションでは、現在の動作について説明します。
 
-Note that while file/line information is important for good error
-reporting, all the relevant information is always available in the stack
-trace anyway. Incorrect file/line blaming is annoying but usually not a
-critical issue.
+ファイル/ライン情報は良いエラー報告のために重要ですが、関連するすべての情報は、とにかくスタックトレースで常に利用可能であることに注意してください。不正確なファイル/行の非難は迷惑ですが、通常、重大な問題ではありません。
 
-### Duktape 1.3 behavior
+### Duktape 1.3動作
 
-The rules for blaming a certain file/line for an error are relatively
-simple in Duktape 1.3:
+Duktape 1.3では、特定のファイル/行をエラーの原因とするルールは比較的単純です：
 
--   For error thrown during compilation the source text file/line is
-    always blamed. The compilation errors are typically SyntaxErrors,
-    but may also be e.g. out-of-memory internal errors.
--   For errors thrown from Duktape internals (including Duktape API
-    functions like `duk_require_xxx()`) the C call site is ignored, and
-    the innermost activation is used for file/line information. This is
-    the case even when the innermost activation\'s function has no
-    `.fileName` property so that the error `.fileName` becomes
-    `undefined`.
--   For errors created/thrown using the Duktape API
-    (`duk_push_error_object()`, `duk_error()`, etc) the C call site is
-    always blamed, so that the error\'s file/line information matches
-    the C call site\'s `__FILE__`/`__LINE__`. This behavior is
-    hardcoded; user code may override the behavior by defining
-    `.fileName` and `.lineNumber` on the error object.
+- コンパイル中に発生したエラーは、常にソーステキストファイル/行のせいにされます。コンパイルエラーは典型的なSyntaxErrorですが、メモリ不足の内部エラーなどもありえます。
+- Duktapeの内部で発生したエラー（`duk_require_xxx()`のようなDuktape API関数を含む）については、C言語のコールサイトは無視され、ファイル/ライン情報については最も内側の起動が使用されます。これは、最も内側のアクティベーションの関数に `.fileName` プロパティがなく、エラー `.fileName` が `undefined` となる場合でも同じです。
+- Duktape API (`duk_push_error_object()`, `duk_error()` など)を使用して作成/スローされたエラーは、常にC呼び出しサイトが責められ、エラーのファイル/行情報がC呼び出しサイトの `__FILE__`/`__LINE__` に一致するようにします。この動作はハードコードされています。ユーザーコードは、エラーオブジェクトに `.fileName` と `.lineNumber` を定義することでこの動作をオーバーライドすることができます。
 
-These rules have a few shortcomings.
+このルールには、いくつかの欠点があります。
 
-First, the C call site is blamed for all user-thrown errors which is
-often not the best behavior. For example:
+まず、C言語のコールサイトは、ユーザーが投げたエラーの責任を負わされることになりますが、これはしばしば最善の行動ではありません。例えば、次のようなことです：
 
-    /* foo/bar/quux.c */
+```c
+/* foo/bar/quux.c */
 
-    static duk_ret_t my_argument_validator(duk_context *ctx) {
-            /* ... */
+static duk_ret_t my_argument_validator(duk_context *ctx) {
+        /* ... */
 
-            /* The duk_error() call site's __FILE__ and __LINE__ will be
-             * recorded into _Tracedata and will be provided when reading
-             * .fileName and .lineNumber of the error, e.g.:
-             *
-             *     err.fileName   --> "foo/bar/quux.c"
-             *     err.lineNumber --> 1234
-             *
-             * If this an "infrastructure function", e.g. a validator for
-             * an argument value, the file/line blamed is not very useful.
-             */
+        /* The duk_error() call site's __FILE__ and __LINE__ will be
+         * recorded into _Tracedata and will be provided when reading
+         * .fileName and .lineNumber of the error, e.g.:
+         *
+         *     err.fileName   --> "foo/bar/quux.c"
+         *     err.lineNumber --> 1234
+         *
+         * If this an "infrastructure function", e.g. a validator for
+         * an argument value, the file/line blamed is not very useful.
+         */
 
-            duk_error(ctx, DUK_ERR_RANGE_ERROR, "argument out of range");
+        duk_error(ctx, DUK_ERR_RANGE_ERROR, "argument out of range");
 
-            /* ... */
-    }
+        /* ... */
+}
+```
 
-Second, when the C call site is not blamed and the innermost activation
-does not have a `.fileName` property (which is the default for Duktape/C
-functions) the error\'s `.fileName` will be `undefined`. For example:
+次に、C言語のコールサイトが非難されず、最も内側のアクティベーションに `.fileName` プロパティがない場合（Duktape/C関数のデフォルト）、エラーの `.fileName` は `undefined` になります。例えば、以下のようになります：
 
-    ((o) Duktape 1.3.0 (v1.3.0)
-    duk> try { [1,2,3].forEach(123); } catch (e) { err = e; }
-    = TypeError: type error (rc -105)
-    duk> err.fileName
-    = undefined
-    duk> err.lineNumber
-    = 0
-    duk> err.stack
-    = TypeError: type error (rc -105)
-            forEach  native strict preventsyield
-            global input:1 preventsyield
-    duk> Array.prototype.forEach.name
-    = forEach
-    duk> Array.prototype.forEach.fileName
-    = undefined
+```sh
+((o) Duktape 1.3.0 (v1.3.0)
+duk> try { [1,2,3].forEach(123); } catch (e) { err = e; }
+= TypeError: type error (rc -105)
+duk> err.fileName
+= undefined
+duk> err.lineNumber
+= 0
+duk> err.stack
+= TypeError: type error (rc -105)
+        forEach  native strict preventsyield
+        global input:1 preventsyield
+duk> Array.prototype.forEach.name
+= forEach
+duk> Array.prototype.forEach.fileName
+= undefined
+```
 
-While `forEach()` has a `.name` property, it doesn\'t have a `.fileName`
-that `err.fileName` becomes `undefined`. This is obviously not very
-useful; it\'d be more useful to blame the error on `input`, which is the
-closest call site with a filename.
+`forEach()`は `.name` プロパティを持っていますが、`.fileName` を持っていないので `err.fileName` が `undefined` になっています。これは明らかに使い勝手が悪い。ファイル名を持つ最も近い呼び出し先である `input` のエラーを責める方がより有用だろう。
 
-### Duktape 1.4.0 behavior
+### Duktape 1.4.0 の動作について
 
-Duktape 1.4.0 improves the blaming behavior slightly when the C call
-site information is not blamed: instead of taking file/line information
-from the innermost activation, it is taken from the closest activation
-which has a `.fileName` property.
+Duktape 1.4.0では、C言語のコールサイト情報が非難されない場合の非難動作を若干改善しました。ファイル/ライン情報を最も内側のアクティベーションから取得する代わりに、`.fileName`プロパティを持っている最も近いアクティベーションから取得するようにしました。
 
-This improves file/line blaming for the `forEach()` example above:
+これにより、上記の`forEach()`の例でファイル/行の非難が改善されます：
 
-    ((o) Duktape 1.3.99 (v1.3.0-294-g386260d-dirty)
-    duk> try { [1,2,3].forEach(123); } catch (e) { err = e; }
-    = TypeError: function required, found 123 (stack index 0)
-    duk> err.fileName
-    = input
-    duk> err.lineNumber
-    = 1
+```sh
+((o) Duktape 1.3.99 (v1.3.0-294-g386260d-dirty)
+duk> try { [1,2,3].forEach(123); } catch (e) { err = e; }
+= TypeError: function required, found 123 (stack index 0)
+duk> err.fileName
+= input
+duk> err.lineNumber
+= 1
+```
 
-If `forEach()` is assigned a filename, it will get blamed instead:
+`forEach()`にファイル名が割り当てられている場合は、その代わりに非難されます：
 
-    ((o) Duktape 1.3.99 (v1.3.0-294-g386260d-dirty)
-    duk> Array.prototype.forEach.fileName = 'dummyFilename.c';
-    = dummyFilename.c
-    duk> try { [1,2,3].forEach(123); } catch (e) { err = e; }
-    = TypeError: function required, found 123 (stack index 0)
-    duk> err.fileName
-    = dummyFilename.c
-    duk> err.lineNumber
-    = 0
+```sh
+((o) Duktape 1.3.99 (v1.3.0-294-g386260d-dirty)
+duk> Array.prototype.forEach.fileName = 'dummyFilename.c';
+= dummyFilename.c
+duk> try { [1,2,3].forEach(123); } catch (e) { err = e; }
+= TypeError: function required, found 123 (stack index 0)
+duk> err.fileName
+= dummyFilename.c
+duk> err.lineNumber
+= 0
+```
 
-There\'s no change in behavior for errors thrown during compilation
-(typically SyntaxErrors).
+コンパイル時に発生するエラー（典型的なSyntaxErrors）に対する動作に変更はない。
 
-There\'s also no change for the case where the C call site is blamed,
-e.g. for errors thrown explicitly using `duk_error()`. Because such
-error throws are possible from both infrastructure code and application
-code, there\'s not yet enough information to select the ideal file/line
-for such an error.
+また、`duk_error()`を使用して明示的に投げられたエラーなど、C言語のコールサイトが責められる場合にも変更はありません。このようなエラーはインフラコードとアプリケーションコードの両方から発生する可能性があるため、このようなエラーに対して理想的なファイル/行を選択するための情報がまだ十分ではありません。
 
-### Replacing the .fileName and .lineNumber accessors
+### .fileNameと.lineNumberのアクセサーを置き換える
 
-If the user application needs more control of file/line blaming, it\'s
-possible to replace the inherited `Error.prototype.fileName` and
-`Error.prototype.lineNumber` accessors and implement whatever logic
-suits the application best. For example, the application could filter
-functions based on a filename whitelist/blacklist or filename patterns.
+ユーザーアプリケーションがファイルや行の非難をもっとコントロールしたい場合、継承された `Error.prototype.fileName` と `Error.prototype.lineNumber` アクセッサを置き換えて、アプリケーションに最も適したロジックを実装することが可能です。例えば、ファイル名のホワイトリスト/ブラックリストやファイル名のパターンに基づいて関数をフィルタリングすることができます。
 
-The downside of this is that the application needs to decode
-`_Tracedata` whose format is version dependent.
+この欠点は、アプリケーションが、バージョンに依存する形式の `_Tracedata` をデコードする必要があることです。
 
-### Future improvements
+### 今後の改善点
 
-#### Control blaming of C call site
+#### Cコールサイトの制御非難
 
-Allow C code to indicate whether the C call site of an error
-create/throw should be considered relevant for file/line blaming. This
-change would allow user code to control the blaming on a per-error
-basis.
+Cコードで、エラー生成/スローのCコールサイトをファイル/ラインの非難に関連するとみなすかどうかを指定できるようにする。この変更により、ユーザーコードはエラーごとに非難を制御できるようになります。
 
-Duktape already does this internally by using a flag
-(`DUK_ERRCODE_FLAG_NOBLAME_FILELINE`) ORed with an error code to convey
-the intent. The flag could simply be exposed in the API, but there are
-other API design options too.
+Duktapeでは、エラーコードとORしたフラグ(`DUK_ERCODE_FLAG_NOBLAME_FILELINE`)を使って、すでに内部でこの処理を行っています。このフラグは単にAPIで公開することもできますが、他のAPI設計のオプションもあります。
 
-#### Control error blaming of compilation errors
+#### コンパイルエラーの制御エラー責めを行う
 
-At the moment source text file/line is always blamed for errors thrown
-during compilation (typically SyntaxErrors).
+現在、ソーステキストファイル/行は、コンパイル時に発生したエラー（典型的なSyntaxErrors）に対して常に非難されています。
 
-Technically there might be compilation errors inside \"infrastructure
-code\" so that it may not always be correct to blame them. This could be
-easily fixed by adding a flag to the compilation API calls.
+技術的には、"インフラストラクチャーコード "の内部でコンパイルエラーが発生する可能性があり、それを責めることが必ずしも正しいとは限りません。これは、コンパイルAPI呼び出しにフラグを追加することで簡単に修正できます。
 
-#### Control error blaming of functions
+#### 機能の制御エラー非難
 
-Allow Duktape/C and ECMAScript functions to provide a flag indicating if
-the function should be considered relevant for file/line blaming.
+Duktape/CおよびECMAScript関数が、その関数がファイル/ラインの非難に関連すると見なされるべきかどうかを示すフラグを提供できるようにしました。
 
-For Duktape 1.4.0 the `.fileName` property of a function serves this
-purpose to some extent: if a function is missing `.fileName` it is
-ignored for file/line blaming, i.e. treated as an infrastructure
-function. However, there may be infrastructure functions which have a
-`.fileName` or non-infrastructure functions which don\'t have a
-`.fileName`, so being able to control the blaming behavior explicitly
-would be useful.
+Duktape 1.4.0では、関数の `.fileName` プロパティがある程度この目的を果たします。関数に `.fileName` がない場合、ファイル/ラインの非難では無視され、つまりインフラストラクチャ関数として扱われます。しかし、`.fileName`を持つインフラストラクチャ関数や、`.fileName`を持たない非インフラストラクチャ関数があるかもしれないので、明示的に非難動作を制御できるようになると便利だと思います。
 
-The control flag could be implemented either as a `duk_hobject` flag or
-an (internal or external) property.
+制御フラグは `duk_hobject` フラグまたは (内部または外部の) プロパティとして実装することができます。
 
-#### Handling of lightfuncs
+#### ライトファンクスの取り扱いについて
 
-Should lightfuncs be blamed or not? Currently they are never blamed for
-file/line.
+lightfuncsは非難されるべきか、されないべきか？現在、ファイル/ラインについて非難されることはない。
 
-## Cause chains
+## コーズチェーン
 
-There is currently no support for cause chains: ECMAScript doesn\'t have
-a cause chain concept nor does there seem to be an unofficial standard
-for them either.
+現在、コーズチェーンはサポートされていません：ECMAScriptには因果連鎖の概念はなく、非公式な標準もないようです。
 
-A custom cause chain could be easily supported by allowing a `cause`
-property to be set on an error, and making the traceback formatter obey
-it.
+エラー時に `cause` プロパティを設定できるようにし、トレースバックフォーマッターをそれに従わせることで、カスタムの原因チェーンを簡単にサポートすることができます。
 
-A custom mechanism for setting an error cause would need to be used. A
-very non-invasive approach would be something like:
+エラー原因を設定するためのカスタムメカニズムを使用する必要があります。非常に非侵襲的なアプローチとして、以下のようなものがあります：
 
-    try {
-        f();
-    } catch (e) {
-        var e2 = new Error("something went wrong");  // line N
-        e2.cause = e;                                // line N+1
-        throw e2;                                    // line N+2
-    }
+```js
+try {
+    f();
+} catch (e) {
+    var e2 = new Error("something went wrong");  // line N
+    e2.cause = e;                                // line N+1
+    throw e2;                                    // line N+2
+}
+```
 
-This is quite awkward and error line information is easily distorted.
-The line number issue can be mitigated by putting the error creation on
-a single line, at the cost of readability:
+これはかなり厄介で、エラー行の情報が簡単に歪んでしまいます。行数の問題は、可読性を犠牲にしてでも、エラー作成を1行にまとめることで軽減できる：
 
+```js
     try {
         f();
     } catch (e) {
         var e2 = new Error("something went wrong"); e2.cause = e; throw e2;
     }
+```
 
-One could also extend the error constructor to allow a cause to be
-specified in a constructor call. This would mimic how Java works and
-would be nice to use, but would have more potential to interfere with
-standard semantics:
+また、エラーコンストラクタを拡張して、コンストラクタ呼び出しの際に原因を指定できるようにすることもできます。これはJavaの動作を模倣したもので、使い勝手は良いのですが、標準的なセマンティクスに干渉する可能性が高くなります：
 
+```js
     try {
         f();
     } catch (e) {
         throw new Error("something went wrong", e);
     }
+```
 
-Using a setter method inherited from `Error.prototype` would be a very
-bad idea as any such calls would be non-portable and cause errors to be
-thrown when used in other ECMAScript engines:
+Error.prototypeから継承されたセッターメソッドを使用することは、非常に悪いアイデアです。 このような呼び出しは移植不可能であり、他のECMAScriptエンジンで使用するとエラーが発生するためです。:
 
+```js
     try {
         f();
     } catch (e) {
@@ -680,135 +442,101 @@ thrown when used in other ECMAScript engines:
         e2.setCause(e);  // throws error if setCause is undefined!
         throw e2;
     }
+```
 
-Since errors are also created (and thrown) from C code using the Duktape
-API and from inside the Duktape implementation, cause handling would
-need to be considered for these too.
+Duktape APIを使用するCコードやDuktapeの実装内部からもエラーが発生（スロー）するため、これらについても原因処理を考慮する必要があります。
 
-Because the `cause` property can be set to anything, the implementation
-would need to tolerate e.g.:
+cause`プロパティは何でも設定できるので、実装では、例えば、以下のようなことを許容する必要があります：
 
+```js
     // non-Error causes (print reasonably in a traceback)
     e.cause = 1;
 
     // cause loops (detect or sanity depth limit traceback)
     e1.cause = e2;
     e2.cause = e1;
+```
 
-## Traceback format (\_Tracedata)
+## トレースバックフォーマット (\_Tracedata)
 
-### Overview
+### 概要
 
-The purpose of the `_Tracedata` value is to capture the relevant
-callstack information very quickly before the callstack is unwound by
-error handling. In many cases the traceback information is not used at
-all, so it should be recorded in a compact and cheap manner.
+トレースデータ `_Tracedata` 値の目的は、エラー処理によってコールスタックが巻き戻される前に、関連するコールスタック情報を非常に素早く取得することである。多くの場合、トレースバック情報は全く使用されないので、コンパクトで安価な方法で記録する必要があります。
 
-To fulfill these requirements, the current format, described below, is a
-bit arcane. The format is version dependent, and is not intended to be
-accessed directly by user code.
+これらの要件を満たすために、以下に説明する現在のフォーマットは、少し難解です。このフォーマットはバージョンに依存し、ユーザーコードから直接アクセスすることは想定していません。
 
-The `_Tracedata` value is a flat array, populated with values
-describing: (1) a possible compilation error site, (2) a possible C call
-site, and (3) the contents of the callstack, starting from the callstack
-top and working downwards until either the callstack bottom or the
-maximum traceback depth is reached.
+`_Tracedata`の値はフラットな配列で、次のような値が格納されます。: (1) コンパイルエラーの可能性のある箇所、(2) C言語の呼び出しの可能性のある箇所、(3) コールスタックの内容。コールスタックの先頭から始まり、コールスタックの底か最大トレースバック深度に達するまで下へ下へと作業する。
 
-The tracedata is processed only by Duktape internal functions:
+トレースデータは、Duktapeの内部機能でのみ処理されます：
 
--   The `Error.prototype.stack` accessor converts tracedata into a human
-    readable, printable traceback string.
--   The `Error.prototype.fileName` and `Error.prototype.lineNumber`
-    accessors provide a file/line \"blaming\" for the error based on the
-    tracedata.
--   Currently (as of Duktape 1.4) there are no exposed helpers to decode
-    tracedata in a user application. However, user code can inspect the
-    current callstack using `Duktape.act()` in the `errCreate` and
-    `errThrow` hooks.
+- `Error.prototype.stack`アクセサは、トレースデータを人間が読めるように印刷可能なトレースバック文字列に変換します。
+- `Error.prototype.fileName` と `Error.prototype.lineNumber` アクセサは、トレースデータに基づいてエラーの原因となるファイルや行を指定します。
+- 現在（Duktape 1.4時点）、ユーザーアプリケーションでトレースデータをデコードするためのヘルパーは公開されていません。しかし、ユーザーコードは `errCreate` と `errThrow` フックの `Duktape.act()` を使って現在のコールスタックを調査することができます。
 
-Example of the concrete tracedata in Duktape 1.4.0:
+Duktape 1.4.0での具体的なトレースデータの例です：
 
-    ((o) Duktape 1.3.99 (v1.3.0-294-g72447fe)
-    duk> try { eval('\n\nfoo='); } catch (e) { err = e; }
-    = SyntaxError: parse error (line 3)
-    duk> err.stack
-    = SyntaxError: parse error (line 3)
-            input:3
-            duk_js_compiler.c:3655
-            eval  native strict directeval preventsyield
-            global input:1 preventsyield
-    duk> Duktape.enc('jx', err[Duktape.dec('hex', 'ff') + 'Tracedata'], null, 4)
-    = [
-        "input",                \  compilation error site
-        3,                      /
-        "duk_js_compiler.c",    \  C call site
-        4294970951,             /
-        {_func:true},           \
-        107374182400,           |  callstack entries
-        {_func:true},           |
-        34359738375             /
-    ]
+```sh
+((o) Duktape 1.3.99 (v1.3.0-294-g72447fe)
+duk> try { eval('\n\nfoo='); } catch (e) { err = e; }
+= SyntaxError: parse error (line 3)
+duk> err.stack
+= SyntaxError: parse error (line 3)
+        input:3
+        duk_js_compiler.c:3655
+        eval  native strict directeval preventsyield
+        global input:1 preventsyield
+duk> Duktape.enc('jx', err[Duktape.dec('hex', 'ff') + 'Tracedata'], null, 4)
+= [
+    "input",                \  compilation error site
+    3,                      /
+    "duk_js_compiler.c",    \  C call site
+    4294970951,             /
+    {_func:true},           \
+    107374182400,           |  callstack entries
+    {_func:true},           |
+    34359738375             /
+]
+```
 
-### Tracedata parts
+### トラディショナルパーツ
 
-#### Compilation error
+#### コンパイルエラー
 
-If the error is thrown during compilation (typically a SyntaxError) the
-file/line in the source text is pushed to `_Tracedata`:
+コンパイル中にエラーが発生した場合（通常はSyntaxError）、ソーステキストのファイル/行が `_Tracedata` にプッシュされます：
 
--   The source filename as a string.
--   The offending linenumber as a number (double).
+- ソースファイル名（文字列）。
+- 数値（double）として、問題のあるリネン番号。
 
-#### C call site
+#### Cコールサイト
 
-If a call has a related C call site, the call site is pushed to
-`_Tracedata`:
+呼び出しに関連するC言語のコールサイトがある場合、コールサイトは `_Tracedata` にプッシュされます。:
 
--   The `__FILE__` value as a string.
+- The `__FILE__` value as a string.
+- A number (double) containing the expression:
 
--   A number (double) containing the expression:
+```c
+(flags << 32) + (__LINE__)
+```
 
-        (flags << 32) + (__LINE__)
+現在の唯一のフラグは、ユーザーがエラーに関連する `fileName` または `lineNumber` を要求したときに、`__FILE__` / `__LINE__` のペアをエラー位置として \"blamed" するかどうかを示します。.
 
-    The only current flag indicates whether or not the `__FILE__` /
-    `__LINE__` pair should be \"blamed\" as the error location when the
-    user requests for a `fileName` or `lineNumber` related to the error.
+#### コールスタックエントリー
 
-#### Callstack entries
+その後、コールスタック要素ごとに、`_Tracedata`に追加される配列のエントリは、以下のペアからなる：
 
-After that, for each callstack element, the array entries appended to
-`_Tracedata` are pairs consisting of:
+- アクティベーションの関数オブジェクトです。関数オブジェクトには、関数の種類と名前が含まれています。また、ファイル名（またはそれに相当するもの、"global "や "eval"）と、場合によってはPCから行へのデバッグ情報も含まれます。これらは、印刷可能なトレースバックを作成するために必要である。
+- 式を含む数値（double）：
 
--   The function object of the activation. The function object contains
-    the function type and name. It also contains the filename (or
-    equivalent, like \"global\" or \"eval\") and possibly PC-to-line
-    debug information. These are needed to create a printable traceback.
+```c
+(activation_flags << 32) + (activation_pc)
+```
 
--   A number (double) containing the expression:
+C言語の関数の場合、プログラムカウンタの値は0である。起動フラグの値は `duk_hthread.h` で定義されています。PCの値は、関数オブジェクトのデバッグ情報とともに行番号に変換することができます。このフラグにより、例えばテールコールをトレースバックで記録することができます。
 
-        (activation_flags << 32) + (activation_pc)
+### 備考
 
-    For C functions, the program counter value is zero. Activation flag
-    values are defined in `duk_hthread.h`. The PC value can be converted
-    to a line number with debug information in the function object. The
-    flags allow e.g. tail calls to be noted in the traceback.
-
-### Notes
-
--   An IEEE double can hold a 53-bit integer accurately so there is
-    space for plenty of flags in the current representation. Flags must
-    be in the low end of the flags field though (bit 20 or lower)
--   The number of elements appended to the `_Tracedata` array for each
-    activation does not need to constant, as long as the value can be
-    decoded starting from the beginning of the array (in other words,
-    random access is not important at the moment).
--   The `this` binding, if any, is not currently recorded.
--   The variable values of activation records are not recorded. They
-    would actually be available because the callstack can be inspected
-    and register maps (if defined) would provide a way to map identifier
-    names to registers. This is definitely future work and may be needed
-    for better debugging support.
--   The `_Tracedata` value is currently an array, but it may later be
-    changed into an internal type of its own right to optimize memory
-    usage and performance. The internal type would then basically be a
-    typed buffer which garbage collection would know how to visit.
+- IEEE doubleは53ビットの整数を正確に保持することができるので、現在の表現ではフラグをたくさん置くスペースがあります。ただし、フラグはフラグフィールドの下位になければなりません（ビット20以下）。
+- 起動ごとに `_Tracedata` 配列に追加される要素の数は、配列の先頭から値を解読できる限り一定である必要はない（言い換えれば、ランダムアクセスは今のところ重要ではない）。
+- もしあれば、`this`バインディングは現在記録されていません。
+- 活性化レコードの変数値は記録されない。コールスタックを検査することができ、レジスタマップ（定義されている場合）は識別子名をレジスタにマッピングする方法を提供するため、それらは実際に利用可能である。これは間違いなく将来の仕事であり、より良いデバッグサポートのために必要かもしれません。
+- 現在 `_Tracedata` の値は配列ですが、メモリ使用量とパフォーマンスを最適化するために、将来的にはそれ自身の内部型に変更されるかもしれません。この内部型は基本的に型付きバッファであり、ガベージコレクションはこのバッファにアクセスする方法を知っています。
