@@ -65,6 +65,7 @@ export default {
                     {text: 'stb', link: '/translation/stb/'},
                     {text: 'SteamOS', link: '/translation/steamos/'},
                     {text: 'Svelte', link: '/translation/svelte/'},
+                    {text: 'uthash', link: '/translation/uthash/'},
                     {text: 'VitePress', link: '/translation/vitepress/'},
                     {text: 'VivlioStyle', link: '/translation/vivliostyle/'},
                 ]
@@ -1101,6 +1102,16 @@ export default {
                     collapsed: false,
                     items: [
                         {text: 'はじめに', link: '/translation/svelte/'},
+                    ]
+                },
+            ],
+            '/translation/uthash/': [
+                {
+                    text: '',
+                    collapsed: false,
+                    items: [
+                        {text: 'はじめに', link: '/translation/uthash/'},
+                        {text: 'uthash', link: '/translation/uthash/uthash.md'},
                     ]
                 },
             ],
