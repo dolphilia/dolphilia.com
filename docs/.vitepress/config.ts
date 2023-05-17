@@ -68,6 +68,7 @@ export default {
                     {text: 'uthash', link: '/translation/uthash/'},
                     {text: 'VitePress', link: '/translation/vitepress/'},
                     {text: 'VivlioStyle', link: '/translation/vivliostyle/'},
+                    {text: 'yyjson', link: '/translation/yyjson/'},
                 ]
             },
         ],
@@ -1210,6 +1211,19 @@ export default {
                     collapsed: false,
                     items: [
                         {text: 'はじめに', link: '/translation/vuepress-next/'},
+                    ]
+                },
+            ],
+            '/translation/yyjson/': [
+                {
+                    text: '',
+                    collapsed: false,
+                    items: [
+                        {text: 'はじめに', link: '/translation/yyjson/'},
+                        {text: '構築とテスト', link: '/translation/yyjson/BuildAndTest.md'},
+                        {text: 'API', link: '/translation/yyjson/API.md'},
+                        {text: 'データ構造', link: '/translation/yyjson/DataStructure.md'},
+                        {text: 'Changelog', link: '/translation/yyjson/CHANGELOG.md'},
                     ]
                 },
             ],
