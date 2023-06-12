@@ -61,6 +61,7 @@ export default {
                     {text: 'Processing', link: '/translation/processing/'},
                     {text: 'pygame', link: '/translation/pygame/reference/'},
                     {text: 'Sass', link: '/translation/sass/'},
+                    {text: 'Scripting', link: '/translation/scripting/'},
                     {text: 'sokol', link: '/translation/sokol/'},
                     {text: 'stb', link: '/translation/stb/'},
                     {text: 'SteamOS', link: '/translation/steamos/'},
@@ -1023,6 +1024,16 @@ export default {
                         {text: 'ブレイキングチェンジ', link: '/translation/sass/changes.md'},
                         {text: 'コマンドライン', link: '/translation/sass/command_line.md'},
                         {text: 'JavaScript API', link: '/translation/sass/api.md'},
+                    ]
+                },
+            ],
+            '/translation/scripting/': [
+                {
+                    text: 'Scripting',
+                    collapsed: false,
+                    items: [
+                        {text: 'はじめに', link: '/translation/scripting/'},
+                        {text: '組み込みスクリプト言語', link: '/translation/scripting/embedded-scripting-languages.md'},
                     ]
                 },
             ],
