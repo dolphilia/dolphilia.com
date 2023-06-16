@@ -1034,6 +1034,8 @@ export default {
                     items: [
                         {text: 'はじめに', link: '/translation/scripting/'},
                         {text: '組み込みスクリプト言語', link: '/translation/scripting/embedded-scripting-languages.md'},
+                        {text: 'JSにコンパイル可能', link: '/translation/scripting/js-languages.md'},
+                        {text: 'Luaにコンパイル可能', link: '/translation/scripting/lua-languages.md'},
                     ]
                 },
             ],
@@ -1243,6 +1245,7 @@ export default {
                     text: 'お絵かき',
                     collapsed: false,
                     items: [
+                        { text: 'AIイラストに関する見解', link: '/essay/ai-illut-ni-kansuru-hansei-wo' },
                         { text: 'AIイラストに対抗する', link: '/essay/ai-illust-ni-taikou-suru' },
                         { text: 'AI画像生成との付き合い方', link: '/essay/ai-gazou-seisei' },
                         { text: 'ライブ配信のマナー', link: '/essay/raibu-haishin-no-mana' },
