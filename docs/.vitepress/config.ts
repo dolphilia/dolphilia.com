@@ -1126,6 +1126,11 @@ export default {
                     items: [
                         {text: 'はじめに', link: '/translation/uthash/'},
                         {text: 'uthash', link: '/translation/uthash/uthash.md'},
+                        {text: 'utlist', link: '/translation/uthash/utlist.md'},
+                        {text: 'utarray', link: '/translation/uthash/utarray.md'},
+                        {text: 'utringbuffer', link: '/translation/uthash/utringbuffer.md'},
+                        {text: 'utstack', link: '/translation/uthash/utstack.md'},
+                        {text: 'utstring', link: '/translation/uthash/utstring.md'},
                     ]
                 },
             ],
