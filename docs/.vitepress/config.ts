@@ -9,7 +9,11 @@ export default {
     cleanUrls: true,
 
     head: [['meta', { name: 'theme-color', content: '#3c8772' }]],
-
+    markdown: {
+        config: (md) => {
+            md.use(require("markdown-it-katex"));
+        },
+    },
     themeConfig: {
         algolia: {
             appId: 'BT9F9T40EX',
@@ -40,6 +44,7 @@ export default {
               //  }
               //]
             },
+            { text: '学習', activeMatch: '/study/', link: '/study/index' },
             { 
                 text: '翻訳', 
                 activeMatch: '/translation/', 
@@ -112,6 +117,149 @@ export default {
                         {text: 'タイムマシンを作った男', link: '/novel/taimu-mashin-wo'},
                     ]
                 }
+            ],
+            '/essay/': [
+                {
+                    text: 'お絵かき',
+                    collapsed: false,
+                    items: [
+                        { text: 'AIイラストに関する見解', link: '/essay/ai-illut-ni-kansuru-hansei-wo' },
+                        { text: 'AIイラストに対抗する', link: '/essay/ai-illust-ni-taikou-suru' },
+                        { text: 'AI画像生成との付き合い方', link: '/essay/ai-gazou-seisei' },
+                        { text: 'ライブ配信のマナー', link: '/essay/raibu-haishin-no-mana' },
+                        { text: 'お絵描き時短テクニック', link: '/essay/sho-tokatto-ya-sukuriputo' },
+                        { text: 'クリエイターの困りごと', link: '/essay/kurieita-ga-komatte-iru-koto' },
+                        { text: '破壊の芸術', link: '/essay/hakai-no-geijutsu' },
+                        { text: 'キャラデザの秘訣', link: '/essay/kyaradeza-de-nayamanai' },
+                        { text: '絵描きと炎上三つ巴', link: '/essay/ekaki-to-enjou-mitsudomoe' },
+                        { text: '絵描きとWeb3.0', link: '/essay/ekaki-to-web30' },
+                        { text: 'イラストが上達する人の特徴', link: '/essay/irasuto-ga-joutatsu' },
+                        { text: '絵の耐久性について', link: '/essay/e-no-taikyuusei' },
+                        { text: 'すれ違うクリエイターたち', link: '/essay/surethigau-kurieita-tachi' },
+                        { text: '創作するときに聴く音楽', link: '/essay/irasuto-wo-kakutoki-ni-kiku' },
+                        { text: '複雑なToDoを最適化させる方法', link: '/essay/fukuzatsu-na-todo-wo' },
+                        { text: 'イラスト依頼のやり方', link: '/essay/ekaki-wo-honki-ni' },
+                        { text: 'スランプから抜け出すには', link: '/essay/e-no-suranpu-ni-tsuite' },
+                        { text: 'アイデアを生むための方法', link: '/essay/aidea-wo-umu-tame' },
+                        { text: '絵師という呼び方について', link: '/essay/eshi-toiu-koshou' },
+                        { text: '絵柄に自信が持てないときは', link: '/essay/egara-ni-jishin' },
+                    ]
+                },
+                {
+                    text: '雑学',
+                    collapsed: false,
+                    items: [
+                        { text: 'ウェブ小説の書き方', link: '/essay/pixiv-shousetsu-ga-moriagatte' },
+                        { text: '手話が認められるまで', link: '/essay/shuwa-ga-gengo-de' },
+                    ]
+                },
+                {
+                    text: '音楽',
+                    collapsed: false,
+                    items: [
+                        { text: '音楽の楽しみ方', link: '/essay/ongaku-wo-sarani-tanoshimu' },
+                        { text: 'Bメロ不要論', link: '/essay/b-mero-huyouron' },
+                    ]
+                },
+                {
+                    text: '心身の健康',
+                    collapsed: false,
+                    items: [
+                        { text: '生きるための処方箋', link: '/essay/ikiru-tame-no-shohousen' },
+                        { text: '傷ついても創作を続けるには', link: '/essay/kokoro-ga-sensai-na-ekaki' },
+                        { text: 'うつ病でも創作を続けるには', link: '/essay/utsu-byou-demo-sousaku' },
+                        { text: '低気圧で体調を崩す理由', link: '/essay/teikiatsu-de-taishou-wo' },
+                    ]
+                },
+                {
+                    text: 'Pixiv',
+                    collapsed: false,
+                    items: [
+                        { text: 'ピクスケの始め方', link: '/essay/sketch-live-no-tanoshii' },
+                        { text: 'ピクスケの楽しみ方', link: '/essay/pixiv-sketch-wo-motto-tanoshimu' },
+                        { text: 'ピクスケを盛り上げたい', link: '/essay/pixiv-sketch-zentai' },
+                        { text: 'PIXIV DEV 予習', link: '/essay/pixiv-dev-meetup-ni-shoutai' },
+                        { text: 'PIXIV DEV 第一印象', link: '/essay/pixiv-dev-meetup-fa-suto' },
+                        { text: 'PIXIV DEV 体験記', link: '/essay/pixiv-dev-meetup-taiken-repo' },
+                        { text: 'Pixiv 新UIに不満が続出', link: '/essay/pixiv-no-atarashii-ui' },
+                        { text: 'Pixiv 新UIの改善点', link: '/essay/pixiv-no-ui-dou-kaizen' },
+                        { text: 'ピクシブ小説の本文検索', link: '/essay/pixiv-shousetsu-no-honbun' },
+                        { text: 'SKETCH LIVEで配信する', link: '/essay/sketch-live-de-koukateki' },
+                        { text: 'FANBOXで生じるジレンマ', link: '/essay/fanbox-de-shoujiru' },
+                    ]
+                },
+            ],
+            '/note/': [
+                {
+                    text: 'リンク',
+                    collapsed: false,
+                    items: [
+                        { text: 'お気に入りのウェブサイト', link: '/note/bookmark' },
+                    ]
+                },
+                {
+                    text: '覚え書き',
+                    collapsed: false,
+                    items: [
+                        { text: 'CでSJISをUTF8に変換する', link: '/note/c-gengo-de-moji' },
+                        { text: '手動でRSS2.0を作成する', link: '/note/rss20-wo-shudou-de' },
+                        { text: 'MusicXMLのチュートリアル', link: '/note/music-xml-no' },
+                        { text: 'ホワイトノイズの生成と再生', link: '/note/openal-wo-tsukatte' },
+                        { text: '波形を生成する', link: '/note/puroguramingu-de-hakei' },
+                    ]
+                },
+                {
+                    text: 'やってみた',
+                    collapsed: false,
+                    items: [
+                        { text: 'CoeFontを使ってみた', link: '/note/jibun-no-koe-de-onsei-gousei' },
+                        { text: 'AIに記事を書かせてみた', link: '/note/jinkou-chinou-ni-kiji-wo' },
+                        { text: 'ペン入れ有り無し混ぜてみた', link: '/note/penire-ari-nashi-wo' },
+                        { text: 'グリザイユ画法に挑戦してみた', link: '/note/gurizaiyu-gahou-ga-raku' },
+                        { text: '防音室を作ってみた', link: '/note/bouon-shitsu-wo-tsukuri' },
+                        { text: '色にこだわってみた', link: '/note/shikisai-ni-torikumu' },
+                        { text: 'タイムラプスを撮ってみた', link: '/note/taimu-rapusu-de-manabu' },
+                        { text: 'VTuberになってみた', link: '/note/ekaki-ga-vtuber-ni-natta' },
+                    ]
+                },
+                
+                {
+                    text: '制作秘話',
+                    collapsed: false,
+                    items: [
+                        { text: 'ウェブ漫画を通して伝えたかったこと', link: '/note/webu-manga-wo-tooshite' },
+                        { text: 'ドローイング・マイシスターの裏話', link: '/note/doro-ingu-mai-shisuta-no-ura-banashi' },
+                        { text: 'なぜクマ？ なぜ学ラン？ 正義のくまさん制作秘話！', link: '/note/naze-kuma-naze-gakuran' },
+                        { text: 'みがらいあの舞台が現代である理由', link: '/note/migaraia-no-butai' },
+                        { text: 'みがらいあの意味', link: '/note/migaraia-no-imi' },
+                        { text: 'みがちゃんが笑わなくなった理由', link: '/note/miga-chan-ga-warawanaku' },
+                    ]
+                },
+                {
+                    text: 'レビュー',
+                    collapsed: false,
+                    items: [
+                        { text: '液タブHuion Kanvas Pro 24(4K)を買ったのでレビューします', link: '/note/ekitabu-huion-kanvas-pro-24-4k' },
+                    ]
+                },
+            ],
+            '/study/': [
+                {
+                    text: '目次',
+                    collapsed: false,
+                    items: [
+                        { text: 'はじめに', link: '/study/' },
+                        { text: '学問のリスト', link: '/study/list_of_studies' },
+                        { text: '高校数学で学ぶこと', link: '/study/list_of_high_school_math' },
+                    ]
+                },
+                {
+                    text: 'IT',
+                    collapsed: false,
+                    items: [
+                        { text: 'KaTeXで数式を書く', link: '/study/katex' },
+                    ]
+                },
             ],
             '/translation/angle/': [
                 {
@@ -1245,131 +1393,6 @@ export default {
                     ]
                 },
             ],
-            '/essay/': [
-                {
-                    text: 'お絵かき',
-                    collapsed: false,
-                    items: [
-                        { text: 'AIイラストに関する見解', link: '/essay/ai-illut-ni-kansuru-hansei-wo' },
-                        { text: 'AIイラストに対抗する', link: '/essay/ai-illust-ni-taikou-suru' },
-                        { text: 'AI画像生成との付き合い方', link: '/essay/ai-gazou-seisei' },
-                        { text: 'ライブ配信のマナー', link: '/essay/raibu-haishin-no-mana' },
-                        { text: 'お絵描き時短テクニック', link: '/essay/sho-tokatto-ya-sukuriputo' },
-                        { text: 'クリエイターの困りごと', link: '/essay/kurieita-ga-komatte-iru-koto' },
-                        { text: '破壊の芸術', link: '/essay/hakai-no-geijutsu' },
-                        { text: 'キャラデザの秘訣', link: '/essay/kyaradeza-de-nayamanai' },
-                        { text: '絵描きと炎上三つ巴', link: '/essay/ekaki-to-enjou-mitsudomoe' },
-                        { text: '絵描きとWeb3.0', link: '/essay/ekaki-to-web30' },
-                        { text: 'イラストが上達する人の特徴', link: '/essay/irasuto-ga-joutatsu' },
-                        { text: '絵の耐久性について', link: '/essay/e-no-taikyuusei' },
-                        { text: 'すれ違うクリエイターたち', link: '/essay/surethigau-kurieita-tachi' },
-                        { text: '創作するときに聴く音楽', link: '/essay/irasuto-wo-kakutoki-ni-kiku' },
-                        { text: '複雑なToDoを最適化させる方法', link: '/essay/fukuzatsu-na-todo-wo' },
-                        { text: 'イラスト依頼のやり方', link: '/essay/ekaki-wo-honki-ni' },
-                        { text: 'スランプから抜け出すには', link: '/essay/e-no-suranpu-ni-tsuite' },
-                        { text: 'アイデアを生むための方法', link: '/essay/aidea-wo-umu-tame' },
-                        { text: '絵師という呼び方について', link: '/essay/eshi-toiu-koshou' },
-                        { text: '絵柄に自信が持てないときは', link: '/essay/egara-ni-jishin' },
-                    ]
-                },
-                {
-                    text: '雑学',
-                    collapsed: false,
-                    items: [
-                        { text: 'ウェブ小説の書き方', link: '/essay/pixiv-shousetsu-ga-moriagatte' },
-                        { text: '手話が認められるまで', link: '/essay/shuwa-ga-gengo-de' },
-                    ]
-                },
-                {
-                    text: '音楽',
-                    collapsed: false,
-                    items: [
-                        { text: '音楽の楽しみ方', link: '/essay/ongaku-wo-sarani-tanoshimu' },
-                        { text: 'Bメロ不要論', link: '/essay/b-mero-huyouron' },
-                    ]
-                },
-                {
-                    text: '心身の健康',
-                    collapsed: false,
-                    items: [
-                        { text: '生きるための処方箋', link: '/essay/ikiru-tame-no-shohousen' },
-                        { text: '傷ついても創作を続けるには', link: '/essay/kokoro-ga-sensai-na-ekaki' },
-                        { text: 'うつ病でも創作を続けるには', link: '/essay/utsu-byou-demo-sousaku' },
-                        { text: '低気圧で体調を崩す理由', link: '/essay/teikiatsu-de-taishou-wo' },
-                    ]
-                },
-                {
-                    text: 'Pixiv',
-                    collapsed: false,
-                    items: [
-                        { text: 'ピクスケの始め方', link: '/essay/sketch-live-no-tanoshii' },
-                        { text: 'ピクスケの楽しみ方', link: '/essay/pixiv-sketch-wo-motto-tanoshimu' },
-                        { text: 'ピクスケを盛り上げたい', link: '/essay/pixiv-sketch-zentai' },
-                        { text: 'PIXIV DEV 予習', link: '/essay/pixiv-dev-meetup-ni-shoutai' },
-                        { text: 'PIXIV DEV 第一印象', link: '/essay/pixiv-dev-meetup-fa-suto' },
-                        { text: 'PIXIV DEV 体験記', link: '/essay/pixiv-dev-meetup-taiken-repo' },
-                        { text: 'Pixiv 新UIに不満が続出', link: '/essay/pixiv-no-atarashii-ui' },
-                        { text: 'Pixiv 新UIの改善点', link: '/essay/pixiv-no-ui-dou-kaizen' },
-                        { text: 'ピクシブ小説の本文検索', link: '/essay/pixiv-shousetsu-no-honbun' },
-                        { text: 'SKETCH LIVEで配信する', link: '/essay/sketch-live-de-koukateki' },
-                        { text: 'FANBOXで生じるジレンマ', link: '/essay/fanbox-de-shoujiru' },
-                    ]
-                },
-            ],
-            '/note/': [
-                {
-                    text: 'リンク',
-                    collapsed: false,
-                    items: [
-                        { text: 'お気に入りのウェブサイト', link: '/note/bookmark' },
-                    ]
-                },
-                {
-                    text: '覚え書き',
-                    collapsed: false,
-                    items: [
-                        { text: 'CでSJISをUTF8に変換する', link: '/note/c-gengo-de-moji' },
-                        { text: '手動でRSS2.0を作成する', link: '/note/rss20-wo-shudou-de' },
-                        { text: 'MusicXMLのチュートリアル', link: '/note/music-xml-no' },
-                        { text: 'ホワイトノイズの生成と再生', link: '/note/openal-wo-tsukatte' },
-                        { text: '波形を生成する', link: '/note/puroguramingu-de-hakei' },
-                    ]
-                },
-                {
-                    text: 'やってみた',
-                    collapsed: false,
-                    items: [
-                        { text: 'CoeFontを使ってみた', link: '/note/jibun-no-koe-de-onsei-gousei' },
-                        { text: 'AIに記事を書かせてみた', link: '/note/jinkou-chinou-ni-kiji-wo' },
-                        { text: 'ペン入れ有り無し混ぜてみた', link: '/note/penire-ari-nashi-wo' },
-                        { text: 'グリザイユ画法に挑戦してみた', link: '/note/gurizaiyu-gahou-ga-raku' },
-                        { text: '防音室を作ってみた', link: '/note/bouon-shitsu-wo-tsukuri' },
-                        { text: '色にこだわってみた', link: '/note/shikisai-ni-torikumu' },
-                        { text: 'タイムラプスを撮ってみた', link: '/note/taimu-rapusu-de-manabu' },
-                        { text: 'VTuberになってみた', link: '/note/ekaki-ga-vtuber-ni-natta' },
-                    ]
-                },
-                
-                {
-                    text: '制作秘話',
-                    collapsed: false,
-                    items: [
-                        { text: 'ウェブ漫画を通して伝えたかったこと', link: '/note/webu-manga-wo-tooshite' },
-                        { text: 'ドローイング・マイシスターの裏話', link: '/note/doro-ingu-mai-shisuta-no-ura-banashi' },
-                        { text: 'なぜクマ？ なぜ学ラン？ 正義のくまさん制作秘話！', link: '/note/naze-kuma-naze-gakuran' },
-                        { text: 'みがらいあの舞台が現代である理由', link: '/note/migaraia-no-butai' },
-                        { text: 'みがらいあの意味', link: '/note/migaraia-no-imi' },
-                        { text: 'みがちゃんが笑わなくなった理由', link: '/note/miga-chan-ga-warawanaku' },
-                    ]
-                },
-                {
-                    text: 'レビュー',
-                    collapsed: false,
-                    items: [
-                        { text: '液タブHuion Kanvas Pro 24(4K)を買ったのでレビューします', link: '/note/ekitabu-huion-kanvas-pro-24-4k' },
-                    ]
-                },
-            ]
         },
         footer: {
             message: '',
