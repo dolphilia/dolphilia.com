@@ -63,6 +63,7 @@ export default {
                     {text: 'Natural Docs', link: '/translation/natural-docs/'},
                     {text: 'Ninja', link: '/translation/ninja/'},
                     {text: 'Nuklear', link: '/translation/nuklear/'},
+                    {text: 'PEG.js', link: '/translation/pegjs/'},
                     {text: 'Processing', link: '/translation/processing/'},
                     {text: 'pygame', link: '/translation/pygame/reference/'},
                     {text: 'Sass', link: '/translation/sass/'},
@@ -1134,6 +1135,16 @@ export default {
                     items: [
                         {text: 'はじめに', link: '/translation/nuklear/'},
                         {text: 'ドキュメント', link: '/translation/nuklear/doc'},
+                    ]
+                },
+            ],
+            '/translation/pegjs/': [
+                {
+                    text: 'PEG.js',
+                    collapsed: false,
+                    items: [
+                        {text: 'はじめに', link: '/translation/pegjs/'},
+                        {text: 'ドキュメント', link: '/translation/pegjs/documentation'},
                     ]
                 },
             ],
