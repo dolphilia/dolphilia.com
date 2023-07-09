@@ -50,6 +50,7 @@ export default {
                 activeMatch: '/translation/', 
                 items: [
                     {text: 'ANGLE', link: '/translation/angle/'},
+                    {text: 'ANTLR', link: '/translation/antlr/'},
                     {text: 'CivetWeb', link: '/translation/civetweb/'},
                     {text: 'C言語', link: '/translation/c/'},
                     {text: 'Duktape', link: '/translation/duktape/'},
@@ -271,6 +272,27 @@ export default {
                         {text: 'ANGLEの開発', link: '/translation/angle/angle_development'},
                         {text: 'MetalANGLEの概要', link: '/translation/angle/metal_angle'},
                         {text: 'MetalANGLEの開発', link: '/translation/angle/metal_andle_development'},
+                    ]
+                }
+            ],
+            '/translation/antlr/': [
+                {
+                    text: 'ANTLR',
+                    collapsed: false,
+                    items: [
+                        {text: 'はじめに', link: '/translation/antlr/'},
+                    ]
+                },
+                {
+                    text: 'ドキュメント',
+                    collapsed: false,
+                    items: [
+                        {text: 'C++', link: '/translation/antlr/cpp-target'},
+                        {text: 'Go', link: '/translation/antlr/go-target'},
+                        {text: 'Java', link: '/translation/antlr/java-target'},
+                        {text: 'JavaScript', link: '/translation/antlr/javascript-target'},
+                        {text: 'Python', link: '/translation/antlr/python-target'},
+                        {text: 'Typescript', link: '/translation/antlr/typescript-target'},
                     ]
                 }
             ],
