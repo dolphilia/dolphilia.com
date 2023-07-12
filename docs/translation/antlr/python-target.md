@@ -1,11 +1,11 @@
 # Python (2 and 3)
 
-The examples from the ANTLR 4 book converted to Python are here.
+ANTLR 4の本からPythonに変換した例はこちらです。
 
-There are 2 Python targets: `Python2` and `Python3`. This is because there is only limited compatibility between those 2 versions of the language. Please refer to the Python documentation for full details.
+2つのPythonターゲットがあります：`Python2` と `Python3` です。これは、この2つのバージョン間には限られた互換性しかないためです。詳細はPythonのドキュメントを参照してください。
 
-How to create a Python lexer or parser?
-This is pretty much the same as creating a Java lexer or parser, except you need to specify the language target, for example:
+Pythonのレキサーやパーサーを作るには？
+これはJavaのレキサーやパーサーを作るのとほとんど同じですが、例えば言語ターゲットを指定する必要があります：
 
 ```
 $ antlr4 -Dlanguage=Python2 MyGrammar.g4
@@ -17,31 +17,31 @@ or
 $ antlr4 -Dlanguage=Python3 MyGrammar.g4
 ```
 
-For a full list of antlr4 tool options, please visit the tool documentation page.
+antlr4ツールオプションの完全なリストについては、ツールのドキュメントページをご覧ください。
 
-## Where can I get the runtime?
+## ランタイムはどこで入手できますか？
 
-Once you've generated the lexer and/or parser code, you need to download the runtime. The Python runtimes are available from PyPI:
+レキサーやパーサーのコードを生成したら、ランタイムをダウンロードする必要があります。PythonのランタイムはPyPIから入手できます：
 
 * https://pypi.python.org/pypi/antlr4-python2-runtime/
 * https://pypi.python.org/pypi/antlr4-python3-runtime/
 
-The runtimes are provided in the form of source code, so no additional installation is required.
+ランタイムはソースコードの形で提供されるため、追加のインストールは必要ない。
 
-We will not document here how to refer to the runtime from your Python project, since this would differ a lot depending on your project type and IDE. 
+Pythonプロジェクトからランタイムを参照する方法は、プロジェクトの種類やIDEによって大きく異なるため、ここでは説明しません。
 
-## How do I run the generated lexer and/or parser?
+## 生成されたレキサーやパーサーを実行するにはどうすればよいですか？
 
-Let's suppose that your grammar is named, as above, "MyGrammar". Let's suppose this parser comprises a rule named "startRule". The tool will have generated for you the following files:
+あなたの文法が上記のように "MyGrammar "という名前だとしよう。このパーサーは "startRule "という名前のルールで構成されているとする。このツールは以下のファイルを生成します：
 
 * MyGrammarLexer.py
 * MyGrammarParser.py
 * MyGrammarListener.py (if you have not activated the -no-listener option)
 * MyGrammarVisitor.py (if you have activated the -visitor option)
 
-(Developers used to Java/C# AntLR will notice that there is no base listener or visitor generated, this is because Python having no support for interfaces, the generated listener and visitor are fully fledged classes)
+(Java/C#のAntLRに慣れている開発者は、生成されるベースリスナーやビジターがないことに気づくでしょう。これは、Pythonがインタフェースをサポートしていないためで、生成されるリスナーとビジターは完全なクラスです)
 
-Now a fully functioning script might look like the following:
+完全に機能するスクリプトは以下のようになります：
  
 ```python
 import sys
@@ -60,17 +60,17 @@ if __name__ == '__main__':
     main(sys.argv)
 ```
 
-This program will work. But it won't be useful unless you do one of the following:
+このプログラムは機能する。しかし、次のいずれかを実行しない限り、役に立ちません：
 
-* you visit the parse tree using a custom listener
-* you visit the parse tree using a custom visitor
-* your grammar comprises production code (like ANTLR3)
+* カスタム・リスナーを使って解析ツリーを訪問する。
+* カスタムビジターを使って解析ツリーにアクセスする
+* 文法が（ANTLR3のような）プロダクションコードで構成されている。
 
-(please note that production code is target specific, so you can't have multi target grammars that include production code, except for very limited use cases, see below)
+(プロダクションコードはターゲットに依存するため、プロダクションコードを含むマルチターゲットの文法を作成することはできません。)
  
-## How do I create and run a custom listener?
+## カスタムリスナーを作成して実行するには？
 
-Let's suppose your MyGrammar grammar comprises 2 rules: "key" and "value". The antlr4 tool will have generated the following listener: 
+MyGrammar文法が2つのルールで構成されているとしましょう："key "と "value "です。antlr4ツールは以下のリスナーを生成します：
 
 ```python
 class MyGrammarListener(ParseTreeListener):
@@ -84,7 +84,7 @@ class MyGrammarListener(ParseTreeListener):
         pass
 ```
  
-In order to provide custom behavior, you might want to create the following class:
+カスタム・ビヘイビアを提供するために、次のようなクラスを作りたいかもしれない：
   
 ```python
 class KeyPrinter(MyGrammarListener):     
@@ -92,7 +92,7 @@ class KeyPrinter(MyGrammarListener):
         print("Oh, a key!") 
 ```
  
-In order to execute this listener, you would simply add the following lines to the above code:
+このリスナーを実行するには、上記のコードに以下の行を追加するだけだ：
  
 ```
        ...
@@ -102,27 +102,27 @@ In order to execute this listener, you would simply add the following lines to t
    walker.walk(printer, tree)
 ```
  
-Further information can be found from the ANTLR 4 definitive guide.
+詳細については、ANTLR 4 決定版ガイドを参照されたい。
 
-The Python implementation of ANTLR is as close as possible to the Java one, so you shouldn't find it difficult to adapt the examples for Python.
+PythonのANTLRの実装はJavaのものにできるだけ近いので、サンプルをPythonに適応させるのは難しくないと思います。
 
-## Target agnostic grammars
+## ターゲットにとらわれない文法
 
-If your grammar is targeted to Python only, you may ignore the following. But if your goal is to get your Java parser to also run in Python, then you might find it useful.
+もしあなたの文法がPythonだけをターゲットにしているのであれば、以下は無視してかまいません。しかし、JavaパーサをPythonでも動作させることが目的であれば、役に立つかもしれません。
 
-1. Do not embed production code inside your grammar. This is not portable and will not be. Move all your code to listeners or visitors.
-1. The only production code absolutely required to sit with the grammar should be semantic predicates, like:
+1. プロダクション・コードを文法の中に埋め込まないでください。これはポータブルではありませんし、今後もそうなることはないでしょう。すべてのコードをリスナーかVisitorに移してください。
+1. 文法に付随して絶対に必要なプロダクション・コードは、意味述語だけであるべきだ：
 ```
 ID {$text.equals("test")}?
 ```
 
-Unfortunately, this is not portable, as Java and Python (and other target languages) have different syntaxes for all but the simplest language elements.  But you can work around it. The trick involves:
+残念ながら、JavaとPython（および他のターゲット言語）では、最も単純な言語要素以外の構文が異なるため、これは移植性がない。  しかし、これを回避することはできる。その方法とは
 
-* deriving your parser from a parser you provide, such as BaseParser
-* implementing utility methods, such as "isEqualText", in this BaseParser, in different files for each target language
-* invoking your utility methods in the semantic predicate from the `$parser` object
+* BaseParserのような、あなたが提供するパーサーからあなたのパーサーを派生させる。
+* このBaseParserで、"isEqualText "のようなユーティリティメソッドを、ターゲット言語ごとに異なるファイルに実装する。
+* `$parser`オブジェクトから意味述語でユーティリティメソッドを呼び出す。
 
-Thanks to the above, you should be able to rewrite the above semantic predicate as follows:
+上記のおかげで、上記の意味述語を次のように書き換えることができるはずだ：
 
 File `MyGrammarParser.g4`:
 ```

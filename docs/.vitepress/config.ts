@@ -252,7 +252,20 @@ export default {
                     items: [
                         { text: 'はじめに', link: '/study/' },
                         { text: '学問のリスト', link: '/study/list_of_studies' },
+                    ]
+                },
+                {
+                    text: '数学',
+                    collapsed: false,
+                    items: [
                         { text: '高校数学で学ぶこと', link: '/study/list_of_high_school_math' },
+                    ]
+                },
+                {
+                    text: '英語',
+                    collapsed: false,
+                    items: [
+                        { text: 'ベーシック英語', link: '/study/basic_english' },
                     ]
                 },
                 {
