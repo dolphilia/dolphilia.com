@@ -20,7 +20,7 @@ export default {
             apiKey: 'aaf30df920537ae115546a12a1554f6b',
             indexName: 'dolphilia'
         },
-        //logo: '/my-logo.svg'
+        logo: '/logo_miga.png',
         siteTitle: 'みが市立図書館',
         socialLinks: [
             { icon: 'github', link: 'https://github.com/dolphilia' },
@@ -32,18 +32,7 @@ export default {
         nav: [
             { text: '小説', activeMatch: '/novel/', link: '/novel/index' },
             { text: '論考', activeMatch: '/essay/', link: '/essay/index' },
-            { text: '雑記', activeMatch: '/note/', link: '/note/index' 
-              //items: [
-              //  {
-              //    // セクションのタイトルです。
-              //    text: 'Section A Title',
-              //    items: [
-              //      { text: 'Section A Item A', link: '...' },
-              //      { text: 'Section B Item B', link: '...' }
-              //    ]
-              //  }
-              //]
-            },
+            { text: '雑記', activeMatch: '/note/', link: '/note/index' },
             { text: '学習', activeMatch: '/study/', link: '/study/index' },
             { 
                 text: '翻訳', 
@@ -58,6 +47,7 @@ export default {
                     {text: 'HonKit', link: '/translation/honkit/'},
                     {text: 'HSP', link: '/translation/hsp/'},
                     {text: 'JavaScript', link: '/translation/javascript/'},
+                    {text: 'LLVM', link: '/translation/llvm/'},
                     {text: 'Mastodon', link: '/translation/mastodon/'},
                     {text: 'Mermaid', link: '/translation/mermaid/'},
                     {text: 'Meson', link: '/translation/meson/'},
@@ -1081,6 +1071,26 @@ export default {
                         {text: '50のルール', link: '/translation/javascript/50_javascript_best_practice.md'},
                         {text: 'Clean Code', link: '/translation/javascript/clean_code_javascript.md'},
                         {text: 'W3C', link: '/translation/javascript/javascript_best_practices.md'},
+                    ]
+                },
+            ],
+            '/translation/llvm/': [
+                {
+                    text: 'LLVM',
+                    collapsed: false,
+                    items: [
+                        {text: '概要', link: '/translation/llvm/'},
+                        {text: '特徴', link: '/translation/llvm/features'},
+                        {text: 'LLVMシステム入門', link: '/translation/llvm/getting_started'}
+                    ]
+                },
+                {
+                    text: 'LLVM デザインと概要',
+                    collapsed: true,
+                    items: [
+                        {text: '目次', link: '/translation/llvm/doc/'},
+                        {text: 'Clean Code', link: '/translation/llvm/doc/'},
+                        {text: 'W3C', link: '/translation/llvm/doc/'},
                     ]
                 },
             ],
