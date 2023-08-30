@@ -7,6 +7,66 @@ head:
 
 # KaTeXで数式を書く
 
+## 改行
+
+```latex
+$$
+\begin{aligned} 
+  x^2 - (a + b)x + ab = 0 \\
+  (x - a) (x - b) = 0 \\
+  x = a, b
+\end{aligned}
+$$
+```
+
+$$
+\begin{aligned} 
+  x^2 - (a + b)x + ab = 0 \\
+  (x - a) (x - b) = 0 \\
+  x = a, b
+\end{aligned}
+$$
+
+## 揃える
+
+```latex
+$$
+\begin{aligned} 
+  x^2 - (a + b)x + ab &= 0 \\
+  (x - a) (x - b) &= 0 \\
+  x &= a, b
+\end{aligned}
+$$
+```
+
+$$
+\begin{aligned} 
+  x^2 - (a + b)x + ab &= 0 \\
+  (x - a) (x - b) &= 0 \\
+  x &= a, b
+\end{aligned}
+$$
+
+## 空白
+
+```latex
+$$
+\begin{aligned} 
+  x^2 - (a + b)x + ab &= 0 \\
+  (x - a) (x - b) &= 0 \\
+  x &= a, \qquad\quad b
+\end{aligned}
+$$
+```
+
+$$
+\begin{aligned} 
+  x^2 - (a + b)x + ab &= 0 \\
+  (x - a) (x - b) &= 0 \\
+  x &= a, \qquad\quad b
+\end{aligned}
+$$
+
 ## 添字
 
 `x^{2}` -> $x^{2}$

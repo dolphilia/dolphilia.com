@@ -20,7 +20,7 @@ export default {
             apiKey: 'aaf30df920537ae115546a12a1554f6b',
             indexName: 'dolphilia'
         },
-        logo: '/logo_miga.png',
+        //logo: '/logo_miga.png',
         siteTitle: 'みが市立図書館',
         socialLinks: [
             { icon: 'github', link: 'https://github.com/dolphilia' },
@@ -46,6 +46,7 @@ export default {
                     {text: 'GLFW', link: '/translation/GLFW/'},
                     {text: 'HonKit', link: '/translation/honkit/'},
                     {text: 'HSP', link: '/translation/hsp/'},
+                    {text: 'ImGui', link: '/translation/imgui/'},
                     {text: 'JavaScript', link: '/translation/javascript/'},
                     {text: 'LLVM', link: '/translation/llvm/'},
                     {text: 'Mastodon', link: '/translation/mastodon/'},
@@ -53,6 +54,7 @@ export default {
                     {text: 'Meson', link: '/translation/meson/'},
                     {text: 'Natural Docs', link: '/translation/natural-docs/'},
                     {text: 'Ninja', link: '/translation/ninja/'},
+                    {text: 'Node.js', link: '/translation/nodejs/'},
                     {text: 'Nuklear', link: '/translation/nuklear/'},
                     {text: 'PEG.js', link: '/translation/pegjs/'},
                     {text: 'Processing', link: '/translation/processing/'},
@@ -1055,6 +1057,16 @@ export default {
                     ]
                 },
             ],
+            '/translation/imgui/': [
+                {
+                    text: 'ImGui',
+                    collapsed: false,
+                    items: [
+                        {text: 'はじめに', link: '/translation/imgui/'},
+                        {text: 'imgui.h', link: '/translation/imgui/imgui_h.md'},
+                    ]
+                }
+            ],
             '/translation/javascript/': [
                 {
                     text: 'JavaScript',
@@ -1170,6 +1182,17 @@ export default {
                         {text: '詳細', link: '/translation/ninja/more_details.md'},
                         {text: 'リファレンス', link: '/translation/ninja/ninja_file_reference.md'},
                         {text: '動的従属性', link: '/translation/ninja/dynamic_dependencies.md'},
+                    ]
+                },
+            ],
+            '/translation/nodejs/': [
+                {
+                    text: 'Node.js',
+                    collapsed: false,
+                    items: [
+                        {text: 'はじめに', link: '/translation/nodejs/'},
+                        {text: 'C++アドオン', link: '/translation/nodejs/addons'},
+                        {text: 'Node API', link: '/translation/nodejs/n-api'},
                     ]
                 },
             ],
