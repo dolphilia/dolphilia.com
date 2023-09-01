@@ -736,7 +736,7 @@ IMGUI_API void PopButtonRepeat();
 | PushStyleVar()                                      | `NewFrame()`の後でスタイルを変更する場合は、常にこれを使用します。                                                                                                                                                 |
 | PushStyleVar(), PopStyleVar()                       | `NewFrame()`の後にスタイルを変更する場合は、常にこの変数を使用します。                                                                                                                                             |
 | PushTabStop(), PopTabStop()                         | == タブストップを有効にする。 TAB/Shift-TABを使ったフォーカシングを許可します。デフォルトで有効になっていますが、特定のウィジェットでは無効にできます。                                                                                                 |
-| PushButtonRepeat(), PopButtonRepeat()               | 繰り返しモードでは、{Button*()}関数は型どおりの方法で繰り返された真を返す。 (`io.KeyRepeatDelay`/`io.KeyRepeatRate`の設定を使用します。). `Button()`の後で`IsItemActive()`を呼び出すことで、ボタンが現在のフレームに保持されているかどうかを知ることができます。 |
+| PushButtonRepeat(), PopButtonRepeat()               | 繰り返しモードでは、`Button*()`関数は型どおりの方法で繰り返された真を返す。 (`io.KeyRepeatDelay`/`io.KeyRepeatRate`の設定を使用します。). `Button()`の後で`IsItemActive()`を呼び出すことで、ボタンが現在のフレームに保持されているかどうかを知ることができます。 |
 
 ### パラメータ・スタック（現在のウィンドウ）
 
@@ -1712,19 +1712,19 @@ IMGUI_API void          SetNextFrameWantCaptureMouse(bool want_capture_mouse);
 | IsMouseDown()                      | マウスボタンが押されているか？                                                                                                                                                                                                                                                |
 | IsMouseClicked()                   | マウスボタンがクリックされたか？ (!ダウンからダウンへ). GetMouseClickedCount() == 1 と同じ。.                                                                                                                                                                            |
 | IsMouseReleased()                  | マウスボタンを離したか？ (ダウンから!ダウンへ)                                                                                                                                                                                                                 |
-| IsMouseDoubleClicked()             | did mouse button double-clicked? Same as GetMouseClickedCount() == 2. (note that a double-click will also report IsMouseClicked() == true)                                                                                                                           |
-| GetMouseClickedCount()             | return the number of successive mouse-clicks at the time where a click happen (otherwise 0).                                                                                                                                                                         |
-| IsMouseHoveringRect()              | is mouse hovering given bounding rect (in screen space). clipped by current clipping settings, but disregarding of other consideration of focus/window ordering/popup-block.                                                                                         |
-| IsMousePosValid()                  | by convention we use (-FLT_MAX,-FLT_MAX) to denote that there is no mouse available                                                                                                                                                                                  |
-| IsAnyMouseDown()                   | [WILL OBSOLETE] is any mouse button held? This was designed for backends, but prefer having backend maintain a mask of held mouse buttons, because upcoming input queue system will make this invalid.                                                               |
-| GetMousePos()                      | shortcut to ImGui::GetIO().MousePos provided by user, to be consistent with other calls                                                                                                                                                                              |
-| GetMousePosOnOpeningCurrentPopup() | retrieve mouse position at the time of opening popup we have BeginPopup() into (helper to avoid user backing that value themselves)                                                                                                                                  |
-| IsMouseDragging()                  | is mouse dragging? (if lock_threshold < -1.0f, uses io.MouseDraggingThreshold)                                                                                                                                                                                       |
-| GetMouseDragDelta()                | return the delta from the initial clicking position while the mouse button is pressed or was just released. This is locked and return 0.0f until the mouse moves past a distance threshold at least once (if lock_threshold < -1.0f, uses io.MouseDraggingThreshold) |
+| IsMouseDoubleClicked()             | マウス・ボタンがダブルクリックされたか？GetMouseClickedCount() == 2 と同じです（ダブルクリックは IsMouseClicked() == true も報告することに注意してください）。                                                                                                                           |
+| GetMouseClickedCount()             | クリックが発生した時点の連続したマウスクリックの回数を返す(それ以外は0)。                                                                                                                                                                         |
+| IsMouseHoveringRect()              | 現在のクリッピング設定によってクリッピングされるが、フォーカス/ウィンドウの順序/ポップアップブロックの他の考慮は無視される。                                                                                         |
+| IsMousePosValid()                  | 慣例として、(-FLT_MAX,-FLT_MAX)はマウスがないことを表す。                                                                                                                                                                                 |
+| IsAnyMouseDown()                   | [WILL OBSOLETE] マウスのボタンが押されていますか？ これはバックエンドのために設計されたものだが、バックエンドが保持されているマウスボタンのマスクを保持する方が望ましい。                                                               |
+| GetMousePos()                      | ImGui::GetIO().MousePosへのショートカットがユーザーによって提供される。                                                                                                                                                                              |
+| GetMousePosOnOpeningCurrentPopup() | BeginPopup()でポップアップを開いたときのマウスの位置を取得します。                                                                                                                                  |
+| IsMouseDragging()                  | マウスがドラッグしているか？(`lock_threshold < -1.0f` の場合 `io.MouseDraggingThreshold`を使用する)                                                                                                                                                                                       |
+| GetMouseDragDelta()                | マウスボタンが押されている間、または離された直後の最初のクリック位置からのデルタを返す。 これはロックされ、マウスが距離のしきい値を少なくとも1回通過するまで0.0fを返す（`lock_threshold < -1.0f`の場合、`io.MouseDraggingThreshold`を使用する）。 |
 | ResetMouseDragDelta()              |                                                                                                                                                                                                                                                                      |
-| GetMouseCursor()                   | get desired mouse cursor shape. Important: reset in ImGui::NewFrame(), this is updated during the frame. valid before Render(). If you use software rendering by setting io.MouseDrawCursor ImGui will render those for you                                          |
-| SetMouseCursor()                   | set desired mouse cursor shape                                                                                                                                                                                                                                       |
-| SetNextFrameWantCaptureMouse()     | Override io.WantCaptureMouse flag next frame (said flag is left for your application to handle, typical when true it instucts your app to ignore inputs). This is equivalent to setting "io.WantCaptureMouse = want_capture_mouse;" after the next NewFrame() call.  |
+| GetMouseCursor()                   | 希望するマウスカーソルの形状を取得する。 重要：ImGui::NewFrame()でリセットされ、これはフレーム中に更新されます。 Render()の前に有効です。io.MouseDrawCursorを設定してソフトウェアレンダリングを使用する場合、ImGuiはあなたのためにそれらをレンダリングします。                                          |
+| SetMouseCursor()                   | マウスカーソルの形状を設定する                                                                                                                                                                                                                                       |
+| SetNextFrameWantCaptureMouse()     | io.WantCaptureMouseフラグの次のフレームをオーバーライドする。 (このフラグはアプリケーションの処理に委ねられるが、典型的な場合、true にすると、アプリケーションは入力を無視するようになる。). これは、次のNewFrame()呼び出しの後に、"io.WantCaptureMouse = want_capture_mouse; "を設定することと同じです。  |
 
 
 ### クリップボードユーティリティ
@@ -4230,8 +4230,8 @@ struct ImDrawChannel
 };
 ```
 
-Split/Merge functions are used to split the draw list into different layers which can be drawn into out of order.
-This is used by the Columns/Tables API, so items of each column can be batched together in a same draw call.
+Split/Merge関数は、描画リストを異なるレイヤーに分割するために使用されます。
+これはColumns/Tables APIで使用され、各カラムのアイテムを同じ描画呼び出しでまとめて描画することができます。
 
 ```cpp
 struct ImDrawListSplitter
@@ -4274,8 +4274,8 @@ enum ImDrawFlags_
 };
 ```
 
-Flags for ImDrawList instance. Those are set automatically by ImGui:: functions from ImGuiIO settings, and generally not manipulated directly.
-It is however possible to temporarily alter flags between calls to ImDrawList:: functions.
+ImDrawList インスタンスのフラグ。これらは ImGui:: 関数によって ImGuiIO の設定から自動的に設定されるもので、一般的には直接操作することはできません。
+しかし、ImDrawList::関数を呼び出す間にフラグを一時的に変更することは可能です。
 
 ```cpp
 enum ImDrawListFlags_
@@ -4290,14 +4290,12 @@ enum ImDrawListFlags_
 
 描画コマンドリスト
 
-This is the low-level list of polygons that ImGui:: functions are filling. At the end of the frame,
-all command lists are passed to your ImGuiIO::RenderDrawListFn function for rendering.
-Each dear imgui window contains its own ImDrawList. You can use ImGui::GetWindowDrawList() to
-access the current window draw list and draw custom primitives.
-You can interleave normal ImGui:: calls and adding primitives to the current draw list.
-In single viewport mode, top-left is == GetMainViewport()->Pos (generally 0,0), bottom-right is == GetMainViewport()->Pos+Size (generally io.DisplaySize).
-You are totally free to apply whatever transformation matrix to want to the data (depending on the use of the transformation you may want to apply it to ClipRect as well!)
-Important: Primitives are always added to the list and not culled (culling is done at higher-level by ImGui:: functions), if you use this API a lot consider coarse culling your drawn objects.
+これは、ImGui::関数が充填するポリゴンの低レベルリストです。フレームの終わりには、すべてのコマンドリストがレンダリングのために ImGuiIO::RenderDrawListFn 関数に渡されます。
+それぞれの親愛なるimguiウィンドウはそれ自身のImDrawListを含んでいます。ImGui::GetWindowDrawList()を使って、現在のウィンドウ描画リストにアクセスし、カスタムプリミティブを描画することができます。
+通常のImGui::の呼び出しと、現在の描画リストへのプリミティブの追加をインターリーブすることができます。
+シングルビューポートモードでは、左上は== GetMainViewport()->Pos (一般的には0,0)、右下は== GetMainViewport()->Pos+Size (一般的にはio.DisplaySize)です。
+データにどのような変換行列を適用するかは完全に自由です（変換の用途によっては、ClipRectにも適用したくなるかもしれません！）。
+重要：プリミティブは常にリストに追加され、カリングされません（カリングはImGui::関数によってより高いレベルで行われます）。
 
 ```cpp
 struct ImDrawList
@@ -4427,8 +4425,7 @@ struct ImDrawList
 
 Dear ImGuiフレームをレンダリングするためのすべての描画データ
 
-(NB: the style and the naming convention here is a little inconsistent, we currently preserve them for backward compatibility purpose,
-as this is one of the oldest structure exposed by the library! Basically, ImDrawList == CmdList)
+注：ここのスタイルと命名規則には少し一貫性がありません。これはライブラリによって公開される最も古い構造の1つであるため、後方互換性の目的のために、現在これらを保存しています！基本的には、ImDrawList == CmdListです。
 
 ```cpp
 struct ImDrawData
@@ -4736,7 +4733,7 @@ struct ImFont
 
 ## ビューポート
 
-Flags stored in `ImGuiViewport::Flags`, giving indications to the platform backends.
+`ImGuiViewport::Flags`に格納されているフラグで、プラットフォームのバックエンドに指示を与える。
 
 ```cpp
 enum ImGuiViewportFlags_
@@ -4783,13 +4780,19 @@ struct ImGuiViewport
 ```cpp
 struct ImGuiPlatformImeData
 {
-    bool    WantVisible;        // A widget wants the IME to be visible
-    ImVec2  InputPos;           // Position of the input cursor
-    float   InputLineHeight;    // Line height
+    bool    WantVisible;
+    ImVec2  InputPos;
+    float   InputLineHeight;
 
     ImGuiPlatformImeData() { memset(this, 0, sizeof(*this)); }
 };
 ```
+
+|名前|説明|
+|---|---|
+| WantVisible        | ウィジェットはIMEを表示したい |
+| InputPos           | 入力カーソルの位置 |
+| InputLineHeight    | ラインの高さ |
 
 ## 廃止された関数と型
 
