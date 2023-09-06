@@ -14,6 +14,7 @@ export default {
             md.use(require("markdown-it-katex"));
         },
     },
+    
     themeConfig: {
         algolia: {
             appId: 'BT9F9T40EX',
@@ -66,6 +67,7 @@ export default {
                     {text: 'SteamOS', link: '/translation/steamos/'},
                     {text: 'Svelte', link: '/translation/svelte/'},
                     {text: 'uthash', link: '/translation/uthash/'},
+                    {text: 'v8', link: '/translation/v8/'},
                     {text: 'VitePress', link: '/translation/vitepress/'},
                     {text: 'VivlioStyle', link: '/translation/vivliostyle/'},
                     {text: 'yyjson', link: '/translation/yyjson/'},
@@ -1346,6 +1348,15 @@ export default {
                     ]
                 },
             ],
+            '/translation/typescript/': [
+                {
+                    text: '',
+                    collapsed: false,
+                    items: [
+                        {text: 'はじめに', link: '/translation/typescript/'},
+                    ]
+                },
+            ],
             '/translation/uthash/': [
                 {
                     text: '',
@@ -1361,12 +1372,14 @@ export default {
                     ]
                 },
             ],
-            '/translation/typescript/': [
+            '/translation/v8/': [
                 {
                     text: '',
                     collapsed: false,
                     items: [
-                        {text: 'はじめに', link: '/translation/typescript/'},
+                        {text: 'はじめに', link: '/translation/v8/'},
+                        {text: 'v8.h', link: '/translation/v8/v8_h'},
+                        {text: 'v8-primitive.h', link: '/translation/v8/v8-primitive_h'},
                     ]
                 },
             ],

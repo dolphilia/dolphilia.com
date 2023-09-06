@@ -375,50 +375,77 @@ typedef int ImGuiWindowFlags;      // -> enum ImGuiWindowFlags_
 
 ```cpp
 #ifndef ImTextureID
-typedef void* ImTextureID; // Default: store a pointer or an integer fitting in a pointer (most renderer backends are ok with that)
+typedef void* ImTextureID;
 #endif
 ```
+
+`ImTextureID`: デフォルト - ポインタまたは整数のフィッティングをポインタに格納する（ほとんどのレンダラーのバックエンドはこれでOKです）。
 
 ### ImDrawIdx
 
 頂点インデックス。コンパイル時に設定可能な型。
 
-- To use 16-bit indices + allow large meshes: backend need to set `'io.BackendFlags |= ImGuiBackendFlags_RendererHasVtxOffset'` and handle `ImDrawCmd::VtxOffset` (recommended).
-- To use 32-bit indices: override with `'#define ImDrawIdx unsigned int'` in your `imconfig.h` file.
+- 16ビットインデックスを使用し、大きなメッシュを使用できるようにするには、バックエンドは `'io.BackendFlags |= ImGuiBackendFlags_RendererHasVtxOffset'` を設定し、`ImDrawCmd::VtxOffset` を処理する必要があります（推奨）。
+- 32ビットインデックスを使用するには、`'#define ImDrawIdx unsigned int'` を `imconfig.h` ファイルでオーバーライドします。
 
 ```cpp
 #ifndef ImDrawIdx
-typedef unsigned short ImDrawIdx;   // Default: 16-bit (for maximum compatibility with renderer backends)
+typedef unsigned short ImDrawIdx;
 #endif
 ```
 
-### Scalar data types
+`ImDrawIdx`: デフォルト - 16ビット（レンダラーのバックエンドとの互換性を最大化するため）
+
+### スカラー・データ型
 
 ```cpp
-typedef unsigned int        ImGuiID;// A unique ID used by widgets (typically the result of hashing a stack of string)
-typedef signed char         ImS8;   // 8-bit signed integer
-typedef unsigned char       ImU8;   // 8-bit unsigned integer
-typedef signed short        ImS16;  // 16-bit signed integer
-typedef unsigned short      ImU16;  // 16-bit unsigned integer
-typedef signed int          ImS32;  // 32-bit signed integer == int
-typedef unsigned int        ImU32;  // 32-bit unsigned integer (often used to store packed colors)
-typedef signed   long long  ImS64;  // 64-bit signed integer
-typedef unsigned long long  ImU64;  // 64-bit unsigned integer
+typedef unsigned int        ImGuiID;
+typedef signed char         ImS8;
+typedef unsigned char       ImU8;
+typedef signed short        ImS16;
+typedef unsigned short      ImU16;
+typedef signed int          ImS32;
+typedef unsigned int        ImU32;
+typedef signed   long long  ImS64;
+typedef unsigned long long  ImU64;
 ```
 
-### Character types
+|名前|説明|
+|---|---|
+|ImGuiID| ウィジェットで使用される一意なID (通常は文字列のスタックをハッシュした結果)|
+|ImS8  | 8ビット符号付き整数|
+|ImU8  | 8ビット符号なし整数|
+|ImS16 | 16ビット符号付き整数|
+|ImU16 | 16ビット符号なし整数|
+|ImS32 | 32ビット符号付き整数 == int|
+|ImU32 | 32ビット符号なし整数（パックカラーを格納するためによく使われる）|
+|ImS64 | 64ビット符号付き整数|
+|ImU64 | 64ビット符号なし整数|
+
+### 文字型
 
 APIでは通常、UTF-8でエンコードされた文字列を使用する。これは、キーボード入力や表示に使用されるデコードされた文字専用のストレージです。
 
 ```cpp
-typedef unsigned short ImWchar16; // A single decoded U16 character/code point. We encode them as multi bytes UTF-8 when used in strings.
-typedef unsigned int ImWchar32;   // A single decoded U32 character/code point. We encode them as multi bytes UTF-8 when used in strings.
-#ifdef IMGUI_USE_WCHAR32          // ImWchar [configurable type: override in imconfig.h with '#define IMGUI_USE_WCHAR32' to support Unicode planes 1-16]
+typedef unsigned short ImWchar16;
+typedef unsigned int ImWchar32;
+#ifdef IMGUI_USE_WCHAR32
 typedef ImWchar32 ImWchar;
 #else
 typedef ImWchar16 ImWchar;
 #endif
 ```
+
+|名前|解説|
+|---|---|
+|ImWchar16 | デコードされた単一のU16文字/コードポイント。文字列で使用する場合は、マルチバイトUTF-8としてエンコードします。|
+|ImWchar32 | デコードされた単一のU32文字/コードポイント。文字列で使用する場合は、マルチバイトUTF-8としてエンコードします。|
+
+ImWchar
+
+設定可能なタイプ：
+
+imconfig.hの'#define IMGUI_USE_WCHAR32'でオーバーライドし、Unicodeプレーン1-16をサポートする。
 
 ### コールバックと関数の型
 
@@ -449,13 +476,17 @@ struct ImVec2
     float                                   x, y;
     constexpr ImVec2()                      : x(0.0f), y(0.0f) { }
     constexpr ImVec2(float _x, float _y)    : x(_x), y(_y) { }
-    float& operator[] (size_t idx)          { IM_ASSERT(idx == 0 || idx == 1); return ((float*)(void*)(char*)this)[idx]; } // We very rarely use this [] operator, so the assert overhead is fine.
+    float& operator[] (size_t idx)          { IM_ASSERT(idx == 0 || idx == 1); return ((float*)(void*)(char*)this)[idx]; }
     float  operator[] (size_t idx) const    { IM_ASSERT(idx == 0 || idx == 1); return ((const float*)(const void*)(const char*)this)[idx]; }
 #ifdef IM_VEC2_CLASS_EXTRA
-    IM_VEC2_CLASS_EXTRA     // Define additional constructors and implicit cast operators in imconfig.h to convert back and forth between your math types and ImVec2.
+    IM_VEC2_CLASS_EXTRA
 #endif
 };
 ```
+
+`float& operator[] (size_t idx)`: この[]演算子を使うことはほとんどないので、アサートのオーバーヘッドは問題ない。
+
+`IM_VEC2_CLASS_EXTRA`: imconfig.hで追加のコンストラクタと暗黙のキャスト演算子を定義し、数学型とImVec2の間を行き来できるようにする。
 
 ### ImVec4
 
@@ -468,11 +499,13 @@ struct ImVec4
     constexpr ImVec4()                                        : x(0.0f), y(0.0f), z(0.0f), w(0.0f) { }
     constexpr ImVec4(float _x, float _y, float _z, float _w)  : x(_x), y(_y), z(_z), w(_w) { }
 #ifdef IM_VEC4_CLASS_EXTRA
-    IM_VEC4_CLASS_EXTRA     // Define additional constructors and implicit cast operators in imconfig.h to convert back and forth between your math types and ImVec4.
+    IM_VEC4_CLASS_EXTRA
 #endif
 };
 IM_MSVC_RUNTIME_CHECKS_RESTORE
 ```
+
+`IM_VEC4_CLASS_EXTRA`: imconfig.hで追加のコンストラクタと暗黙のキャスト演算子を定義し、数学型とImVec4の間を行き来できるようにする。
 
 ## Dear ImGuiエンドユーザーAPI関数
 
@@ -490,10 +523,12 @@ namespace ImGui
 
 ```cpp
 IMGUI_API ImGuiContext* CreateContext(ImFontAtlas* shared_font_atlas = NULL);
-IMGUI_API void          DestroyContext(ImGuiContext* ctx = NULL);   // NULL = destroy current context
+IMGUI_API void          DestroyContext(ImGuiContext* ctx = NULL);
 IMGUI_API ImGuiContext* GetCurrentContext();
 IMGUI_API void          SetCurrentContext(ImGuiContext* ctx);
 ```
+
+`DestroyContext()`: NULL = 現在のコンテキストを破棄する
 
 ### メイン
 
@@ -957,11 +992,15 @@ IMGUI_API bool ImageButton(const char* str_id, ImTextureID user_texture_id, cons
 
 ```cpp
 IMGUI_API bool BeginCombo(const char* label, const char* preview_value, ImGuiComboFlags flags = 0);
-IMGUI_API void EndCombo(); // only call EndCombo() if BeginCombo() returns true!
+IMGUI_API void EndCombo();
 IMGUI_API bool Combo(const char* label, int* current_item, const char* const items[], int items_count, int popup_max_height_in_items = -1);
-IMGUI_API bool Combo(const char* label, int* current_item, const char* items_separated_by_zeros, int popup_max_height_in_items = -1);      // Separate items with \0 within a string, end item-list with \0\0. e.g. "One\0Two\0Three\0"
+IMGUI_API bool Combo(const char* label, int* current_item, const char* items_separated_by_zeros, int popup_max_height_in_items = -1);
 IMGUI_API bool Combo(const char* label, int* current_item, bool(*items_getter)(void* data, int idx, const char** out_text), void* data, int items_count, int popup_max_height_in_items = -1);
 ```
+
+- `EndCombo()`: 呼び出すのは、BeginCombo() が真を返す場合だけです！
+- `Combo(...items_separated_by_zeros...)`: 文字列内のアイテムは `\0` で区切り、item-list は `\0\0` で終了する。例えば "`One\0Two\0Three\0`"
+
 
 ### ウィジェット: ドラッグスライダー
 
@@ -976,12 +1015,12 @@ IMGUI_API bool Combo(const char* label, int* current_item, bool(*items_getter)(v
 - レガシー：1.78以前では、`ImGuiSliderFlags flags=0'`引数の代わりに`float power=1.0f'`引数を取る`DragXXX()`関数のシグネチャがあります。 もし浮動小数点数を ImGuiSliderFlags に変換するときに警告が表示されたら、 `https://github.com/ocornut/imgui/issues/3361` を読んでください。
 
 ```cpp
-IMGUI_API bool DragFloat(const char* label, float* v, float v_speed = 1.0f, float v_min = 0.0f, float v_max = 0.0f, const char* format = "%.3f", ImGuiSliderFlags flags = 0);     // If v_min >= v_max we have no bound
+IMGUI_API bool DragFloat(const char* label, float* v, float v_speed = 1.0f, float v_min = 0.0f, float v_max = 0.0f, const char* format = "%.3f", ImGuiSliderFlags flags = 0);
 IMGUI_API bool DragFloat2(const char* label, float v[2], float v_speed = 1.0f, float v_min = 0.0f, float v_max = 0.0f, const char* format = "%.3f", ImGuiSliderFlags flags = 0);
 IMGUI_API bool DragFloat3(const char* label, float v[3], float v_speed = 1.0f, float v_min = 0.0f, float v_max = 0.0f, const char* format = "%.3f", ImGuiSliderFlags flags = 0);
 IMGUI_API bool DragFloat4(const char* label, float v[4], float v_speed = 1.0f, float v_min = 0.0f, float v_max = 0.0f, const char* format = "%.3f", ImGuiSliderFlags flags = 0);
 IMGUI_API bool DragFloatRange2(const char* label, float* v_current_min, float* v_current_max, float v_speed = 1.0f, float v_min = 0.0f, float v_max = 0.0f, const char* format = "%.3f", const char* format_max = NULL, ImGuiSliderFlags flags = 0);
-IMGUI_API bool DragInt(const char* label, int* v, float v_speed = 1.0f, int v_min = 0, int v_max = 0, const char* format = "%d", ImGuiSliderFlags flags = 0);  // If v_min >= v_max we have no bound
+IMGUI_API bool DragInt(const char* label, int* v, float v_speed = 1.0f, int v_min = 0, int v_max = 0, const char* format = "%d", ImGuiSliderFlags flags = 0);
 IMGUI_API bool DragInt2(const char* label, int v[2], float v_speed = 1.0f, int v_min = 0, int v_max = 0, const char* format = "%d", ImGuiSliderFlags flags = 0);
 IMGUI_API bool DragInt3(const char* label, int v[3], float v_speed = 1.0f, int v_min = 0, int v_max = 0, const char* format = "%d", ImGuiSliderFlags flags = 0);
 IMGUI_API bool DragInt4(const char* label, int v[4], float v_speed = 1.0f, int v_min = 0, int v_max = 0, const char* format = "%d", ImGuiSliderFlags flags = 0);
@@ -989,6 +1028,9 @@ IMGUI_API bool DragIntRange2(const char* label, int* v_current_min, int* v_curre
 IMGUI_API bool DragScalar(const char* label, ImGuiDataType data_type, void* p_data, float v_speed = 1.0f, const void* p_min = NULL, const void* p_max = NULL, const char* format = NULL, ImGuiSliderFlags flags = 0);
 IMGUI_API bool DragScalarN(const char* label, ImGuiDataType data_type, void* p_data, int components, float v_speed = 1.0f, const void* p_min = NULL, const void* p_max = NULL, const char* format = NULL, ImGuiSliderFlags flags = 0);
 ```
+
+- `DragFloat()`: `v_min >= v_max`の場合、境界はない。
+- `DragInt()`: `v_min >= v_max`の場合、境界はない。
 
 ### ウィジェット: レギュラー・スライダー
 
@@ -998,7 +1040,7 @@ IMGUI_API bool DragScalarN(const char* label, ImGuiDataType data_type, void* p_d
 - レガシー：1.78 より前の `SliderXXX()` 関数のシグネチャでは、`ImGuiSliderFlags flags=0` 引数の代わりに `float power=1.0f` という最終引数を取ります。 もし浮動小数点数を `ImGuiSliderFlags` に変換するときに警告が表示されたら、 `https://github.com/ocornut/imgui/issues/3361` を読んでください。
 
 ```cpp
-IMGUI_API bool SliderFloat(const char* label, float* v, float v_min, float v_max, const char* format = "%.3f", ImGuiSliderFlags flags = 0);     // adjust format to decorate the value with a prefix or a suffix for in-slider labels or unit display.
+IMGUI_API bool SliderFloat(const char* label, float* v, float v_min, float v_max, const char* format = "%.3f", ImGuiSliderFlags flags = 0);
 IMGUI_API bool SliderFloat2(const char* label, float v[2], float v_min, float v_max, const char* format = "%.3f", ImGuiSliderFlags flags = 0);
 IMGUI_API bool SliderFloat3(const char* label, float v[3], float v_min, float v_max, const char* format = "%.3f", ImGuiSliderFlags flags = 0);
 IMGUI_API bool SliderFloat4(const char* label, float v[4], float v_min, float v_max, const char* format = "%.3f", ImGuiSliderFlags flags = 0);
@@ -1013,6 +1055,8 @@ IMGUI_API bool VSliderFloat(const char* label, const ImVec2& size, float* v, flo
 IMGUI_API bool VSliderInt(const char* label, const ImVec2& size, int* v, int v_min, int v_max, const char* format = "%d", ImGuiSliderFlags flags = 0);
 IMGUI_API bool VSliderScalar(const char* label, const ImVec2& size, ImGuiDataType data_type, void* p_data, const void* p_min, const void* p_max, const char* format = NULL, ImGuiSliderFlags flags = 0);
 ```
+
+- `SliderFloat()`: スライダー内ラベルや単位表示のために、値を接頭辞や接尾辞で装飾する書式を調整します。
 
 ### ウィジェット: キーボード入力
 
@@ -1066,8 +1110,8 @@ IMGUI_API void SetColorEditOptions(ImGuiColorEditFlags flags);
 
 ```cpp
 IMGUI_API bool  TreeNode(const char* label);
-IMGUI_API bool  TreeNode(const char* str_id, const char* fmt, ...) IM_FMTARGS(2);   // helper variation to easily decorelate the id from the displayed string. Read the FAQ about why and how to use ID. to align arbitrary text at the same level as a TreeNode() you can use Bullet().
-IMGUI_API bool  TreeNode(const void* ptr_id, const char* fmt, ...) IM_FMTARGS(2);   // "
+IMGUI_API bool  TreeNode(const char* str_id, const char* fmt, ...) IM_FMTARGS(2);
+IMGUI_API bool  TreeNode(const void* ptr_id, const char* fmt, ...) IM_FMTARGS(2);
 IMGUI_API bool  TreeNodeV(const char* str_id, const char* fmt, va_list args) IM_FMTLIST(2);
 IMGUI_API bool  TreeNodeV(const void* ptr_id, const char* fmt, va_list args) IM_FMTLIST(2);
 IMGUI_API bool  TreeNodeEx(const char* label, ImGuiTreeNodeFlags flags = 0);
@@ -1075,13 +1119,13 @@ IMGUI_API bool  TreeNodeEx(const char* str_id, ImGuiTreeNodeFlags flags, const c
 IMGUI_API bool  TreeNodeEx(const void* ptr_id, ImGuiTreeNodeFlags flags, const char* fmt, ...) IM_FMTARGS(3);
 IMGUI_API bool  TreeNodeExV(const char* str_id, ImGuiTreeNodeFlags flags, const char* fmt, va_list args) IM_FMTLIST(3);
 IMGUI_API bool  TreeNodeExV(const void* ptr_id, ImGuiTreeNodeFlags flags, const char* fmt, va_list args) IM_FMTLIST(3);
-IMGUI_API void  TreePush(const char* str_id);                                       // ~ Indent()+PushId(). Already called by TreeNode() when returning true, but you can call TreePush/TreePop yourself if desired.
-IMGUI_API void  TreePush(const void* ptr_id);                                       // "
-IMGUI_API void  TreePop();                                                          // ~ Unindent()+PopId()
-IMGUI_API float GetTreeNodeToLabelSpacing();                                        // horizontal distance preceding label when using TreeNode*() or Bullet() == (g.FontSize + style.FramePadding.x*2) for a regular unframed TreeNode
-IMGUI_API bool  CollapsingHeader(const char* label, ImGuiTreeNodeFlags flags = 0);  // if returning 'true' the header is open. doesn't indent nor push on ID stack. user doesn't have to call TreePop().
-IMGUI_API bool  CollapsingHeader(const char* label, bool* p_visible, ImGuiTreeNodeFlags flags = 0); // when 'p_visible != NULL': if '*p_visible==true' display an additional small close button on upper right of the header which will set the bool to false when clicked, if '*p_visible==false' don't display the header.
-IMGUI_API void  SetNextItemOpen(bool is_open, ImGuiCond cond = 0);                  // set next TreeNode/CollapsingHeader open state.
+IMGUI_API void  TreePush(const char* str_id);
+IMGUI_API void  TreePush(const void* ptr_id);
+IMGUI_API void  TreePop();
+IMGUI_API float GetTreeNodeToLabelSpacing();
+IMGUI_API bool  CollapsingHeader(const char* label, ImGuiTreeNodeFlags flags = 0);
+IMGUI_API bool  CollapsingHeader(const char* label, bool* p_visible, ImGuiTreeNodeFlags flags = 0);
+IMGUI_API void  SetNextItemOpen(bool is_open, ImGuiCond cond = 0);
 ```
 
 | 名前                        | 説明                                                                                                                                                |
@@ -1283,8 +1327,10 @@ IMGUI_API bool BeginPopupContextVoid(const char* str_id = NULL, ImGuiPopupFlags 
 - IsPopupOpen() with ImGuiPopupFlags_AnyPopupId + ImGuiPopupFlags_AnyPopupLevel: ポップアップが開いていれば`true`を返す。
 
 ```cpp
-IMGUI_API bool IsPopupOpen(const char* str_id, ImGuiPopupFlags flags = 0); // return true if the popup is open.
+IMGUI_API bool IsPopupOpen(const char* str_id, ImGuiPopupFlags flags = 0);
 ```
+
+- `IsPopupOpen()`: ポップアップが開いていればtrueを返す。
 
 ### テーブル
 
@@ -1599,7 +1645,7 @@ IMGUI_API ImGuiViewport* GetMainViewport();
 
 | 名前              | 説明                                                     |
 |-------------------|----------------------------------------------------------|
-| GetMainViewport() | return primary/default viewport. This can never be NULL. |
+| GetMainViewport() | プライマリ/デフォルトビューポートを返す。NULLになることはありません。|
 
 ### 背景／前景ドローリスト
 
@@ -1761,13 +1807,15 @@ IMGUI_API const char* SaveIniSettingsToMemory(size_t* out_ini_size = NULL);
 
 ```cpp
 IMGUI_API void DebugTextEncoding(const char* text);
-IMGUI_API bool DebugCheckVersionAndDataLayout(const char* version_str, size_t sz_io, size_t sz_style, size_t sz_vec2, size_t sz_vec4, size_t sz_drawvert, size_t sz_drawidx); // This is called by IMGUI_CHECKVERSION() macro.
+IMGUI_API bool DebugCheckVersionAndDataLayout(const char* version_str, size_t sz_io, size_t sz_style, size_t sz_vec2, size_t sz_vec4, size_t sz_drawvert, size_t sz_drawidx);
 ```
+
+- `DebugCheckVersionAndDataLayout()`: これは IMGUI_CHECKVERSION() マクロによって呼び出される。
 
 ### メモリ・アロケータ
 
 - これらの機能は、現在のコンテクストに依存しない。
-- DLLユーザー：ヒープとグローバルはDLL境界を越えて共有されません！呼び出す静的/DLL境界ごとに、SetCurrentContext() + SetAllocatorFunctions()を呼び出す必要があります。詳しくはimgui.cppの "Context and Memory Allocators "セクションを参照してください。
+- DLLユーザー：ヒープとグローバルはDLL境界を越えて共有されません！呼び出す静的/DLL境界ごとに、SetCurrentContext() + SetAllocatorFunctions()を呼び出す必要があります。詳しくはimgui.cppの "Context and Memory Allocators"セクションを参照してください。
 
 ```cpp
 IMGUI_API void   SetAllocatorFunctions(ImGuiMemAllocFunc alloc_func, ImGuiMemFreeFunc free_func, void* user_data = NULL);
@@ -1780,7 +1828,7 @@ IMGUI_API void   MemFree(void* ptr);
 
 ## フラグと列挙型
 
-### Flags for `ImGui::Begin()`
+### `ImGui::Begin()` のフラグ
 
 これらはウィンドウごとのフラグである。`ImGuiIO`には共有フラグがある： `io.ConfigWindowsResizeFromEdges` と `io.ConfigWindowsMoveFromTitleBarOnly` 。
 
@@ -1893,27 +1941,27 @@ enum ImGuiInputTextFlags_
 | 名前                                    | 説明                                                                                                                                                                                                                                                                                                                                              |
 |-----------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | ImGuiInputTextFlags_None                |                                                                                                                                                                                                                                                                                                                                                   |
-| ImGuiInputTextFlags_CharsDecimal        | 0123456789.+-*/ を許可する。                                                                                                                                                                                                                                                                                                                             |
-| ImGuiInputTextFlags_CharsHexadecimal    | 0123456789ABCDEFabcdefを 許可する                                                                                                                                                                                                                                                                                                                      |
-| ImGuiInputTextFlags_CharsUppercase      | a..z を A..Zにする                                                                                                                                                                                                                                                                                                                              |
+| ImGuiInputTextFlags_CharsDecimal        | `0123456789.+-*/` を許可する。                                                                                                                                                                                                                                                                                                                             |
+| ImGuiInputTextFlags_CharsHexadecimal    | `0123456789ABCDEFabcdef`を 許可する                                                                                                                                                                                                                                                                                                                      |
+| ImGuiInputTextFlags_CharsUppercase      | `a..z` を `A..Z`にする                                                                                                                                                                                                                                                                                                                              |
 | ImGuiInputTextFlags_CharsNoBlank        | スペース、タブのフィルタリング                                                                                                                                                                                                                                                                                                                           |
 | ImGuiInputTextFlags_AutoSelectAll       | 最初にマウスフォーカスが当たったときにテキスト全体を選択                                                                                                                                                                                                                                                                                                  |
 | ImGuiInputTextFlags_EnterReturnsTrue    | (値が変更されるたびにではなく) Enterが押されたときに'true'を返す。IsItemDeactivatedAfterEdit() 関数を見てみましょう。                                                                                                                                                                                             |
-| ImGuiInputTextFlags_CallbackCompletion  | Callback on pressing TAB (for completion handling)                                                                                                                                                                                                                                                                                                |
-| ImGuiInputTextFlags_CallbackHistory     | Callback on pressing Up/Down arrows (for history handling)                                                                                                                                                                                                                                                                                        |
-| ImGuiInputTextFlags_CallbackAlways      | Callback on each iteration. User code may query cursor position, modify text buffer.                                                                                                                                                                                                                                                              |
-| ImGuiInputTextFlags_CallbackCharFilter  | Callback on character inputs to replace or discard them. Modify 'EventChar' to replace or discard, or return 1 in callback to discard.                                                                                                                                                                                                            |
-| ImGuiInputTextFlags_AllowTabInput       | Pressing TAB input a '\t' character into the text field                                                                                                                                                                                                                                                                                           |
-| ImGuiInputTextFlags_CtrlEnterForNewLine | In multi-line mode, unfocus with Enter, add new line with Ctrl+Enter (default is opposite: unfocus with Ctrl+Enter, add line with Enter).                                                                                                                                                                                                         |
-| ImGuiInputTextFlags_NoHorizontalScroll  | Disable following the cursor horizontally                                                                                                                                                                                                                                                                                                         |
-| ImGuiInputTextFlags_AlwaysOverwrite     | Overwrite mode                                                                                                                                                                                                                                                                                                                                    |
-| ImGuiInputTextFlags_ReadOnly            | Read-only mode                                                                                                                                                                                                                                                                                                                                    |
-| ImGuiInputTextFlags_Password            | Password mode, display all characters as '*'                                                                                                                                                                                                                                                                                                      |
-| ImGuiInputTextFlags_NoUndoRedo          | Disable undo/redo. Note that input text owns the text data while active, if you want to provide your own undo/redo stack you need e.g. to call ClearActiveID().                                                                                                                                                                                   |
-| ImGuiInputTextFlags_CharsScientific     | Allow 0123456789.+-*/eE (Scientific notation input)                                                                                                                                                                                                                                                                                               |
-| ImGuiInputTextFlags_CallbackResize      | Callback on buffer capacity changes request (beyond 'buf_size' parameter value), allowing the string to grow. Notify when the string wants to be resized (for string types which hold a cache of their Size). You will be provided a new BufSize in the callback and NEED to honor it. (see misc/cpp/imgui_stdlib.h for an example of using this) |
-| ImGuiInputTextFlags_CallbackEdit        | Callback on any edit (note that InputText() already returns true on edit, the callback is useful mainly to manipulate the underlying buffer while focus is active)                                                                                                                                                                                |
-| ImGuiInputTextFlags_EscapeClearsAll     | Escape key clears content if not empty, and deactivate otherwise (contrast to default behavior of Escape to revert)                                                                                                                                                                                                                               |
+| ImGuiInputTextFlags_CallbackCompletion  | TABボタン押下時のコールバック（完了処理用）                                                                                                                                                                                                                                                                                                |
+| ImGuiInputTextFlags_CallbackHistory     | 上下矢印を押したときのコールバック（履歴処理用）                                                                                                                                                                                                                                                                                       |
+| ImGuiInputTextFlags_CallbackAlways      | 各反復でコールバック。ユーザー・コードは、カーソルの位置を問い合わせたり、テキスト・バッファを変更したりすることができる。                                                                                                                                                                                                                                                             |
+| ImGuiInputTextFlags_CallbackCharFilter  | 文字入力を置換または破棄するためのコールバック。EventChar'を変更して置換または破棄するか、コールバックで1を返して破棄する。                                                                                                                                                                                                            |
+| ImGuiInputTextFlags_AllowTabInput       | TABキーを押すと、テキストフィールドに「`\t`」が入力されます。                                                                                                                                                                                                                                                                                           |
+| ImGuiInputTextFlags_CtrlEnterForNewLine | 複数行モードでは、Enterでフォーカスを外し、Ctrl+Enterで改行する（デフォルトは逆：Ctrl+Enterでフォーカスを外し、Enterで改行）。                                                                                                                                                                                                         |
+| ImGuiInputTextFlags_NoHorizontalScroll  | カーソルを水平方向に追従させない                                                                                                                                                                                                                                                                                                         |
+| ImGuiInputTextFlags_AlwaysOverwrite     | 上書きモード                                                                                                                                                                                                                                                                                                                                    |
+| ImGuiInputTextFlags_ReadOnly            | 読み取り専用モード                                                                                                                                                                                                                                                                                                                                    |
+| ImGuiInputTextFlags_Password            | パスワードモード、すべての文字を'*'として表示                                                                                                                                                                                                                                                                                                      |
+| ImGuiInputTextFlags_NoUndoRedo          | アンドゥ／リドゥを無効にする。入力テキストは、アクティブな間テキストデータを所有することに注意してください。独自のアンドゥ/リドゥスタックを提供したい場合は、例えばClearActiveID()を呼び出す必要があります。                                                                                                                                                                                   |
+| ImGuiInputTextFlags_CharsScientific     | `0123456789.+-*/eE`を許可する (科学表記法の入力)                                                                                                                                                                                                                                                                                               |
+| ImGuiInputTextFlags_CallbackResize      | バッファ容量の変更要求があったときにコールバックし、(パラメータ 'buf_size' の値を超えて) 文字列が大きくなるようにする。文字列のサイズを変更したいときに通知する（Sizeのキャッシュを保持する文字列型の場合）。コールバックで新しいBufSizeが提供されるので、それに従う必要がある。(これを使う例は misc/cpp/imgui_stdlib.h を参照)。 |
+| ImGuiInputTextFlags_CallbackEdit        | 編集時のコールバック (InputText()は編集時にすでにtrueを返していることに注意。コールバックは、主にフォーカスがアクティブなときに、その下にあるバッファを操作するのに便利です。)                                                                                                                                                                                |
+| ImGuiInputTextFlags_EscapeClearsAll     | Escapeキーは、コンテンツが空でなければクリアし、そうでなければ無効化する（デフォルトのEscapeの動作とは対照的に、元に戻す）。                                                                                                                                                                                                                             |
 
 
 ### ImGui::TreeNodeEx(), ImGui::CollapsingHeader*() のフラグ。
@@ -1948,33 +1996,30 @@ enum ImGuiTreeNodeFlags_
 | 名前                                    | 説明                                                                                                                                                                                                                                                                        |
 |-----------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | ImGuiTreeNodeFlags_None                 |                                                                                                                                                                                                                                                                             |
-| ImGuiTreeNodeFlags_Selected             | Draw as selected                                                                                                                                                                                                                                                            |
-| ImGuiTreeNodeFlags_Framed               | Draw frame with background (e.g. for CollapsingHeader)                                                                                                                                                                                                                      |
-| ImGuiTreeNodeFlags_AllowOverlap         | Hit testing to allow subsequent widgets to overlap this one                                                                                                                                                                                                                 |
-| ImGuiTreeNodeFlags_NoTreePushOnOpen     | Don't do a TreePush() when open (e.g. for CollapsingHeader) = no extra indent nor pushing on ID stack                                                                                                                                                                       |
-| ImGuiTreeNodeFlags_NoAutoOpenOnLog      | Don't automatically and temporarily open node when Logging is active (by default logging will automatically open tree nodes)                                                                                                                                                |
-| ImGuiTreeNodeFlags_DefaultOpen          | Default node to be open                                                                                                                                                                                                                                                     |
-| ImGuiTreeNodeFlags_OpenOnDoubleClick    | Need double-click to open node                                                                                                                                                                                                                                              |
-| ImGuiTreeNodeFlags_OpenOnArrow          | Only open when clicking on the arrow part. If ImGuiTreeNodeFlags_OpenOnDoubleClick is also set, single-click arrow or double-click all box to open.                                                                                                                         |
-| ImGuiTreeNodeFlags_Leaf                 | No collapsing, no arrow (use as a convenience for leaf nodes).                                                                                                                                                                                                              |
-| ImGuiTreeNodeFlags_Bullet               | Display a bullet instead of arrow. IMPORTANT: node can still be marked open/close if you don't set the _Leaf flag!                                                                                                                                                          |
-| ImGuiTreeNodeFlags_FramePadding         | Use FramePadding (even for an unframed text node) to vertically align text baseline to regular widget height. Equivalent to calling AlignTextToFramePadding().                                                                                                              |
-| ImGuiTreeNodeFlags_SpanAvailWidth       | Extend hit box to the right-most edge, even if not framed. This is not the default in order to allow adding other items on the same line. In the future we may refactor the hit system to be front-to-back, allowing natural overlaps and then this can become the default. |
-| ImGuiTreeNodeFlags_SpanFullWidth        | Extend hit box to the left-most and right-most edges (bypass the indented area).                                                                                                                                                                                            |
-| ImGuiTreeNodeFlags_NavLeftJumpsBackHere | (WIP) Nav: left direction may move to this TreeNode() from any of its child (items submitted between TreeNode and TreePop)                                                                                                                                                  |
-| (ImGuiTreeNodeFlags_NoScrollOnOpen)     | 修正: TODO: Disable automatic scroll on TreePop() if node got just open and contents is not visible
+| ImGuiTreeNodeFlags_Selected             | 選択された通りに描く                                                                                                                                                |
+| ImGuiTreeNodeFlags_Framed               | 背景付きフレームを描画する（CollapsingHeaderの場合など）                                                                                                                                                |
+| ImGuiTreeNodeFlags_AllowOverlap         | 後続のウィジェットがこのウィジェットに重なるようにテストを実行する。                                                                                                                                                |
+| ImGuiTreeNodeFlags_NoTreePushOnOpen     | オープン時にTreePush()を行わない（CollapsingHeaderの場合など） = 余分なインデントやIDスタックへのプッシュを行わない。                                                                                                                                                |
+| ImGuiTreeNodeFlags_NoAutoOpenOnLog      | ロギングがアクティブなときに、自動的に一時的にノードを開かない（デフォルトでは、ロギングは自動的にツリーノードを開きます。）                                                                                                                                                |
+| ImGuiTreeNodeFlags_DefaultOpen          | デフォルトでオープンするノード                                                                                                                                                |
+| ImGuiTreeNodeFlags_OpenOnDoubleClick    | ノードを開くにはダブルクリックが必要                                                                                                                                                |
+| ImGuiTreeNodeFlags_OpenOnArrow          | 矢印部分をクリックした時のみ開く。ImGuiTreeNodeFlags_OpenOnDoubleClickも設定されている場合、矢印をシングルクリックするか、すべてのボックスをダブルクリックすると開きます。                                                                                                                         |
+| ImGuiTreeNodeFlags_Leaf                 | 折りたたみなし、矢印なし（リーフノードの便宜上使用）。                                                                                                                                                                                                              |
+| ImGuiTreeNodeFlags_Bullet               | 矢印の代わりに弾丸を表示します。重要：_Leafフラグを設定しなくても、ノードは開閉マークが付けられます！                                                                                                                                                          |
+| ImGuiTreeNodeFlags_FramePadding         | テキストのベースラインを通常のウィジェットの高さに垂直に揃えるには、FramePadding を使用します（フレーム化されていないテキスト・ノードに対しても）。AlignTextToFramePadding() を呼び出すのと同じです。                                                                                                              |
+| ImGuiTreeNodeFlags_SpanAvailWidth       | 枠がない場合でも、ヒットボックスを右端まで拡張する。これは、同じ行に他の項目を追加できるようにするため、デフォルトではありません。将来的には、ヒットシステムをリファクタリングして前から後ろへ、自然な重なりができるようにし、これをデフォルトにすることもできるだろう。|
+| ImGuiTreeNodeFlags_SpanFullWidth        | ヒット・ボックスを左端と右端に拡張する（インデントされた領域をバイパスする）。                                                                                                                                                                                            |
+| ImGuiTreeNodeFlags_NavLeftJumpsBackHere | (WIP)ナビ：左方向は、その子(TreeNodeとTreePopの間に提出されたアイテム)のどれからでも、このTreeNode()に移動することができる。                                                                                                                                                  |
+| (ImGuiTreeNodeFlags_NoScrollOnOpen)     | 修正: TODO: ノードが開いたばかりでコンテンツが表示されていない場合、TreePop()での自動スクロールを無効にする。
 | ImGuiTreeNodeFlags_CollapsingHeader     | ImGuiTreeNodeFlags_Framed + ImGuiTreeNodeFlags_NoTreePushOnOpen + ImGuiTreeNodeFlags_NoAutoOpenOnLog, |
 
 
-### Flags for OpenPopup*(), BeginPopupContext*(), IsPopupOpen() functions.
+### `OpenPopup*()`、`BeginPopupContext*()`、`IsPopupOpen()` 関数のフラグ。
 
-- To be backward compatible with older API which took an 'int mouse_button = 1' argument, we need to treat
-  small flags values as a mouse button index, so we encode the mouse button in the first few bits of the flags.
-  It is therefore guaranteed to be legal to pass a mouse button index in ImGuiPopupFlags.
-- For the same reason, we exceptionally default the ImGuiPopupFlags argument of BeginPopupContextXXX functions to 1 instead of 0.
-  IMPORTANT: because the default parameter is 1 (==ImGuiPopupFlags_MouseButtonRight), if you rely on the default parameter
-  and want to use another flag, you need to pass in the ImGuiPopupFlags_MouseButtonRight flag explicitly.
-- Multiple buttons currently cannot be combined/or-ed in those functions (we could allow it later).
+- `int mouse_button = 1` 引数を取る古いAPIとの後方互換性を保つために、小さなフラグ値をマウスボタンのインデックスとして扱う必要があります。したがって、ImGuiPopupFlagsでマウスボタンのインデックスを渡すことは正しいことが保証されています。
+- 同じ理由で、BeginPopupContextXXX関数のImGuiPopupFlags引数のデフォルトは0ではなく1です。
+  - 重要：デフォルトのパラメータは1（==ImGuiPopupFlags_MouseButtonRight）なので、デフォルトのパラメータに依存して他のフラグを使用したい場合は、明示的にImGuiPopupFlags_MouseButtonRightフラグを渡す必要があります。
+- 現在のところ、これらの関数で複数のボタンを組み合わせたり、編集したりすることはできません。
 
 ```cpp
 enum ImGuiPopupFlags_
@@ -1996,18 +2041,18 @@ enum ImGuiPopupFlags_
 | 名前                                    | 説明                                                                                                                   |
 |-----------------------------------------|------------------------------------------------------------------------------------------------------------------------|
 | ImGuiPopupFlags_None                    |                                                                                                                        |
-| ImGuiPopupFlags_MouseButtonLeft         | For BeginPopupContext*(): open on Left Mouse release. Guaranteed to always be == 0 (same as ImGuiMouseButton_Left)     |
-| ImGuiPopupFlags_MouseButtonRight        | For BeginPopupContext*(): open on Right Mouse release. Guaranteed to always be == 1 (same as ImGuiMouseButton_Right)   |
-| ImGuiPopupFlags_MouseButtonMiddle       | For BeginPopupContext*(): open on Middle Mouse release. Guaranteed to always be == 2 (same as ImGuiMouseButton_Middle) |
+| ImGuiPopupFlags_MouseButtonLeft         | `BeginPopupContext*()`の場合：左マウスリリース時に開く。常に== 0であることが保証される（ImGuiMouseButton_Leftと同じ）。 |
+| ImGuiPopupFlags_MouseButtonRight        | `BeginPopupContext*()`の場合：右マウスを離すと開く。常に== 1であることが保証されます（ImGuiMouseButton_Rightと同じ）。 |
+| ImGuiPopupFlags_MouseButtonMiddle       | `BeginPopupContext*()`の場合：Middle Mouseのリリース時に開く。常に== 2であることが保証される（ImGuiMouseButton_Middleと同じ）。 |
 | ImGuiPopupFlags_MouseButtonMask_        |                                                                                                                        |
 | ImGuiPopupFlags_MouseButtonDefault_     |                                                                                                                        |
-| ImGuiPopupFlags_NoOpenOverExistingPopup | For OpenPopup*(), BeginPopupContext*(): don't open if there's already a popup at the same level of the popup stack     |
-| ImGuiPopupFlags_NoOpenOverItems         | For BeginPopupContextWindow(): don't return true when hovering items, only when hovering empty space                   |
-| ImGuiPopupFlags_AnyPopupId              | For IsPopupOpen(): ignore the ImGuiID parameter and test for any popup.                                                |
-| ImGuiPopupFlags_AnyPopupLevel           | For IsPopupOpen(): search/test at any level of the popup stack (default test in the current level)                     |
-| ImGuiPopupFlags_AnyPopup                | ImGuiPopupFlags_AnyPopupId + ImGuiPopupFlags_AnyPopupLevel                                                             |
+| ImGuiPopupFlags_NoOpenOverExistingPopup | `OpenPopup*()`、`BeginPopupContext*()`：ポップアップ・スタックの同じレベルに既にポップアップがある場合は開きません。 |
+| ImGuiPopupFlags_NoOpenOverItems         | `BeginPopupContextWindow()`について：アイテムをホバーしたときにtrueを返さず、空のスペースをホバーしたときのみtrueを返すようにしました。 |
+| ImGuiPopupFlags_AnyPopupId              | `IsPopupOpen()`: ImGuiID パラメータを無視し、ポップアップがあるかどうかをテストします。                                                |
+| ImGuiPopupFlags_AnyPopupLevel           | `IsPopupOpen()`: ポップアップ・スタックの任意のレベルで検索/テスト (デフォルトは現在のレベルでテスト) |
+| ImGuiPopupFlags_AnyPopup                | ImGuiPopupFlags_AnyPopupId + ImGuiPopupFlags_AnyPopupLevel |
 
-### Flags for ImGui::Selectable()
+### `ImGui::Selectable()` のフラグ
 
 ```cpp
 enum ImGuiSelectableFlags_
@@ -2028,13 +2073,13 @@ enum ImGuiSelectableFlags_
 | 名前                                  | 説明                                                                          |
 |---------------------------------------|-------------------------------------------------------------------------------|
 | ImGuiSelectableFlags_None             |                                                                               |
-| ImGuiSelectableFlags_DontClosePopups  | Clicking this doesn't close parent popup window                               |
-| ImGuiSelectableFlags_SpanAllColumns   | Selectable frame can span all columns (text will still fit in current column) |
-| ImGuiSelectableFlags_AllowDoubleClick | Generate press events on double clicks too                                    |
-| ImGuiSelectableFlags_Disabled         | Cannot be selected, display grayed out text                                   |
-| ImGuiSelectableFlags_AllowOverlap     | (WIP) Hit testing to allow subsequent widgets to overlap this one             |
+| ImGuiSelectableFlags_DontClosePopups  | これをクリックしても親のポップアップ・ウィンドウが閉じない |
+| ImGuiSelectableFlags_SpanAllColumns   | 選択可能なフレームは、すべての列にまたがることができます（テキストは現在の列に収まります）。 |
+| ImGuiSelectableFlags_AllowDoubleClick | ダブルクリックでもプレスイベントを生成 |
+| ImGuiSelectableFlags_Disabled         | 選択できず、テキストが灰色で表示される |
+| ImGuiSelectableFlags_AllowOverlap     | (WIP)後続のウィジェットがこのウィジェットに重なるようにするためのヒットテスト |
 
-### Flags for ImGui::BeginCombo()
+### `ImGui::BeginCombo()` のフラグ
 
 ```cpp
 enum ImGuiComboFlags_
@@ -2054,16 +2099,16 @@ enum ImGuiComboFlags_
 | 名前                           | 説明                                                                                                                                                   |
 |--------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------|
 | ImGuiComboFlags_None           |                                                                                                                                                        |
-| ImGuiComboFlags_PopupAlignLeft | Align the popup toward the left by default                                                                                                             |
-| ImGuiComboFlags_HeightSmall    | Max ~4 items visible. Tip: If you want your combo popup to be a specific size you can use SetNextWindowSizeConstraints() prior to calling BeginCombo() |
-| ImGuiComboFlags_HeightRegular  | Max ~8 items visible (default)                                                                                                                         |
-| ImGuiComboFlags_HeightLarge    | Max ~20 items visible                                                                                                                                  |
-| ImGuiComboFlags_HeightLargest  | As many fitting items as possible                                                                                                                      |
-| ImGuiComboFlags_NoArrowButton  | Display on the preview box without the square arrow button                                                                                             |
-| ImGuiComboFlags_NoPreview      | Display only a square arrow button                                                                                                                     |
-| ImGuiComboFlags_HeightMask_    | ImGuiComboFlags_HeightSmall + ImGuiComboFlags_HeightRegular + ImGuiComboFlags_HeightLarge + ImGuiComboFlags_HeightLargest                              |
+| ImGuiComboFlags_PopupAlignLeft | デフォルトでポップアップを左寄せにします。 |
+| ImGuiComboFlags_HeightSmall    | 最大4つのアイテムが表示されます。ヒント: コンボポップアップを特定のサイズにしたい場合は、BeginCombo() を呼び出す前に SetNextWindowSizeConstraints() を使用できます。 |
+| ImGuiComboFlags_HeightRegular  | 最大～8アイテム表示（デフォルト） |
+| ImGuiComboFlags_HeightLarge    | 最大～20アイテムまで表示可能 |
+| ImGuiComboFlags_HeightLargest  | できるだけ多くのフィッティング・アイテム |
+| ImGuiComboFlags_NoArrowButton  | 四角い矢印ボタンを使わずにプレビューボックスに表示する |
+| ImGuiComboFlags_NoPreview      | 四角い矢印ボタンのみを表示 |
+| ImGuiComboFlags_HeightMask_    | ImGuiComboFlags_HeightSmall + ImGuiComboFlags_HeightRegular + ImGuiComboFlags_HeightLarge + ImGuiComboFlags_HeightLargest |
 
-### Flags for ImGui::BeginTabBar()
+### `ImGui::BeginTabBar()` のフラグ
 
 ```cpp
 enum ImGuiTabBarFlags_
@@ -2085,18 +2130,18 @@ enum ImGuiTabBarFlags_
 | 名前                                          | 説明                                                                                                                                                                                                                 |
 |-----------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | ImGuiTabBarFlags_None                         |                                                                                                                                                                                                                      |
-| ImGuiTabBarFlags_Reorderable                  | Allow manually dragging tabs to re-order them + New tabs are appended at the end of list                                                                                                                             |
-| ImGuiTabBarFlags_AutoSelectNewTabs            | Automatically select new tabs when they appear                                                                                                                                                                       |
-| ImGuiTabBarFlags_TabListPopupButton           | Disable buttons to open the tab list popup                                                                                                                                                                           |
-| ImGuiTabBarFlags_NoCloseWithMiddleMouseButton | Disable behavior of closing tabs (that are submitted with p_open != NULL) with middle mouse button. You can still repro this behavior on user's side with if (IsItemHovered() && IsMouseClicked(2)) *p_open = false. |
-| ImGuiTabBarFlags_NoTabListScrollingButtons    | Disable scrolling buttons (apply when fitting policy is ImGuiTabBarFlags_FittingPolicyScroll)                                                                                                                        |
-| ImGuiTabBarFlags_NoTooltip                    | Disable tooltips when hovering a tab                                                                                                                                                                                 |
-| ImGuiTabBarFlags_FittingPolicyResizeDown      | Resize tabs when they don't fit                                                                                                                                                                                      |
-| ImGuiTabBarFlags_FittingPolicyScroll          | Add scroll buttons when tabs don't fit                                                                                                                                                                               |
-| ImGuiTabBarFlags_FittingPolicyMask_           | ImGuiTabBarFlags_FittingPolicyResizeDown + ImGuiTabBarFlags_FittingPolicyScroll                                                                                                                                      |
-| ImGuiTabBarFlags_FittingPolicyDefault_        | ImGuiTabBarFlags_FittingPolicyResizeDown                                                                                                                                                                             |
+| ImGuiTabBarFlags_Reorderable                  | 手動でタブをドラッグして並び替えが可能 + 新しいタブがリストの最後に追加される                                                                                                                            |
+| ImGuiTabBarFlags_AutoSelectNewTabs            | 新しいタブが表示されたら自動的に選択                                                                                                                            |
+| ImGuiTabBarFlags_TabListPopupButton           | タブリストのポップアップを開くボタンを無効にする                                                                                                                            |
+| ImGuiTabBarFlags_NoCloseWithMiddleMouseButton | タブを閉じる動作を無効にする (`p_open!=NULL`で送信されたもの)をマウスの中ボタンでクリックする。ユーザー側でこの動作を再現するには `if (IsItemHovered() && IsMouseClicked(2)) *p_open = false.` |
+| ImGuiTabBarFlags_NoTabListScrollingButtons    | スクロールボタンを無効にする (フィッティングポリシーが ImGuiTabBarFlags_FittingPolicyScroll の場合に適用)                                                                                                                   |
+| ImGuiTabBarFlags_NoTooltip                    | タブをホバーしたときのツールチップを無効にする                                                                                                                   |
+| ImGuiTabBarFlags_FittingPolicyResizeDown      | タブのサイズが合わないときにリサイズする                                                                                                                   |
+| ImGuiTabBarFlags_FittingPolicyScroll          | タブが収まらない場合のスクロール・ボタンの追加                                                                                                                   |
+| ImGuiTabBarFlags_FittingPolicyMask_           | ImGuiTabBarFlags_FittingPolicyResizeDown + ImGuiTabBarFlags_FittingPolicyScroll                                                                                                                   |
+| ImGuiTabBarFlags_FittingPolicyDefault_        | ImGuiTabBarFlags_FittingPolicyResizeDown                                                                                                                   |
 
-### Flags for ImGui::BeginTabItem()
+### `ImGui::BeginTabItem()` のフラグ
 
 ```cpp
 enum ImGuiTabItemFlags_
@@ -2116,45 +2161,45 @@ enum ImGuiTabItemFlags_
 | 名前                                           | 説明                                                                                                                                                                                                                                                                |
 |------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | ImGuiTabItemFlags_None                         |                                                                                                                                                                                                                                                                     |
-| ImGuiTabItemFlags_UnsavedDocument              | Display a dot next to the title + tab is selected when clicking the X + closure is not assumed (will wait for user to stop submitting the tab). Otherwise closure is assumed when pressing the X, so if you keep submitting the tab may reappear at end of tab bar. |
-| ImGuiTabItemFlags_SetSelected                  | Trigger flag to programmatically make the tab selected when calling BeginTabItem()                                                                                                                                                                                  |
-| ImGuiTabItemFlags_NoCloseWithMiddleMouseButton | Disable behavior of closing tabs (that are submitted with p_open != NULL) with middle mouse button. You can still repro this behavior on user's side with if (IsItemHovered() && IsMouseClicked(2)) *p_open = false.                                                |
-| ImGuiTabItemFlags_NoPushId                     | Don't call PushID(tab->ID)/PopID() on BeginTabItem()/EndTabItem()                                                                                                                                                                                                   |
-| ImGuiTabItemFlags_NoTooltip                    | Disable tooltip for the given tab                                                                                                                                                                                                                                   |
-| ImGuiTabItemFlags_NoReorder                    | Disable reordering this tab or having another tab cross over this tab                                                                                                                                                                                               |
-| ImGuiTabItemFlags_Leading                      | Enforce the tab position to the left of the tab bar (after the tab list popup button)                                                                                                                                                                               |
-| ImGuiTabItemFlags_Trailing                     | Enforce the tab position to the right of the tab bar (before the scrolling buttons)                                                                                                                                                                                 |
+| ImGuiTabItemFlags_UnsavedDocument              | タイトルの横にドットを表示 + X をクリックするとタブが選択される + タブの終了を仮定しない（ユーザーがタブの送信をやめるまで待つ）。そうでない場合は X を押した時点でタブが閉じられたことにするので、タブバーの最後にタブが再表示される可能性がある。 |
+| ImGuiTabItemFlags_SetSelected                  | BeginTabItem() を呼び出す際に、プログラムでタブを選択状態にするためのトリガーフラグ |
+| ImGuiTabItemFlags_NoCloseWithMiddleMouseButton | タブを閉じる動作を無効にする (p_open != NULL で投入されたもの）をマウスの中ボタンでクリックする。 ユーザー側でこの動作を再現するには `if (IsItemHovered() && IsMouseClicked(2)) *p_open = false`.                                                |
+| ImGuiTabItemFlags_NoPushId                     | BeginTabItem()/EndTabItem()でPushID(tab->ID)/PopID()を呼び出さない。                                                                                                                                                                               |
+| ImGuiTabItemFlags_NoTooltip                    | 指定されたタブのツールチップを無効にする                                                                                                                                                                               |
+| ImGuiTabItemFlags_NoReorder                    | このタブの順序を入れ替えたり、このタブに別のタブが重ならないようにする。                                                                                                                                                                               |
+| ImGuiTabItemFlags_Leading                      | タブの位置をタブバーの左側（タブリストポップアップボタンの後）に強制する                                                                                                                                                                               |
+| ImGuiTabItemFlags_Trailing                     | タブの位置をタブバーの右側（スクロールボタンの前）に強制する                                                                                                                                                                               |
 
-### Flags for ImGui::BeginTable()
+### `ImGui::BeginTable()` のフラグ
 
-- Important! Sizing policies have complex and subtle side effects, much more so than you would expect.
-  Read comments/demos carefully + experiment with live demos to get acquainted with them.
+- 重要なこと: サイジング・ポリシーには複雑で微妙な副作用があります。
+  コメントやデモを注意深く読み、ライブデモで試してみてください。
 - The DEFAULT sizing policies are:
-  - Default to ImGuiTableFlags_SizingFixedFit    if ScrollX is on, or if host window has ImGuiWindowFlags_AlwaysAutoResize.
-  - Default to ImGuiTableFlags_SizingStretchSame if ScrollX is off.
-- When ScrollX is off:
-  - Table defaults to ImGuiTableFlags_SizingStretchSame -> all Columns defaults to ImGuiTableColumnFlags_WidthStretch with same weight.
-  - Columns sizing policy allowed: Stretch (default), Fixed/Auto.
-  - Fixed Columns (if any) will generally obtain their requested width (unless the table cannot fit them all).
-  - Stretch Columns will share the remaining width according to their respective weight.
-  - Mixed Fixed/Stretch columns is possible but has various side-effects on resizing behaviors.
-     The typical use of mixing sizing policies is: any number of LEADING Fixed columns, followed by one or two TRAILING Stretch columns.
-     (this is because the visible order of columns have subtle but necessary effects on how they react to manual resizing).
-- When ScrollX is on:
-  - Table defaults to ImGuiTableFlags_SizingFixedFit -> all Columns defaults to ImGuiTableColumnFlags_WidthFixed
-  - Columns sizing policy allowed: Fixed/Auto mostly.
-  - Fixed Columns can be enlarged as needed. Table will show a horizontal scrollbar if needed.
-  - When using auto-resizing (non-resizable) fixed columns, querying the content width to use item right-alignment e.g. SetNextItemWidth(-FLT_MIN) doesn't make sense, would create a feedback loop.
-  - Using Stretch columns OFTEN DOES NOT MAKE SENSE if ScrollX is on, UNLESS you have specified a value for 'inner_width' in BeginTable().
-     If you specify a value for 'inner_width' then effectively the scrolling space is known and Stretch or mixed Fixed/Stretch columns become meaningful again.
-- Read on documentation at the top of imgui_tables.cpp for details.
+  - デフォルトは ImGuiTableFlags_SizingFixedFitです。ScrollX がオンの場合、またはホストウィンドウが ImGuiWindowFlags_AlwaysAutoResize を持っている場合。
+  - デフォルトは ImGuiTableFlags_SizingStretchSameです。ScrollXがオフの場合。
+- ScrollXがオフの場合:
+  - テーブルのデフォルトは ImGuiTableFlags_SizingStretchSame -> すべてのカラムのデフォルトは ImGuiTableColumnFlags_WidthStretch で、同じウェイト。
+  - 許容されるカラムサイズポリシー：Stretch（デフォルト）、Fixed/Auto。
+  - 固定カラムは（もしあれば）通常、要求された幅を得ます（テーブルがそれらをすべて収めることができない場合を除く）。
+  - ストレッチカラムは、それぞれのウェイトに従って残りの幅を共有します。
+  - 固定列とストレッチ列を混在させることも可能ですが、リサイズ動作にさまざまな副作用があります。
+     典型的なサイズ調整ポリシーの混在は次のようなものです：任意の数の先頭の固定カラムと、それに続く1つまたは2つの後続のストレッチカラム。
+     (これは、列の表示順序が、手動でのリサイズに対する反応に微妙だが必要な影響を与えるためである)。
+- ScrollXがオンの場合：
+  - テーブルのデフォルトは ImGuiTableFlags_SizingFixedFit -> すべてのカラムのデフォルトは ImGuiTableColumnFlags_WidthFixed です。
+  - カラムサイズポリシー：ほとんどが固定/自動。
+  - 固定カラムは必要に応じて拡大可能。テーブルは必要に応じて水平スクロールバーを表示します。
+  - 自動サイズ変更可能な（サイズ変更不可能な）固定カラムを使用する場合、アイテムの右揃えを使用するためにコンテンツの幅を問い合わせること（例えば `SetNextItemWidth(-FLT_MIN)`）は意味を成さず、フィードバックループを作成します。
+  - `BeginTable()` で 'inner_width' に値を指定していない限り、ScrollX がオンの場合にストレッチ・カラムを使用しても意味がないことがよくあります。
+     もし'inner_width'に値を指定すれば、実質的にスクロールスペースがわかるので、StretchカラムやFixed/Stretch混在カラムが再び意味を持つようになります。
+- 詳しくはimgui_tables.cppの一番上にあるドキュメントを読んでほしい。
 
 ```cpp
 enum ImGuiTableFlags_
 {
 ```
 
-#### Features
+#### 特徴
 
 ```cpp
 ImGuiTableFlags_None              = 0,
@@ -2169,14 +2214,14 @@ ImGuiTableFlags_ContextMenuInBody = 1 << 5,
 | 名前                              | 説明                                                                                                                                |
 |-----------------------------------|-------------------------------------------------------------------------------------------------------------------------------------|
 | ImGuiTableFlags_None              |                                                                                                                                     |
-| ImGuiTableFlags_Resizable         | Enable resizing columns.                                                                                                            |
-| ImGuiTableFlags_Reorderable       | Enable reordering columns in header row (need calling TableSetupColumn() + TableHeadersRow() to display headers)                    |
-| ImGuiTableFlags_Hideable          | Enable hiding/disabling columns in context menu.                                                                                    |
-| ImGuiTableFlags_Sortable          | Enable sorting. Call TableGetSortSpecs() to obtain sort specs. Also see ImGuiTableFlags_SortMulti and ImGuiTableFlags_SortTristate. |
-| ImGuiTableFlags_NoSavedSettings   | Disable persisting columns order, width and sort settings in the .ini file.                                                         |
-| ImGuiTableFlags_ContextMenuInBody | Right-click on columns body/contents will display table context menu. By default it is available in TableHeadersRow().              |
+| ImGuiTableFlags_Resizable         | 列のサイズ変更を有効にする。                                                                                                            |
+| ImGuiTableFlags_Reorderable       | ヘッダ行のカラムの並び替えを有効にする (ヘッダを表示するには TableSetupColumn() + TableHeadersRow() の呼び出しが必要) |
+| ImGuiTableFlags_Hideable          | コンテキストメニューで列の非表示/無効を有効にする。                                                                                    |
+| ImGuiTableFlags_Sortable          | 並べ替えを有効にします。TableGetSortSpecs()を呼び出して、ソートの仕様を取得します。ImGuiTableFlags_SortMulti および ImGuiTableFlags_SortTristate も参照してください。 |
+| ImGuiTableFlags_NoSavedSettings   | .iniファイルで列の順序、幅、並べ替えの設定を保持しないようにする。                                                         |
+| ImGuiTableFlags_ContextMenuInBody | カラムのボディ/コンテンツ上で右クリックすると、テーブル・コンテキスト・メニューが表示されます。デフォルトでは、TableHeadersRow() で利用可能です。              |
 
-#### Decorations
+#### デコレーション
 
 ```cpp
 ImGuiTableFlags_RowBg                      = 1 << 6,
@@ -2195,20 +2240,20 @@ ImGuiTableFlags_NoBordersInBodyUntilResize = 1 << 12,
 
 | 名前                                       | 説明                                                                                                                                                               |
 |--------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| ImGuiTableFlags_RowBg                      | Set each RowBg color with ImGuiCol_TableRowBg or ImGuiCol_TableRowBgAlt (equivalent of calling TableSetBgColor with ImGuiTableBgFlags_RowBg0 on each row manually) |
-| ImGuiTableFlags_BordersInnerH              | Draw horizontal borders between rows.                                                                                                                              |
-| ImGuiTableFlags_BordersOuterH              | Draw horizontal borders at the top and bottom.                                                                                                                     |
-| ImGuiTableFlags_BordersInnerV              | Draw vertical borders between columns.                                                                                                                             |
-| ImGuiTableFlags_BordersOuterV              | Draw vertical borders on the left and right sides.                                                                                                                 |
-| ImGuiTableFlags_BordersH                   | ImGuiTableFlags_BordersInnerH + ImGuiTableFlags_BordersOuterH, // Draw horizontal borders.                                                                         |
-| ImGuiTableFlags_BordersV                   | ImGuiTableFlags_BordersInnerV + ImGuiTableFlags_BordersOuterV, // Draw vertical borders.                                                                           |
-| ImGuiTableFlags_BordersInner               | ImGuiTableFlags_BordersInnerV + ImGuiTableFlags_BordersInnerH, // Draw inner borders.                                                                              |
-| ImGuiTableFlags_BordersOuter               | ImGuiTableFlags_BordersOuterV + ImGuiTableFlags_BordersOuterH, // Draw outer borders.                                                                              |
-| ImGuiTableFlags_Borders                    | ImGuiTableFlags_BordersInner + ImGuiTableFlags_BordersOuter,   // Draw all borders.                                                                                |
-| ImGuiTableFlags_NoBordersInBody            | [ALPHA] Disable vertical borders in columns Body (borders will always appear in Headers). -> May move to style                                                     |
-| ImGuiTableFlags_NoBordersInBodyUntilResize | [ALPHA] Disable vertical borders in columns Body until hovered for resize (borders will always appear in Headers). -> May move to style                            |
+| ImGuiTableFlags_RowBg                      | ImGuiCol_TableRowBg または ImGuiCol_TableRowBgAlt を使用して、各行ごとに RowBg カラーを設定します (手動で各行に ImGuiTableBgFlags_RowBg0 を指定して TableSetBgColor を呼び出すのと同じです)。 |
+| ImGuiTableFlags_BordersInnerH              | 行と行の間に水平ボーダーを引く。                                                                                                                              |
+| ImGuiTableFlags_BordersOuterH              | 上下に水平のボーダーを引く。                                                                                                                     |
+| ImGuiTableFlags_BordersInnerV              | 列と列の間に縦の境界線を引く。                                                                                                                             |
+| ImGuiTableFlags_BordersOuterV              | 左右に縦のボーダーを引く。                                                                                                                 |
+| ImGuiTableFlags_BordersH                   | ImGuiTableFlags_BordersInnerH + ImGuiTableFlags_BordersOuterH, // 水平ボーダーを引く。                                                                         |
+| ImGuiTableFlags_BordersV                   | ImGuiTableFlags_BordersInnerV + ImGuiTableFlags_BordersOuterV, // 縦のボーダーを引く。                                                                           |
+| ImGuiTableFlags_BordersInner               | ImGuiTableFlags_BordersInnerV + ImGuiTableFlags_BordersInnerH, // 内側の境界線を引く。                                                                              |
+| ImGuiTableFlags_BordersOuter               | ImGuiTableFlags_BordersOuterV + ImGuiTableFlags_BordersOuterH, // 外枠を描く。                                                                              |
+| ImGuiTableFlags_Borders                    | ImGuiTableFlags_BordersInner + ImGuiTableFlags_BordersOuter,   // すべての境界線を引く。                                                                                |
+| ImGuiTableFlags_NoBordersInBody            | [ALPHA] カラムの縦のボーダーを無効にする（ボーダーは常にヘッダーに表示されます）。-> スタイルに移動する                            |
+| ImGuiTableFlags_NoBordersInBodyUntilResize | [ALPHA] リサイズのためにカーソルを合わせるまで、カラム・ボディの垂直ボーダーを無効にする（ボーダーは常にヘッダーに表示される）。-> スタイルに移動する                            |
 
-#### Sizing Policy (read above for defaults)
+#### サイジング・ポリシー（デフォルトは上記を参照）
 
 ```cpp
 ImGuiTableFlags_SizingFixedFit    = 1 << 13,
@@ -2219,12 +2264,12 @@ ImGuiTableFlags_SizingStretchSame = 4 << 13,
 
 | 名前                              | 説明                                                                                                                                                                                      |
 |-----------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| ImGuiTableFlags_SizingFixedFit    | Columns default to _WidthFixed or _WidthAuto (if resizable or not resizable), matching contents width.                                                                                    |
-| ImGuiTableFlags_SizingFixedSame   | Columns default to _WidthFixed or _WidthAuto (if resizable or not resizable), matching the maximum contents width of all columns. Implicitly enable ImGuiTableFlags_NoKeepColumnsVisible. |
-| ImGuiTableFlags_SizingStretchProp | Columns default to _WidthStretch with default weights proportional to each columns contents widths.                                                                                       |
-| ImGuiTableFlags_SizingStretchSame | Columns default to _WidthStretch with default weights all equal, unless overridden by TableSetupColumn().                                                                                 |
+| ImGuiTableFlags_SizingFixedFit    | カラムのデフォルトは_WidthFixedまたは_WidthAuto（リサイズ可能な場合、またはリサイズ不可能な場合）で、コンテンツの幅と一致します。                                                                                    |
+| ImGuiTableFlags_SizingFixedSame   | カラムのデフォルトは_WidthFixedまたは_WidthAuto（リサイズ可能な場合、またはリサイズ不可能な場合）で、すべてのカラムの最大コンテンツ幅に一致します。ImGuiTableFlags_NoKeepColumnsVisible を暗黙的に有効にします。 |
+| ImGuiTableFlags_SizingStretchProp | カラムのデフォルトは_WidthStretchで、デフォルトのウェイトは各カラムのコンテンツ幅に比例する。                                                                                       |
+| ImGuiTableFlags_SizingStretchSame | カラムのデフォルトは _WidthStretch で、TableSetupColumn() によって上書きされない限り、デフォルトの重みはすべて等しくなります。                                                                                 |
 
-#### Sizing Extra Options
+#### サイズ追加オプション
 
 ```cpp
 ImGuiTableFlags_NoHostExtendX        = 1 << 16,
@@ -2235,12 +2280,12 @@ ImGuiTableFlags_PreciseWidths        = 1 << 19,
 
 | 名前                                 | 説明                                                                                                                                                                                                                                           |
 |--------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| ImGuiTableFlags_NoHostExtendX        | Make outer width auto-fit to columns, overriding outer_size.x value. Only available when ScrollX/ScrollY are disabled and Stretch columns are not used.                                                                                        |
-| ImGuiTableFlags_NoHostExtendY        | Make outer height stop exactly at outer_size.y (prevent auto-extending table past the limit). Only available when ScrollX/ScrollY are disabled. Data below the limit will be clipped and not visible.                                          |
-| ImGuiTableFlags_NoKeepColumnsVisible | Disable keeping column always minimally visible when ScrollX is off and table gets too small. Not recommended if columns are resizable.                                                                                                        |
-| ImGuiTableFlags_PreciseWidths        | Disable distributing remainder width to stretched columns (width allocation on a 100-wide table with 3 columns: Without this flag: 33,33,34. With this flag: 33,33,33). With larger number of columns, resizing will appear to be less smooth. |
+| ImGuiTableFlags_NoHostExtendX        | 外側の幅をカラムに自動フィットさせ、outer_size.x の値を上書きします。ScrollX/ScrollYが無効で、Stretchカラムが使用されていない場合にのみ使用できます。                                                                                        |
+| ImGuiTableFlags_NoHostExtendY        | 外側の高さを outer_size.y で正確に停止するようにします (テーブルが制限を超えて自動拡張されるのを防ぎます)。ScrollX/ScrollYが無効の場合のみ使用可能。制限値以下のデータは切り取られ、表示されません。                                          |
+| ImGuiTableFlags_NoKeepColumnsVisible | ScrollXがオフでテーブルが小さくなりすぎた場合、カラムを常に最小表示にしておくことを無効にする。カラムがリサイズ可能な場合はお勧めしません。                                                                                                        |
+| ImGuiTableFlags_PreciseWidths        | 余りの幅をストレッチされたカラムに分配しないようにする (100幅のテーブルで3カラムの幅を割り当てる)：このフラグなし：33,33,34.このフラグあり：33,33,33).カラム数が多くなると、リサイズがスムーズに行われなくなります。 |
 
-#### Clipping
+#### クリッピング
 
 ```cpp
 ImGuiTableFlags_NoClip = 1 << 20,
@@ -2248,9 +2293,9 @@ ImGuiTableFlags_NoClip = 1 << 20,
 
 | 名前                   | 説明                                                                                                                                                                                          |
 |------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| ImGuiTableFlags_NoClip | Disable clipping rectangle for every individual columns (reduce draw command count, items will be able to overflow into other columns). Generally incompatible with TableSetupScrollFreeze(). |
+| ImGuiTableFlags_NoClip | 個々の列のクリッピング矩形を無効にする(描画コマンド数を減らし、項目が他の列にはみ出すことができるようになる)。一般に、TableSetupScrollFreeze() とは互換性がありません。 |
 
-#### Padding
+#### パディング
 
 ```cpp
 ImGuiTableFlags_PadOuterX   = 1 << 21,
@@ -2260,11 +2305,11 @@ ImGuiTableFlags_NoPadInnerX = 1 << 23,
 
 | 名前                        | 説明                                                                                                                               |
 |-----------------------------|------------------------------------------------------------------------------------------------------------------------------------|
-| ImGuiTableFlags_PadOuterX   | Default if BordersOuterV is on. Enable outermost padding. Generally desirable if you have headers.                                 |
-| ImGuiTableFlags_NoPadOuterX | Default if BordersOuterV is off. Disable outermost padding.                                                                        |
-| ImGuiTableFlags_NoPadInnerX | Disable inner padding between columns (double inner padding if BordersOuterV is on, single inner padding if BordersOuterV is off). |
+| ImGuiTableFlags_PadOuterX   | BordersOuterV がオンの場合のデフォルト。一番外側のパディングを有効にする。一般にヘッダーがある場合に望ましい。                                 |
+| ImGuiTableFlags_NoPadOuterX | BordersOuterV が off の場合のデフォルト。一番外側のパディングを無効にする。                                                                        |
+| ImGuiTableFlags_NoPadInnerX | 列間の内側パディングを無効にする（BordersOuterV がオンの場合は二重内側パディング、オフの場合は一重内側パディング）。 |
 
-#### Scrolling
+#### スクロール
 
 ```cpp
 ImGuiTableFlags_ScrollX = 1 << 24,
@@ -2273,10 +2318,10 @@ ImGuiTableFlags_ScrollY = 1 << 25,
 
 | 名前                    | 説明                                                                                                                                                                                                                                          |
 |-------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| ImGuiTableFlags_ScrollX | Enable horizontal scrolling. Require 'outer_size' parameter of BeginTable() to specify the container size. Changes default sizing policy. Because this creates a child window, ScrollY is currently generally recommended when using ScrollX. |
-| ImGuiTableFlags_ScrollY | Enable vertical scrolling. Require 'outer_size' parameter of BeginTable() to specify the container size.                                                                                                                                      |
+| ImGuiTableFlags_ScrollX | 水平スクロールを有効にする。BeginTable() の 'outer_size' パラメータでコンテナのサイズを指定する必要がある。既定のサイズ設定ポリシーが変更されます。これは子ウィンドウを作成するため、ScrollX を使用する場合は、現在一般的に ScrollY を推奨します。 |
+| ImGuiTableFlags_ScrollY | 垂直スクロールを有効にする。BeginTable() の 'outer_size' パラメータでコンテナのサイズを指定する。                                                                                                                                      |
 
-#### Sorting
+#### ソート
 
 ```cpp
 ImGuiTableFlags_SortMulti    = 1 << 26,
@@ -2285,10 +2330,10 @@ ImGuiTableFlags_SortTristate = 1 << 27,
 
 | 名前                         | 説明                                                                                                                      |
 |------------------------------|---------------------------------------------------------------------------------------------------------------------------|
-| ImGuiTableFlags_SortMulti    | Hold shift when clicking headers to sort on multiple column. TableGetSortSpecs() may return specs where (SpecsCount > 1). |
-| ImGuiTableFlags_SortTristate | Allow no sorting, disable default sorting. TableGetSortSpecs() may return specs where (SpecsCount == 0).                  |
+| ImGuiTableFlags_SortMulti    | ヘッダをクリックするときにシフトを押したままにすると、複数の列でソートされる。TableGetSortSpecs() は、(SpecsCount > 1) の場合に Specs を返すことがあります。 |
+| ImGuiTableFlags_SortTristate | ソートを許可しない、デフォルトのソートを無効にする。TableGetSortSpecs() は、(SpecsCount == 0) の specs を返す場合があります。                  |
 
-#### (Internal) Combinations and masks:
+#### (内部)コンビネーションとマスク：
 
 ```cpp
 ImGuiTableFlags_SizingMask_ = ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_SizingFixedSame | ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_SizingStretchSame,
@@ -2299,7 +2344,7 @@ ImGuiTableFlags_SizingMask_ = ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_S
 |-----------------------------|------------------------------------------------------------------------------------------------------------------------------------------|
 | ImGuiTableFlags_SizingMask_ | ImGuiTableFlags_SizingFixedFit + ImGuiTableFlags_SizingFixedSame + ImGuiTableFlags_SizingStretchProp + ImGuiTableFlags_SizingStretchSame |
 
-### Flags for ImGui::TableSetupColumn()
+### ImGui::TableSetupColumn() のフラグ
 
 ```cpp
 enum ImGuiTableColumnFlags_
@@ -2333,27 +2378,27 @@ ImGuiTableColumnFlags_IndentDisable         = 1 << 17,
 | 名前                                       | 説明                                                                                                                                                         |
 |--------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | ImGuiTableColumnFlags_None                 |                                                                                                                                                              |
-| ImGuiTableColumnFlags_Disabled             | Overriding/master disable flag: hide column, won't show in context menu (unlike calling TableSetColumnEnabled() which manipulates the user accessible state) |
-| ImGuiTableColumnFlags_DefaultHide          | Default as a hidden/disabled column.                                                                                                                         |
-| ImGuiTableColumnFlags_DefaultSort          | Default as a sorting column.                                                                                                                                 |
-| ImGuiTableColumnFlags_WidthStretch         | Column will stretch. Preferable with horizontal scrolling disabled (default if table sizing policy is _SizingStretchSame or _SizingStretchProp).             |
-| ImGuiTableColumnFlags_WidthFixed           | Column will not stretch. Preferable with horizontal scrolling enabled (default if table sizing policy is _SizingFixedFit and table is resizable).            |
-| ImGuiTableColumnFlags_NoResize             | Disable manual resizing.                                                                                                                                     |
-| ImGuiTableColumnFlags_NoReorder            | Disable manual reordering this column, this will also prevent other columns from crossing over this column.                                                  |
-| ImGuiTableColumnFlags_NoHide               | Disable ability to hide/disable this column.                                                                                                                 |
-| ImGuiTableColumnFlags_NoClip               | Disable clipping for this column (all NoClip columns will render in a same draw command).                                                                    |
-| ImGuiTableColumnFlags_NoSort               | Disable ability to sort on this field (even if ImGuiTableFlags_Sortable is set on the table).                                                                |
-| ImGuiTableColumnFlags_NoSortAscending      | Disable ability to sort in the ascending direction.                                                                                                          |
-| ImGuiTableColumnFlags_NoSortDescending     | Disable ability to sort in the descending direction.                                                                                                         |
-| ImGuiTableColumnFlags_NoHeaderLabel        | TableHeadersRow() will not submit label for this column. Convenient for some small columns. Name will still appear in context menu.                          |
-| ImGuiTableColumnFlags_NoHeaderWidth        | Disable header text width contribution to automatic column width.                                                                                            |
-| ImGuiTableColumnFlags_PreferSortAscending  | Make the initial sort direction Ascending when first sorting on this column (default).                                                                       |
-| ImGuiTableColumnFlags_PreferSortDescending | Make the initial sort direction Descending when first sorting on this column.                                                                                |
-| ImGuiTableColumnFlags_IndentEnable         | Use current Indent value when entering cell (default for column 0).                                                                                          |
-| ImGuiTableColumnFlags_IndentDisable        | Ignore current Indent value when entering cell (default for columns > 0). Indentation changes _within_ the cell will still be honored.                       |
+| ImGuiTableColumnFlags_Disabled             | 上書き/マスター無効化フラグ: カラムが非表示になり、コンテキストメニューに表示されない (ユーザがアクセス可能な状態を操作する TableSetColumnEnabled() の呼び出しとは異なる)|
+| ImGuiTableColumnFlags_DefaultHide          | デフォルトは非表示/無効カラム。                                                                                                                         |
+| ImGuiTableColumnFlags_DefaultSort          | ソート列としてのデフォルト。                                                                                                                                 |
+| ImGuiTableColumnFlags_WidthStretch         | カラムがストレッチされます。水平スクロールを無効にすることが望ましいです (テーブルのサイズ設定ポリシーが _SizingStretchSame または _SizingStretchProp の場合のデフォルト)。             |
+| ImGuiTableColumnFlags_WidthFixed           | カラムはストレッチされません。水平スクロールが有効であることが望ましい (テーブルのサイズ設定ポリシーが _SizingFixedFit で、テーブルがリサイズ可能な場合のデフォルト)。            |
+| ImGuiTableColumnFlags_NoResize             | 手動リサイズを無効にする。                                                                                                                                     |
+| ImGuiTableColumnFlags_NoReorder            | このカラムの手動並べ替えを無効にすることで、他のカラムがこのカラムをまたぐのを防ぐことができます。                                                  |
+| ImGuiTableColumnFlags_NoHide               | このカラムを隠す/無効にする機能を無効にする。                                                                                                                 |
+| ImGuiTableColumnFlags_NoClip               | この列のクリッピングを無効にします（すべてのNoClip列は同じ描画コマンドでレンダリングされます）。                                                                    |
+| ImGuiTableColumnFlags_NoSort               | テーブルにImGuiTableFlags_Sortableが設定されていても）このフィールドのソート機能を無効にします。                                                                |
+| ImGuiTableColumnFlags_NoSortAscending      | 昇順にソートする機能を無効にする。                                                                                                          |
+| ImGuiTableColumnFlags_NoSortDescending     | 降順にソートする機能を無効にする。                                                                                                         |
+| ImGuiTableColumnFlags_NoHeaderLabel        | TableHeadersRow() は、このカラムのラベルを送信しません。小さなカラムの場合に便利です。名前はコンテキストメニューに表示されます。                          |
+| ImGuiTableColumnFlags_NoHeaderWidth        | ヘッダーテキスト幅の自動列幅への寄与を無効にする。                                                                                            |
+| ImGuiTableColumnFlags_PreferSortAscending  | このカラムを最初にソートする際の最初のソート方向を昇順にします (デフォルト)。                                                                       |
+| ImGuiTableColumnFlags_PreferSortDescending | このカラムを最初にソートする際に、最初のソート方向を降順にします。                                                                                |
+| ImGuiTableColumnFlags_IndentEnable         | セル入力時に現在のインデント値を使用する（カラム 0 のデフォルト）。                                                                                          |
+| ImGuiTableColumnFlags_IndentDisable        | セル入力時に現在のインデント値を無視する(デフォルトは列 > 0)。セル内のインデント変更はそのまま尊重される。                         |
 
 
-#### Output status flags, read-only via TableGetColumnFlags()
+#### 出力ステータス・フラグ, TableGetColumnFlags() による読み込み専用。
 
 ```cpp
 ImGuiTableColumnFlags_IsEnabled = 1 << 24,
@@ -2364,10 +2409,10 @@ ImGuiTableColumnFlags_IsHovered = 1 << 27,
 
 | 名前                            | 説明                                                                                                    |
 |---------------------------------|---------------------------------------------------------------------------------------------------------|
-| ImGuiTableColumnFlags_IsEnabled | Status: is enabled == not hidden by user/api (referred to as "Hide" in _DefaultHide and _NoHide) flags. |
-| ImGuiTableColumnFlags_IsVisible | Status: is visible == is enabled AND not clipped by scrolling.                                          |
-| ImGuiTableColumnFlags_IsSorted  | Status: is currently part of the sort specs                                                             |
-| ImGuiTableColumnFlags_IsHovered | Status: is hovered by mouse                                                                             |
+| ImGuiTableColumnFlags_IsEnabled | ステータス: 有効 == ユーザー/apiによって非表示（_DefaultHideと_NoHideでは "Hide"）フラグ。 |
+| ImGuiTableColumnFlags_IsVisible | ステータス: 表示されている == 有効であり、かつスクロールによってクリッピングされていない。                                          |
+| ImGuiTableColumnFlags_IsSorted  | ステータス：現在、ソート仕様の一部である。 |
+| ImGuiTableColumnFlags_IsHovered | ステータス：マウスがホバーした状態 |
 
 #### (Internal) Combinations and masks
 
@@ -2384,10 +2429,10 @@ ImGuiTableColumnFlags_NoDirectResize_ = 1 << 30,
 | ImGuiTableColumnFlags_WidthMask_      | ImGuiTableColumnFlags_WidthStretch + ImGuiTableColumnFlags_WidthFixed                                                                |
 | ImGuiTableColumnFlags_IndentMask_     | ImGuiTableColumnFlags_IndentEnable + ImGuiTableColumnFlags_IndentDisable                                                             |
 | ImGuiTableColumnFlags_StatusMask_     | ImGuiTableColumnFlags_IsEnabled + ImGuiTableColumnFlags_IsVisible + ImGuiTableColumnFlags_IsSorted + ImGuiTableColumnFlags_IsHovered |
-| ImGuiTableColumnFlags_NoDirectResize_ | (Internal) Disable user resizing this column directly (it may however we resized indirectly from its left edge)                      |
+| ImGuiTableColumnFlags_NoDirectResize_ | (内部) ユーザーがこの列のサイズを直接変更できないようにする(ただし、列の左端から間接的にサイズを変更することはできる)                      |
 
 
-### Flags for ImGui::TableNextRow()
+### ImGui::TableNextRow() のフラグ
 
 ```cpp
 enum ImGuiTableRowFlags_
@@ -2400,20 +2445,20 @@ enum ImGuiTableRowFlags_
 | 名前                       | 説明                                                                                                                   |
 |----------------------------|------------------------------------------------------------------------------------------------------------------------|
 | ImGuiTableRowFlags_None    |                                                                                                                        |
-| ImGuiTableRowFlags_Headers | Identify header row (set default background color + width of its contents accounted differently for auto column width) |
+| ImGuiTableRowFlags_Headers | ヘッダー行を特定する（デフォルトの背景色を設定し、自動カラム幅とは異なるコンテンツの幅を設定する） |
 
-### Enum for ImGui::TableSetBgColor()
+### ImGui::TableSetBgColor() 用列挙型
 
-Background colors are rendering in 3 layers:
+背景色は3つのレイヤーでレンダリングされる：
 
-- Layer 0: draw with RowBg0 color if set, otherwise draw with ColumnBg0 if set.
-- Layer 1: draw with RowBg1 color if set, otherwise draw with ColumnBg1 if set.
-- Layer 2: draw with CellBg color if set.
+- レイヤー0：設定されていればRowBg0カラーで描画し、設定されていなければColumnBg0で描画します。
+- レイヤー 1: 設定されていれば RowBg1 色で描画し、設定されていなければ ColumnBg1 色で描画します。
+- レイヤー 2: 設定されていれば CellBg カラーで描画します。
 
-The purpose of the two row/columns layers is to let you decide if a background color change should override or blend with the existing color.
-When using ImGuiTableFlags_RowBg on the table, each row has the RowBg0 color automatically set for odd/even rows.
-If you set the color of RowBg0 target, your color will override the existing RowBg0 color.
-If you set the color of RowBg1 or ColumnBg1 target, your color will blend over the RowBg0 color.
+2つの行/列レイヤーの目的は、背景色の変更が既存の色を上書きするかブレンドするかを決定することです。
+テーブルで ImGuiTableFlags_RowBg を使用している場合、各行には奇数/偶数行の RowBg0 カラーが自動的に設定されます。
+RowBg0 の色をターゲットに設定すると、既存の RowBg0 の色が上書きされます。
+RowBg1またはColumnBg1ターゲットの色を設定した場合、その色はRowBg0の色の上にブレンドされます。
 
 ```cpp
 enum ImGuiTableBgTarget_
@@ -2428,11 +2473,11 @@ enum ImGuiTableBgTarget_
 | 名前                      | 説明                                                                                                             |
 |---------------------------|------------------------------------------------------------------------------------------------------------------|
 | ImGuiTableBgTarget_None   |                                                                                                                  |
-| ImGuiTableBgTarget_RowBg0 | Set row background color 0 (generally used for background, automatically set when ImGuiTableFlags_RowBg is used) |
-| ImGuiTableBgTarget_RowBg1 | Set row background color 1 (generally used for selection marking)                                                |
-| ImGuiTableBgTarget_CellBg | Set cell background color (top-most color)                                                                       |
+| ImGuiTableBgTarget_RowBg0 | 行の背景色 0 を設定する (一般的に背景に使用される。ImGuiTableFlags_RowBg が使用されると自動的に設定される) |
+| ImGuiTableBgTarget_RowBg1 | 行の背景色 1 を設定する（通常、選択マーク用に使用される） |
+| ImGuiTableBgTarget_CellBg | セルの背景色（一番上の色）を設定する |
 
-### Flags for ImGui::IsWindowFocused()
+### ImGui::IsWindowFocused() のフラグ
 
 ```cpp
 enum ImGuiFocusedFlags_
@@ -2450,17 +2495,17 @@ enum ImGuiFocusedFlags_
 | 名前                                  | 説明                                                                                                                                                                                       |
 |---------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | ImGuiFocusedFlags_None                |                                                                                                                                                                                            |
-| ImGuiFocusedFlags_ChildWindows        | Return true if any children of the window is focused                                                                                                                                       |
-| ImGuiFocusedFlags_RootWindow          | Test from root window (top most parent of the current hierarchy)                                                                                                                           |
-| ImGuiFocusedFlags_AnyWindow           | Return true if any window is focused. Important: If you are trying to tell how to dispatch your low-level inputs, do NOT use this. Use 'io.WantCaptureMouse' instead! Please read the FAQ! |
-| ImGuiFocusedFlags_NoPopupHierarchy    | Do not consider popup hierarchy (do not treat popup emitter as parent of popup) (when used with _ChildWindows or _RootWindow)                                                              |
-| (無効)ImGuiFocusedFlags_DockHierarchy | Consider docking hierarchy (treat dockspace host as parent of docked window) (when used with _ChildWindows or _RootWindow)                                                                 |
-| ImGuiFocusedFlags_RootAndChildWindows | ImGuiFocusedFlags_RootWindow + ImGuiFocusedFlags_ChildWindows,                                                                                                                             |
+| ImGuiFocusedFlags_ChildWindows        | ウィンドウの子ウィンドウにフォーカスが当たっていれば真を返す |
+| ImGuiFocusedFlags_RootWindow          | ルートウィンドウ（現在の階層の最上位の親）からのテスト |
+| ImGuiFocusedFlags_AnyWindow           | いずれかのウィンドウにフォーカスが当たっていればtrueを返す。重要: 低レベルの入力をどのようにディスパッチするかを指定しようとしている場合は、これを使用しないでください。代わりに 'io.WantCaptureMouse'を使用してください！FAQをお読みください！ |
+| ImGuiFocusedFlags_NoPopupHierarchy    | ポップアップの階層を考慮しない (ポップアップの親としてポップアップ・エミッターを扱わない) (_ChildWindowsまたは_RootWindowと一緒に使用する場合) |
+| (無効)ImGuiFocusedFlags_DockHierarchy | ドッキング階層を考慮する (ドッキングされたウィンドウの親としてドッキングスペースホストを扱う) (_ChildWindowsまたは_RootWindowと一緒に使用する場合) |
+| ImGuiFocusedFlags_RootAndChildWindows | ImGuiFocusedFlags_RootWindow + ImGuiFocusedFlags_ChildWindows |
 
-### Flags for ImGui::IsItemHovered(), ImGui::IsWindowHovered()
+### ImGui::IsItemHovered(), ImGui::IsWindowHovered() のフラグ。
 
-Note: if you are trying to check whether your mouse should be dispatched to Dear ImGui or to your app, you should use 'io.WantCaptureMouse' instead! Please read the FAQ!
-Note: windows with the ImGuiWindowFlags_NoInputs flag are ignored by IsWindowHovered() calls.
+- 注意：マウスをImGuiに送るか、アプリに送るかを確認する場合は、'io.WantCaptureMouse'を使用してください！FAQをお読みください！
+- 注意：ImGuiWindowFlags_NoInputsフラグを持つウィンドウは、IsWindowHovered()コールでは無視されます。
 
 ```cpp
 enum ImGuiHoveredFlags_
@@ -2485,30 +2530,30 @@ ImGuiHoveredFlags_RootAndChildWindows           = ImGuiHoveredFlags_RootWindow |
 
 | 名前                                            | 説明                                                                                                                                                   |
 |-------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------|
-| ImGuiHoveredFlags_None                          | Return true if directly over the item/window, not obstructed by another window, not obstructed by an active popup or modal blocking inputs under them. |
-| ImGuiHoveredFlags_ChildWindows                  | IsWindowHovered() only: Return true if any children of the window is hovered                                                                           |
-| ImGuiHoveredFlags_RootWindow                    | IsWindowHovered() only: Test from root window (top most parent of the current hierarchy)                                                               |
-| ImGuiHoveredFlags_AnyWindow                     | IsWindowHovered() only: Return true if any window is hovered                                                                                           |
-| ImGuiHoveredFlags_NoPopupHierarchy              | IsWindowHovered() only: Do not consider popup hierarchy (do not treat popup emitter as parent of popup) (when used with _ChildWindows or _RootWindow)  |
-| (無効)ImGuiHoveredFlags_DockHierarchy           | IsWindowHovered() only: Consider docking hierarchy (treat dockspace host as parent of docked window) (when used with _ChildWindows or _RootWindow)     |
-| ImGuiHoveredFlags_AllowWhenBlockedByPopup       | Return true even if a popup window is normally blocking access to this item/window                                                                     |
-| (無効)ImGuiHoveredFlags_AllowWhenBlockedByModal | Return true even if a modal popup window is normally blocking access to this item/window. FIXME-TODO: Unavailable yet.                                 |
-| ImGuiHoveredFlags_AllowWhenBlockedByActiveItem  | Return true even if an active item is blocking access to this item/window. Useful for Drag and Drop patterns.                                          |
-| ImGuiHoveredFlags_AllowWhenOverlappedByItem     | IsItemHovered() only: Return true even if the item uses AllowOverlap mode and is overlapped by another hoverable item.                                 |
-| ImGuiHoveredFlags_AllowWhenOverlappedByWindow   | IsItemHovered() only: Return true even if the position is obstructed or overlapped by another window.                                                  |
-| ImGuiHoveredFlags_AllowWhenDisabled             | IsItemHovered() only: Return true even if the item is disabled                                                                                         |
-| ImGuiHoveredFlags_NoNavOverride                 | IsItemHovered() only: Disable using gamepad/keyboard navigation state when active, always query mouse                                                  |
+| ImGuiHoveredFlags_None                          | アイテム/ウィンドウの真上にあり、他のウィンドウに遮られておらず、アクティブなポップアップやモーダルがその下の入力をブロックしていない場合、true を返します。 |
+| ImGuiHoveredFlags_ChildWindows                  | IsWindowHovered() のみ：ウィンドウの子ウィンドウがホバリングされている場合に true を返す |
+| ImGuiHoveredFlags_RootWindow                    | IsWindowHovered() のみ：ルート・ウィンドウ（現在の階層の最上位の親）からのテスト |
+| ImGuiHoveredFlags_AnyWindow                     | IsWindowHovered() のみ：ウィンドウがホバーされている場合に true を返す |
+| ImGuiHoveredFlags_NoPopupHierarchy              | IsWindowHovered() のみ：ポップアップの階層を考慮しない (ポップアップの親としてポップアップ・エミッターを扱わない) (_ChildWindows または _RootWindow とともに使用する場合) |
+| (無効)ImGuiHoveredFlags_DockHierarchy           | IsWindowHovered() のみ：ドッキング階層を考慮する(ドッキングされたウィンドウの親としてドッキングスペースホストを扱う) (_ChildWindows または _RootWindow とともに使用する場合) |
+| ImGuiHoveredFlags_AllowWhenBlockedByPopup       | ポップアップウィンドウがこのアイテム/ウィンドウへのアクセスを通常ブロックしている場合でも、trueを返す。 |
+| (無効)ImGuiHoveredFlags_AllowWhenBlockedByModal | モーダルポップアップウィンドウが通常このアイテム/ウィンドウへのアクセスをブロックしている場合でも、true を返します。FIXME-TODO: まだ使用できません。                                 |
+| ImGuiHoveredFlags_AllowWhenBlockedByActiveItem  | アクティブなアイテムがこのアイテム/ウィンドウへのアクセスをブロックしている場合でも真を返します。Drag and Drop パターンに便利です。                                          |
+| ImGuiHoveredFlags_AllowWhenOverlappedByItem     | IsItemHovered() のみ：アイテムが AllowOverlap モードを使用していて、他のホバー可能なアイテムに重なっている場合でも true を返します。                                 |
+| ImGuiHoveredFlags_AllowWhenOverlappedByWindow   | IsItemHovered() のみ：他のウィンドウに遮られたり重なったりしても真を返す。                                                  |
+| ImGuiHoveredFlags_AllowWhenDisabled             | IsItemHovered() のみ：アイテムが無効になっていてもtrueを返す |
+| ImGuiHoveredFlags_NoNavOverride                 | IsItemHovered()のみ：アクティブ時にゲームパッド/キーボードのナビゲーション状態を使用せず、常にマウスに問い合わせる。 |
 | ImGuiHoveredFlags_AllowWhenOverlapped           | ImGuiHoveredFlags_AllowWhenOverlappedByItem + ImGuiHoveredFlags_AllowWhenOverlappedByWindow                                                            |
 | ImGuiHoveredFlags_RectOnly                      | ImGuiHoveredFlags_AllowWhenBlockedByPopup + ImGuiHoveredFlags_AllowWhenBlockedByActiveItem + ImGuiHoveredFlags_AllowWhenOverlapped                     |
 | ImGuiHoveredFlags_RootAndChildWindows           | ImGuiHoveredFlags_RootWindow + ImGuiHoveredFlags_ChildWindows                                                                                          |
 
-#### Tooltips mode
+#### ツールチップモード
 
-- typically used in IsItemHovered() + SetTooltip() sequence.
-- this is a shortcut to pull flags from 'style.HoverFlagsForTooltipMouse' or 'style.HoverFlagsForTooltipNav' where you can reconfigure desired behavior.
-  e.g. 'TooltipHoveredFlagsForMouse' defaults to 'ImGuiHoveredFlags_Stationary | ImGuiHoveredFlags_DelayShort'.
-- for frequently actioned or hovered items providing a tooltip, you want may to use ImGuiHoveredFlags_ForTooltip (stationary + delay) so the tooltip doesn't show too often.
-- for items which main purpose is to be hovered, or items with low affordance, or in less consistent apps, prefer no delay or shorter delay.
+- 通常、IsItemHovered() + SetTooltip() シーケンスで使用します。
+- これは、'style.HoverFlagsForTooltipMouse' または 'style.HoverFlagsForTooltipNav' からフラグを取得するショートカットです。
+  - 例: 'TooltipHoveredFlagsForMouse' のデフォルトは 'ImGuiHoveredFlags_Stationary | ImGuiHoveredFlags_DelayShort' です。
+- 頻繁にアクションを起こしたり、ツールチップを表示するアイテムには、ImGuiHoveredFlags_ForTooltip (stationary + delay)を使い、ツールチップが頻繁に表示されないようにします。
+- ホバーされることが主な目的であるアイテム、アフォーダンスが低いアイテム、または一貫性のないアプリでは、遅延なし、または短い遅延を使用します。
 
 ```cpp
 ImGuiHoveredFlags_ForTooltip = 1 << 12,
@@ -2516,12 +2561,12 @@ ImGuiHoveredFlags_ForTooltip = 1 << 12,
 
 | 名前                         | 説明                                                                            |
 |------------------------------|---------------------------------------------------------------------------------|
-| ImGuiHoveredFlags_ForTooltip | Shortcut for standard flags when using IsItemHovered() + SetTooltip() sequence. |
+| ImGuiHoveredFlags_ForTooltip | IsItemHovered() + SetTooltip() シーケンス使用時の標準フラグのショートカット。 |
 
-#### (Advanced) Mouse Hovering delays.
+#### (詳細)マウスホバリングの遅延。
 
-- generally you can use ImGuiHoveredFlags_ForTooltip to use application-standardized flags.
-- use those if you need specific overrides.
+- 一般的には、ImGuiHoveredFlags_ForTooltipを使ってアプリケーション標準のフラグを使うことができます。
+- 特定のオーバーライドが必要な場合は、それらを使用してください。
 
 ```cpp
 ImGuiHoveredFlags_Stationary    = 1 << 13,
@@ -2534,14 +2579,14 @@ ImGuiHoveredFlags_NoSharedDelay = 1 << 17,
 
 | 名前                            | 説明                                                                                                                                                                                                         |
 |---------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| ImGuiHoveredFlags_Stationary    | Require mouse to be stationary for style.HoverStationaryDelay (~0.15 sec) at least one time. After this, can move on same item/window. Using the stationary test tends to reduces the need for a long delay. |
-| ImGuiHoveredFlags_DelayNone     | IsItemHovered() only: Return true immediately (default). As this is the default you generally ignore this.                                                                                                   |
-| ImGuiHoveredFlags_DelayShort    | IsItemHovered() only: Return true after style.HoverDelayShort elapsed (~0.15 sec) (shared between items) + requires mouse to be stationary for style.HoverStationaryDelay (once per item).                   |
-| ImGuiHoveredFlags_DelayNormal   | IsItemHovered() only: Return true after style.HoverDelayNormal elapsed (~0.40 sec) (shared between items) + requires mouse to be stationary for style.HoverStationaryDelay (once per item).                  |
-| ImGuiHoveredFlags_NoSharedDelay | IsItemHovered() only: Disable shared delay system where moving from one item to the next keeps the previous timer for a short time (standard for tooltips with long delays)                                  |
+| ImGuiHoveredFlags_Stationary    | style.HoverStationaryDelay (~0.15 秒) の間、マウスを少なくとも 1 回静止させる。この後、同じアイテム/ウィンドウ上を移動できます。静止テストを使用すると、長い遅延の必要性が減る傾向があります。 |
+| ImGuiHoveredFlags_DelayNone     | IsItemHovered() のみ：すぐに真を返す（デフォルト）。これはデフォルトなので、通常は無視します。                                                                                                   |
+| ImGuiHoveredFlags_DelayShort    | IsItemHovered() のみ：style.HoverDelayShort経過後（～0.15秒）にtrueを返す（アイテム間で共有） + style.HoverStationaryDelayの間、マウスが静止している必要がある（アイテムごとに1回）。                   |
+| ImGuiHoveredFlags_DelayNormal   | IsItemHovered() のみ：style.HoverDelayNormalの経過後（～0.40秒）にtrueを返す（アイテム間で共有） + style.HoverStationaryDelayの間、マウスが静止している必要がある（アイテムごとに1回）。                  |
+| ImGuiHoveredFlags_NoSharedDelay | IsItemHovered() のみ：あるアイテムから次のアイテムに移動すると、前のタイマーが短時間維持される共有遅延システムを無効にする(長い遅延を持つツールチップの標準) |
 
 
-### Flags for ImGui::BeginDragDropSource(), ImGui::AcceptDragDropPayload()
+### ImGui::BeginDragDropSource(), ImGui::AcceptDragDropPayload() のフラグ。
 
 ```cpp
 enum ImGuiDragDropFlags_
@@ -2566,17 +2611,17 @@ enum ImGuiDragDropFlags_
 |---------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | ImGuiDragDropFlags_None                     |                                                                                                                                                                                                                                                                      |
 | (無効)BeginDragDropSource() flags           |                                                                                                                                                                                                                                                                      |
-| ImGuiDragDropFlags_SourceNoPreviewTooltip   | Disable preview tooltip. By default, a successful call to BeginDragDropSource opens a tooltip so you can display a preview or description of the source contents. This flag disables this behavior.                                                                  |
-| ImGuiDragDropFlags_SourceNoDisableHover     | By default, when dragging we clear data so that IsItemHovered() will return false, to avoid subsequent user code submitting tooltips. This flag disables this behavior so you can still call IsItemHovered() on the source item.                                     |
-| ImGuiDragDropFlags_SourceNoHoldToOpenOthers | Disable the behavior that allows to open tree nodes and collapsing header by holding over them while dragging a source item.                                                                                                                                         |
-| ImGuiDragDropFlags_SourceAllowNullID        | Allow items such as Text(), Image() that have no unique identifier to be used as drag source, by manufacturing a temporary identifier based on their window-relative position. This is extremely unusual within the dear imgui ecosystem and so we made it explicit. |
-| ImGuiDragDropFlags_SourceExtern             | External source (from outside of dear imgui), won't attempt to read current item/window info. Will always return true. Only one Extern source can be active simultaneously.                                                                                          |
-| ImGuiDragDropFlags_SourceAutoExpirePayload  | Automatically expire the payload if the source cease to be submitted (otherwise payloads are persisting while being dragged)                                                                                                                                         |
+| ImGuiDragDropFlags_SourceNoPreviewTooltip   | プレビューのツールチップを無効にします。デフォルトでは、BeginDragDropSource の呼び出しに成功すると、ツールチップが開き、ソースの内容のプレビューや説明を表示できます。このフラグは、この動作を無効にします。                                                                  |
+| ImGuiDragDropFlags_SourceNoDisableHover     | デフォルトでは、ドラッグ時にデータをクリアして IsItemHovered() が false を返すようにします。このフラグはこの動作を無効にするので、ソース・アイテムの IsItemHovered() を呼び出すことができます。                                     |
+| ImGuiDragDropFlags_SourceNoHoldToOpenOthers | ソース・アイテムをドラッグしている間、その上にホールドすることによって、ツリー・ノードを開いたり、ヘッダーを折りたたんだりすることができる動作を無効にする。                                                                                                                                         |
+| ImGuiDragDropFlags_SourceAllowNullID        | Text()やImage()のような一意な識別子を持たないアイテムを、ウィンドウの相対位置に基づいて一時的な識別子を生成することで、ドラッグソースとして使用できるようにしました。これは親愛なるimguiエコシステムの中では非常に珍しいことなので、明示しました。 |
+| ImGuiDragDropFlags_SourceExtern             | 外部ソース（親愛なるimguiの外部）から、現在のアイテム/ウィンドウ情報を読み取ろうとしません。常にtrueを返します。同時にアクティブにできる外部ソースは1つだけです。                                                                                          |
+| ImGuiDragDropFlags_SourceAutoExpirePayload  | ソースが送信されなくなった場合、ペイロードは自動的に期限切れになります。 |
 | (無効)AcceptDragDropPayload() flags         |                                                                                                                                                                                                                                                                      |
-| ImGuiDragDropFlags_AcceptBeforeDelivery     | AcceptDragDropPayload() will returns true even before the mouse button is released. You can then call IsDelivery() to test if the payload needs to be delivered.                                                                                                     |
-| ImGuiDragDropFlags_AcceptNoDrawDefaultRect  | Do not draw the default highlight rectangle when hovering over target.                                                                                                                                                                                               |
-| ImGuiDragDropFlags_AcceptNoPreviewTooltip   | Request hiding the BeginDragDropSource tooltip from the BeginDragDropTarget site.                                                                                                                                                                                    |
-| ImGuiDragDropFlags_AcceptPeekOnly           | ImGuiDragDropFlags_AcceptBeforeDelivery + ImGuiDragDropFlags_AcceptNoDrawDefaultRect // For peeking ahead and inspecting the payload before delivery.                                                                                                                |
+| ImGuiDragDropFlags_AcceptBeforeDelivery     | AcceptDragDropPayload() は、マウス・ボタンが離される前でも真を返します。その後、IsDelivery() を呼び出して、ペイロードを配信する必要があるかどうかをテストできます。                                                                                                     |
+| ImGuiDragDropFlags_AcceptNoDrawDefaultRect  | ターゲット上にカーソルを置いたときに、デフォルトのハイライト矩形を描画しない。                                                                                                                                                                                               |
+| ImGuiDragDropFlags_AcceptNoPreviewTooltip   | BeginDragDropTarget サイトから BeginDragDropSource ツールチップを非表示にすることを要求します。                                                                                                                                                                                    |
+| ImGuiDragDropFlags_AcceptPeekOnly           | ImGuiDragDropFlags_AcceptBeforeDelivery + ImGuiDragDropFlags_AcceptNoDrawDefaultRect (配信前に先読みしてペイロードを検査するため)。                                                                                                                |
 
 Standard Drag and Drop payload types. You can define you own payload types using short strings. Types starting with '_' are defined by Dear ImGui.
 
@@ -2587,29 +2632,43 @@ Standard Drag and Drop payload types. You can define you own payload types using
 
 | 名前                        | 説明                                                                            |
 |-----------------------------|---------------------------------------------------------------------------------|
-| IMGUI_PAYLOAD_TYPE_COLOR_3F | float[3]: Standard type for colors, without alpha. User code may use this type. |
-| IMGUI_PAYLOAD_TYPE_COLOR_4F | float[4]: Standard type for colors. User code may use this type.                |
+| IMGUI_PAYLOAD_TYPE_COLOR_3F | `float[3]`: アルファを含まない色の標準型。ユーザーコードはこの型を使用できる。 |
+| IMGUI_PAYLOAD_TYPE_COLOR_4F | `float[4]`: 色の標準型。ユーザーコードはこの型を使用できる。                |
 
-### A primary data type
+### 主要なデータ型
 
 ```cpp
 enum ImGuiDataType_
 {
-    ImGuiDataType_S8,       // signed char / char (with sensible compilers)
-    ImGuiDataType_U8,       // unsigned char
-    ImGuiDataType_S16,      // short
-    ImGuiDataType_U16,      // unsigned short
-    ImGuiDataType_S32,      // int
-    ImGuiDataType_U32,      // unsigned int
-    ImGuiDataType_S64,      // long long / __int64
-    ImGuiDataType_U64,      // unsigned long long / unsigned __int64
-    ImGuiDataType_Float,    // float
-    ImGuiDataType_Double,   // double
+    ImGuiDataType_S8,
+    ImGuiDataType_U8,
+    ImGuiDataType_S16,
+    ImGuiDataType_U16,
+    ImGuiDataType_S32,
+    ImGuiDataType_U32,
+    ImGuiDataType_S64,
+    ImGuiDataType_U64,
+    ImGuiDataType_Float,
+    ImGuiDataType_Double,
     ImGuiDataType_COUNT
 };
 ```
 
-### A cardinal direction
+|名前|説明|
+|---|---|
+|ImGuiDataType_S8     | signed char / char (with sensible compilers) |
+|ImGuiDataType_U8     | unsigned char |
+|ImGuiDataType_S16    | short |
+|ImGuiDataType_U16    | unsigned short |
+|ImGuiDataType_S32    | int |
+|ImGuiDataType_U32    | unsigned int |
+|ImGuiDataType_S64    | long long / __int64 |
+|ImGuiDataType_U64    | unsigned long long / unsigned __int64 |
+|ImGuiDataType_Float  | float |
+|ImGuiDataType_Double | double |
+|ImGuiDataType_COUNT  | |
+
+### 主要な方向
 
 ```cpp
 enum ImGuiDir_
@@ -2623,25 +2682,30 @@ enum ImGuiDir_
 };
 ```
 
-### A sorting direction
+### ソートの順序
 
 ```cpp
 enum ImGuiSortDirection_
 {
     ImGuiSortDirection_None         = 0,
-    ImGuiSortDirection_Ascending    = 1,    // Ascending = 0->9, A->Z etc.
-    ImGuiSortDirection_Descending   = 2     // Descending = 9->0, Z->A etc.
+    ImGuiSortDirection_Ascending    = 1,
+    ImGuiSortDirection_Descending   = 2
 };
 ```
+
+|名前|説明|
+|---|---|
+|ImGuiSortDirection_Ascending |昇順 = 0->9、A->Zなど。 |
+|ImGuiSortDirection_Descending|降順 = 9->0、Z->Aなど。 |
 
 ### キーの識別子
 
 (`ImGuiKey_XXX` または `ImGuiMod_XXX` の値): はキーボード、マウス、ゲームパッドの値を表します。
 
-All our named keys are >= 512. Keys value 0 to 511 are left unused as legacy native/opaque key values (< 1.87).
-Since >= 1.89 we increased typing (went from int to enum), some legacy code may need a cast to ImGuiKey.
-Read details about the 1.87 and 1.89 transition : `https://github.com/ocornut/imgui/issues/4921`
-Note that "Keys" related to physical keys and are not the same concept as input "Characters", the later are submitted via io.AddInputCharacter().
+名前付きキーはすべて>= 512である。キー値0から511は、レガシーなネイティブ/不透明キー値として未使用のままになっています（< 1.87）。
+1.89以降、型付けが増え（intからenumへ）、レガシーなコードではImGuiKeyへのキャストが必要になる場合があります。
+1.87と1.89の移行の詳細については`https://github.com/ocornut/imgui/issues/4921`を参照してください。
+Key "は物理的なキーに関連しており、入力 "Characters "とは同じ概念ではないことに注意してください。
 
 ```cpp
 enum ImGuiKey : int
@@ -2705,35 +2769,62 @@ enum ImGuiKey : int
 
 #### ゲームパッド
 
-(some of those are analog values, 0.0f to 1.0f)                          // NAVIGATION ACTION
-(download controller mapping PNG/PSD at http://dearimgui.com/controls_sheets)
+ナビゲーションアクション: そのうちのいくつかはアナログ値で、0.0fから1.0fまである
+コントローラマッピングPNG/PSDのダウンロードは、`http://dearimgui.com/controls_sheets`から。
 
 ```cpp
-    ImGuiKey_GamepadStart,          // Menu (Xbox)      + (Switch)   Start/Options (PS)
-    ImGuiKey_GamepadBack,           // View (Xbox)      - (Switch)   Share (PS)
-    ImGuiKey_GamepadFaceLeft,       // X (Xbox)         Y (Switch)   Square (PS)        // Tap: Toggle Menu. Hold: Windowing mode (Focus/Move/Resize windows)
-    ImGuiKey_GamepadFaceRight,      // B (Xbox)         A (Switch)   Circle (PS)        // Cancel / Close / Exit
-    ImGuiKey_GamepadFaceUp,         // Y (Xbox)         X (Switch)   Triangle (PS)      // Text Input / On-screen Keyboard
-    ImGuiKey_GamepadFaceDown,       // A (Xbox)         B (Switch)   Cross (PS)         // Activate / Open / Toggle / Tweak
-    ImGuiKey_GamepadDpadLeft,       // D-pad Left                                       // Move / Tweak / Resize Window (in Windowing mode)
-    ImGuiKey_GamepadDpadRight,      // D-pad Right                                      // Move / Tweak / Resize Window (in Windowing mode)
-    ImGuiKey_GamepadDpadUp,         // D-pad Up                                         // Move / Tweak / Resize Window (in Windowing mode)
-    ImGuiKey_GamepadDpadDown,       // D-pad Down                                       // Move / Tweak / Resize Window (in Windowing mode)
-    ImGuiKey_GamepadL1,             // L Bumper (Xbox)  L (Switch)   L1 (PS)            // Tweak Slower / Focus Previous (in Windowing mode)
-    ImGuiKey_GamepadR1,             // R Bumper (Xbox)  R (Switch)   R1 (PS)            // Tweak Faster / Focus Next (in Windowing mode)
-    ImGuiKey_GamepadL2,             // L Trig. (Xbox)   ZL (Switch)  L2 (PS) [Analog]
-    ImGuiKey_GamepadR2,             // R Trig. (Xbox)   ZR (Switch)  R2 (PS) [Analog]
-    ImGuiKey_GamepadL3,             // L Stick (Xbox)   L3 (Switch)  L3 (PS)
-    ImGuiKey_GamepadR3,             // R Stick (Xbox)   R3 (Switch)  R3 (PS)
-    ImGuiKey_GamepadLStickLeft,     // [Analog]                                         // Move Window (in Windowing mode)
-    ImGuiKey_GamepadLStickRight,    // [Analog]                                         // Move Window (in Windowing mode)
-    ImGuiKey_GamepadLStickUp,       // [Analog]                                         // Move Window (in Windowing mode)
-    ImGuiKey_GamepadLStickDown,     // [Analog]                                         // Move Window (in Windowing mode)
-    ImGuiKey_GamepadRStickLeft,     // [Analog]
-    ImGuiKey_GamepadRStickRight,    // [Analog]
-    ImGuiKey_GamepadRStickUp,       // [Analog]
-    ImGuiKey_GamepadRStickDown,     // [Analog]
+    ImGuiKey_GamepadStart,
+    ImGuiKey_GamepadBack,
+    ImGuiKey_GamepadFaceLeft,
+    ImGuiKey_GamepadFaceRight,
+    ImGuiKey_GamepadFaceUp,
+    ImGuiKey_GamepadFaceDown,
+    ImGuiKey_GamepadDpadLeft,
+    ImGuiKey_GamepadDpadRight,
+    ImGuiKey_GamepadDpadUp,
+    ImGuiKey_GamepadDpadDown,
+    ImGuiKey_GamepadL1,
+    ImGuiKey_GamepadR1,
+    ImGuiKey_GamepadL2,
+    ImGuiKey_GamepadR2,
+    ImGuiKey_GamepadL3,
+    ImGuiKey_GamepadR3,
+    ImGuiKey_GamepadLStickLeft,
+    ImGuiKey_GamepadLStickRight,
+    ImGuiKey_GamepadLStickUp,
+    ImGuiKey_GamepadLStickDown,
+    ImGuiKey_GamepadRStickLeft,
+    ImGuiKey_GamepadRStickRight,
+    ImGuiKey_GamepadRStickUp,
+    ImGuiKey_GamepadRStickDown,
 ```
+
+|名前|ゲームパッド|説明|
+|---|---|---|
+|ImGuiKey_GamepadStart       | Menu (Xbox), + (Switch), Start/Options (PS) ||
+|ImGuiKey_GamepadBack        | View (Xbox), - (Switch), Share (PS)         ||
+|ImGuiKey_GamepadFaceLeft    | X (Xbox), Y (Switch), Square (PS)        | タップ：メニューの切り替え。ホールド：ウィンドウ・モード（ウィンドウのフォーカス／移動／サイズ変更）|
+|ImGuiKey_GamepadFaceRight   | B (Xbox), A (Switch), Circle (PS)        | キャンセル / 閉じる / 終了|
+|ImGuiKey_GamepadFaceUp      | Y (Xbox), X (Switch), Triangle (PS)      | テキスト入力 / オンスクリーンキーボード|
+|ImGuiKey_GamepadFaceDown    | A (Xbox), B (Switch), Cross (PS)         | アクティベート / オープン / トグル / 微調整|
+|ImGuiKey_GamepadDpadLeft    | D-pad Left                                       | 移動 / 微調整 / ウィンドウのサイズ変更 (ウィンドウモード)|
+|ImGuiKey_GamepadDpadRight   | D-pad Right                                      | 移動 / 微調整 / ウィンドウのサイズ変更 (ウィンドウモード)|
+|ImGuiKey_GamepadDpadUp      | D-pad Up                                         | 移動 / 微調整 / ウィンドウのサイズ変更 (ウィンドウモード)|
+|ImGuiKey_GamepadDpadDown    | D-pad Down                                       | 移動 / 微調整 / ウィンドウのサイズ変更 (ウィンドウモード)|
+|ImGuiKey_GamepadL1          | L Bumper (Xbox), L (Switch), L1 (PS)            | ゆっくり調整 / 前へフォーカス (ウィンドウモード)|
+|ImGuiKey_GamepadR1          | R Bumper (Xbox), R (Switch), R1 (PS)            | より速く調整する / 次へフォーカス (ウィンドウモード)|
+|ImGuiKey_GamepadL2          | L Trig. (Xbox), ZL (Switch), L2 (PS) (Analog)   ||
+|ImGuiKey_GamepadR2          | R Trig. (Xbox), ZR (Switch), R2 (PS) (Analog)   ||
+|ImGuiKey_GamepadL3          | L Stick (Xbox), L3 (Switch), L3 (PS)            ||
+|ImGuiKey_GamepadR3          | R Stick (Xbox), R3 (Switch), R3 (PS)            ||
+|ImGuiKey_GamepadLStickLeft  | (Analog)                                         | ウィンドウの移動（ウィンドウモード）|
+|ImGuiKey_GamepadLStickRight | (Analog)                                         | ウィンドウの移動（ウィンドウモード）|
+|ImGuiKey_GamepadLStickUp    | (Analog)                                         | ウィンドウの移動（ウィンドウモード）|
+|ImGuiKey_GamepadLStickDown  | (Analog)                                         | ウィンドウの移動（ウィンドウモード）|
+|ImGuiKey_GamepadRStickLeft  | (Analog)||
+|ImGuiKey_GamepadRStickRight | (Analog)||
+|ImGuiKey_GamepadRStickUp    | (Analog)||
+|ImGuiKey_GamepadRStickDown  | (Analog)||
 
 #### エイリアス: マウスボタン
 
@@ -2745,7 +2836,7 @@ AddMouseButtonEvent()呼び出しから自動サブミットされる。
     ImGuiKey_MouseLeft, ImGuiKey_MouseRight, ImGuiKey_MouseMiddle, ImGuiKey_MouseX1, ImGuiKey_MouseX2, ImGuiKey_MouseWheelX, ImGuiKey_MouseWheelY,
 ```
 
-#### [Internal] Reserved for mod storage
+#### (内部) MODストレージ用に予約
 
 ```cpp
     ImGuiKey_ReservedForModCtrl, ImGuiKey_ReservedForModShift, ImGuiKey_ReservedForModAlt, ImGuiKey_ReservedForModSuper,
@@ -2754,29 +2845,36 @@ AddMouseButtonEvent()呼び出しから自動サブミットされる。
 
 #### キーボード修飾子
 
-(explicitly submitted by backend via AddKeyEvent() calls)
+AddKeyEvent() 呼び出しによってバックエンドから明示的に送信される。
 
-- This is mirroring the data also written to io.KeyCtrl, io.KeyShift, io.KeyAlt, io.KeySuper, in a format allowing
-  them to be accessed via standard key API, allowing calls such as IsKeyPressed(), IsKeyReleased(), querying duration etc.
-- Code polling every key (e.g. an interface to detect a key press for input mapping) might want to ignore those
-  and prefer using the real keys (e.g. ImGuiKey_LeftCtrl, ImGuiKey_RightCtrl instead of ImGuiMod_Ctrl).
-- In theory the value of keyboard modifiers should be roughly equivalent to a logical or of the equivalent left/right keys.
-  In practice: it's complicated; mods are often provided from different sources. Keyboard layout, IME, sticky keys and
-  backends tend to interfere and break that equivalence. The safer decision is to relay that ambiguity down to the end-user...
+- これは、io.KeyCtrl、io.KeyShift、io.KeyAlt、io.KeySuperに書き込まれたデータを、標準的なキーAPIでアクセスできる形式にミラーリングしたもので、IsKeyPressed()、IsKeyReleased()、持続時間の問い合わせなどの呼び出しが可能です。
+- すべてのキーをポーリングするコード（例えば、入力マッピングのためにキーが押されたことを検出するインターフェース）は、これらのキーを無視して、実際のキーを使用することを好むかもしれません（例えば、ImGuiMod_Ctrlの代わりにImGuiKey_LeftCtrl、ImGuiKey_RightCtrl）。
+- 理論的には、キーボードモディファイアの値は、左/右キーの論理値とほぼ等しいはずです。
+  - 実際には複雑です。モディファイアはしばしば異なるソースから提供されます。キーボードレイアウト、IME、スティッキーキー、バックエンドが干渉し、その等価性を壊す傾向があります。より安全な決定は、その曖昧さをエンドユーザーに伝えることです。
 
 ```cpp
-    ImGuiMod_None                   = 0,
-    ImGuiMod_Ctrl                   = 1 << 12, // Ctrl
-    ImGuiMod_Shift                  = 1 << 13, // Shift
-    ImGuiMod_Alt                    = 1 << 14, // Option/Menu
-    ImGuiMod_Super                  = 1 << 15, // Cmd/Super/Windows
-    ImGuiMod_Shortcut               = 1 << 11, // Alias for Ctrl (non-macOS) _or_ Super (macOS).
-    ImGuiMod_Mask_                  = 0xF800,  // 5-bits
+    ImGuiMod_None     = 0,
+    ImGuiMod_Ctrl     = 1 << 12,
+    ImGuiMod_Shift    = 1 << 13,
+    ImGuiMod_Alt      = 1 << 14,
+    ImGuiMod_Super    = 1 << 15,
+    ImGuiMod_Shortcut = 1 << 11,
+    ImGuiMod_Mask_    = 0xF800,
 ```
 
-[Internal] Prior to 1.87 we required user to fill io.KeysDown[512] using their own native index + the io.KeyMap[] array.
-We are ditching this method but keeping a legacy path for user code doing e.g. IsKeyPressed(MY_NATIVE_KEY_CODE)
-If you need to iterate all keys (for e.g. an input mapper) you may use ImGuiKey_NamedKey_BEGIN..ImGuiKey_NamedKey_END.
+|名前|説明|
+|---|---|
+| ImGuiMod_None     | |
+| ImGuiMod_Ctrl     | Ctrl |
+| ImGuiMod_Shift    | Shift |
+| ImGuiMod_Alt      | Option/Menu |
+| ImGuiMod_Super    | Cmd/Super/Windows |
+| ImGuiMod_Shortcut | Ctrl（macOS以外）または Super（macOS）のエイリアス。 |
+| ImGuiMod_Mask_    | 5-bits |
+
+(内部) 1.87以前では、ネイティブインデックスと`io.KeyMap[]`配列を使って`io.KeysDown[512]`を埋める必要がありました。
+このメソッドは捨てますが、IsKeyPressed(MY_NATIVE_KEY_CODE)などのユーザーコード用のレガシーパスは残します。
+すべてのキーを反復処理する必要がある場合（入力マッパーなど）、ImGuiKey_NamedKey_BEGIN..ImGuiKey_NamedKey_ENDを使用できます。
 
 ```cpp
     ImGuiKey_NamedKey_BEGIN         = 512,
@@ -2809,7 +2907,9 @@ enum ImGuiNavInput
 #endif
 ```
 
-### Configuration flags stored in io.ConfigFlags. Set by user/application.
+### io.ConfigFlagsに格納されている設定フラグ。
+
+ユーザ/アプリケーションによって設定される。
 
 ```cpp
 enum ImGuiConfigFlags_
@@ -2826,16 +2926,16 @@ ImGuiConfigFlags_NoMouseCursorChange  = 1 << 5,
 | 名前                                  | 説明                                                                                                                                                                                                                                                                                                                                    |
 |---------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | ImGuiConfigFlags_None                 |                                                                                                                                                                                                                                                                                                                                         |
-| ImGuiConfigFlags_NavEnableKeyboard    | Master keyboard navigation enable flag. Enable full Tabbing + directional arrows + space/enter to activate.                                                                                                                                                                                                                             |
-| ImGuiConfigFlags_NavEnableGamepad     | Master gamepad navigation enable flag. Backend also needs to set ImGuiBackendFlags_HasGamepad.                                                                                                                                                                                                                                          |
-| ImGuiConfigFlags_NavEnableSetMousePos | Instruct navigation to move the mouse cursor. May be useful on TV/console systems where moving a virtual mouse is awkward. Will update io.MousePos and set io.WantSetMousePos=true. If enabled you MUST honor io.WantSetMousePos requests in your backend, otherwise ImGui will react as if the mouse is jumping around back and forth. |
-| ImGuiConfigFlags_NavNoCaptureKeyboard | Instruct navigation to not set the io.WantCaptureKeyboard flag when io.NavActive is set.                                                                                                                                                                                                                                                |
-| ImGuiConfigFlags_NoMouse              | Instruct imgui to clear mouse position/buttons in NewFrame(). This allows ignoring the mouse information set by the backend.                                                                                                                                                                                                            |
-| ImGuiConfigFlags_NoMouseCursorChange  | Instruct backend to not alter mouse cursor shape and visibility. Use if the backend cursor changes are interfering with yours and you don't want to use SetMouseCursor() to change mouse cursor. You may want to honor requests from imgui by reading GetMouseCursor() yourself instead.                                                |
+| ImGuiConfigFlags_NavEnableKeyboard    | マスターキーボードナビゲーション有効フラグ。フルタブ＋方向矢印＋スペース/エンターで有効にする。                                                                                                                                                                                                                             |
+| ImGuiConfigFlags_NavEnableGamepad     | マスターゲームパッドナビゲーション有効フラグ。バックエンドもImGuiBackendFlags_HasGamepadを設定する必要がある。                                                                                                                                                                                                                                          |
+| ImGuiConfigFlags_NavEnableSetMousePos | マウスカーソルの移動をナビゲーションに指示する。仮想マウスを動かすのが厄介なTV/コンソールシステムで役に立つかもしれない。io.MousePosを更新し、io.WantSetMousePos=trueを設定します。有効にした場合、バックエンドでio.WantSetMousePosリクエストに従わなければなりません。そうしないと、ImGuiはマウスが前後に飛び跳ねているかのように反応します。 |
+| ImGuiConfigFlags_NavNoCaptureKeyboard | io.NavActiveが設定されているときに、io.WantCaptureKeyboardフラグを設定しないようにナビゲーションに指示する。                                                                                                                                                                                                                                                |
+| ImGuiConfigFlags_NoMouse              | NewFrame()でマウスの位置/ボタンをクリアするようimguiに指示。これにより、バックエンドによって設定されたマウス情報を無視することができる。                                                                                                                                                                                                            |
+| ImGuiConfigFlags_NoMouseCursorChange  | マウスカーソルの形状と可視性を変更しないようにバックエンドに指示する。バックエンドのカーソルの変更があなたのカーソルの変更と干渉していて、マウスカーソルを変更するために SetMouseCursor() を使いたくない場合に使用します。代わりに自分でGetMouseCursor()を読み込んで、imguiからの要求を尊重したい場合があります。                                                |
 
-#### User storage
+#### ユーザーストレージ
 
-(to allow your backend/engine to communicate to code that may be shared between multiple projects. Those flags are NOT used by core Dear ImGui)
+バックエンド/エンジンが複数のプロジェクトで共有されるコードと通信できるようにするためです。これらのフラグはImGuiのコアでは使用されません。
 
 ```cpp
 ImGuiConfigFlags_IsSRGB        = 1 << 20,
@@ -2845,10 +2945,10 @@ ImGuiConfigFlags_IsTouchScreen = 1 << 21,
 
 | 名前                           | 説明                                                    |
 |--------------------------------|---------------------------------------------------------|
-| ImGuiConfigFlags_IsSRGB        | Application is SRGB-aware.                              |
-| ImGuiConfigFlags_IsTouchScreen | Application is using a touch screen instead of a mouse. |
+| ImGuiConfigFlags_IsSRGB        | アプリケーションはSRGBを意識している。                              |
+| ImGuiConfigFlags_IsTouchScreen | アプリケーションはマウスの代わりにタッチスクリーンを使っている。 |
 
-Backend capabilities flags stored in io.BackendFlags. Set by imgui_impl_xxx or custom backend.
+io.BackendFlags に格納されているバックエンド機能フラグ。imgui_impl_xxx またはカスタムバックエンドによって設定されます。
 
 ```cpp
 enum ImGuiBackendFlags_
@@ -2864,13 +2964,13 @@ enum ImGuiBackendFlags_
 | 名前                                   | 説明                                                                                                                                                   |
 |----------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------|
 | ImGuiBackendFlags_None                 |                                                                                                                                                        |
-| ImGuiBackendFlags_HasGamepad           | Backend Platform supports gamepad and currently has one connected.                                                                                     |
-| ImGuiBackendFlags_HasMouseCursors      | Backend Platform supports honoring GetMouseCursor() value to change the OS cursor shape.                                                               |
-| ImGuiBackendFlags_HasSetMousePos       | Backend Platform supports io.WantSetMousePos requests to reposition the OS mouse position (only used if ImGuiConfigFlags_NavEnableSetMousePos is set). |
-| ImGuiBackendFlags_RendererHasVtxOffset | Backend Renderer supports ImDrawCmd::VtxOffset. This enables output of large meshes (64K+ vertices) while still using 16-bit indices.                  |
+| ImGuiBackendFlags_HasGamepad           | バックエンドプラットフォームはゲームパッドをサポートしており、現在1台が接続されている。                                                                                     |
+| ImGuiBackendFlags_HasMouseCursors      | バックエンドプラットフォームは、OSのカーソル形状を変更するためにGetMouseCursor()の値を尊重することをサポートします。                                                               |
+| ImGuiBackendFlags_HasSetMousePos       | バックエンドプラットフォームは、OSのマウス位置を再配置するio.WantSetMousePosリクエストをサポートします（ImGuiConfigFlags_NavEnableSetMousePosが設定されている場合のみ使用されます）。 |
+| ImGuiBackendFlags_RendererHasVtxOffset | バックエンド・レンダラーがImDrawCmd::VtxOffsetをサポートしました。これにより、16ビットインデックスを使用しながら、大きなメッシュ（64K以上の頂点）の出力が可能になります。                  |
 
 
-### Enumeration for PushStyleColor() / PopStyleColor()
+### PushStyleColor() / PopStyleColor() の列挙型
 
 ```cpp
 enum ImGuiCol_
@@ -2932,14 +3032,14 @@ enum ImGuiCol_
 };
 ```
 
-### Enumeration for PushStyleVar() / PopStyleVar() to temporarily modify the ImGuiStyle structure.
+### ImGuiStyle 構造体を一時的に変更する PushStyleVar() / PopStyleVar() 用の列挙型
 
-- The enum only refers to fields of ImGuiStyle which makes sense to be pushed/popped inside UI code.
-  During initialization or between frames, feel free to just poke into ImGuiStyle directly.
-- Tip: Use your programming IDE navigation facilities on the names in the _second column_ below to find the actual members and their description.
-  In Visual Studio IDE: CTRL+comma ("Edit.GoToAll") can follow symbols in comments, whereas CTRL+F12 ("Edit.GoToImplementation") cannot.
-  With Visual Assist installed: ALT+G ("VAssistX.GoToImplementation") can also follow symbols in comments.
-- When changing this enum, you need to update the associated internal table GStyleVarInfo[] accordingly. This is where we link enum values to members offset/type.
+- enumはImGuiStyleのフィールドを参照するだけなので、UIコード内でプッシュ/ポップされるのは理にかなっている。
+  初期化中やフレームとフレームの間は、ImGuiStyleに直接突っ込んでください。
+- ヒントプログラミングIDEのナビゲーション機能を使って、下の_2列目の名前をクリックすると、実際のメンバーとその説明が表示されます。
+  Visual Studio IDEではCTRL+カンマ（"Edit.GoToAll"）はコメント内のシンボルをフォローできますが、CTRL+F12（"Edit.GoToImplementation"）はフォローできません。
+  Visual Assistがインストールされている場合ALT+G（"VAssistX.GoToImplementation"）もコメント内の記号を追うことができます。
+- この列挙型を変更する場合は、関連する内部テーブル GStyleVarInfo[] を適宜更新する必要があります。ここで、列挙値をメンバーのオフセット/タイプにリンクします。
 
 ```cpp
 enum ImGuiStyleVar_
@@ -2993,7 +3093,7 @@ enum ImGuiButtonFlags_
 };
 ```
 
-### Flags for ColorEdit3() / ColorEdit4() / ColorPicker3() / ColorPicker4() / ColorButton()
+### ColorEdit3() / ColorEdit4() / ColorPicker3() / ColorPicker4() / ColorButton() のフラグ。
 
 ```cpp
 enum ImGuiColorEditFlags_
@@ -3040,29 +3140,39 @@ enum ImGuiColorEditFlags_
 };
 ```
 
-### Flags for DragFloat(), DragInt(), SliderFloat(), SliderInt() etc.
+### DragFloat()、DragInt()、SliderFloat()、SliderInt() などのフラグ。
 
-We use the same sets of flags for DragXXX() and SliderXXX() functions as the features are the same and it makes it easier to swap them.
-(Those are per-item flags. There are shared flags in ImGuiIO: io.ConfigDragClickToInputText)
+DragXXX()とSliderXXX()関数の機能は同じであり、入れ替えが簡単になるため、同じフラグセットを使用しています。
+(これらはアイテムごとのフラグです。ImGuiIOには共有フラグがある： io.ConfigDragClickToInputText)
 
 ```cpp
 enum ImGuiSliderFlags_
 {
     ImGuiSliderFlags_None                   = 0,
-    ImGuiSliderFlags_AlwaysClamp            = 1 << 4,       // Clamp value to min/max bounds when input manually with CTRL+Click. By default CTRL+Click allows going out of bounds.
-    ImGuiSliderFlags_Logarithmic            = 1 << 5,       // Make the widget logarithmic (linear otherwise). Consider using ImGuiSliderFlags_NoRoundToFormat with this if using a format-string with small amount of digits.
-    ImGuiSliderFlags_NoRoundToFormat        = 1 << 6,       // Disable rounding underlying value to match precision of the display format string (e.g. %.3f values are rounded to those 3 digits)
-    ImGuiSliderFlags_NoInput                = 1 << 7,       // Disable CTRL+Click or Enter key allowing to input text directly into the widget
-    ImGuiSliderFlags_InvalidMask_           = 0x7000000F,   // [Internal] We treat using those bits as being potentially a 'float power' argument from the previous API that has got miscast to this enum, and will trigger an assert if needed.
+    ImGuiSliderFlags_AlwaysClamp            = 1 << 4,
+    ImGuiSliderFlags_Logarithmic            = 1 << 5,
+    ImGuiSliderFlags_NoRoundToFormat        = 1 << 6,
+    ImGuiSliderFlags_NoInput                = 1 << 7,
+    ImGuiSliderFlags_InvalidMask_           = 0x7000000F,
 
     // Obsolete names
     //ImGuiSliderFlags_ClampOnInput = ImGuiSliderFlags_AlwaysClamp, // [renamed in 1.79]
 };
 ```
 
-### Identify a mouse button
+|名前|説明|
+|---|---|
+|ImGuiSliderFlags_None            | |
+|ImGuiSliderFlags_AlwaysClamp     | CTRL+クリックで手動入力された場合、値を最小/最大境界にクランプする。デフォルトでは、CTRL+クリックで境界を越えることができます。|
+|ImGuiSliderFlags_Logarithmic     | ウィジェットを対数にします（それ以外は線形）。桁数の少ないフォーマット文字列を使用する場合、ImGuiSliderFlags_NoRoundToFormat の使用を検討してください。|
+|ImGuiSliderFlags_NoRoundToFormat | 表示フォーマット文字列の精度に合うように、基礎となる値の丸めを無効にする（例えば、%.3fの値はその3桁に丸められる）。
+|ImGuiSliderFlags_NoInput         | ウィジェットに直接テキストを入力できるように、CTRL+クリックまたはEnterキーを無効にする。
+|ImGuiSliderFlags_InvalidMask_    | (内部) これらのビットを使用することは、以前のAPIからこのenumにミスキャストされた'float power'引数である可能性があるとして扱います。|
 
-Those values are guaranteed to be stable and we frequently use 0/1 directly. Named enums provided for convenience.
+
+### マウスボタンの識別
+
+これらの値は安定性が保証されており、私たちは頻繁に0/1を直接使用する。便宜上、名前付き列挙型を用意した。
 
 ```cpp
 enum ImGuiMouseButton_
@@ -3074,9 +3184,9 @@ enum ImGuiMouseButton_
 };
 ```
 
-### Enumeration for GetMouseCursor()
+### GetMouseCursor() の列挙
 
-User code may request backend to display given cursor by calling SetMouseCursor(), which is why we have some cursors that are marked unused here
+ユーザ・コードは、SetMouseCursor()を呼び出すことによって、指定されたカーソルを表示するようにバックエンドに要求することができます。
 
 ```cpp
 enum ImGuiMouseCursor_
@@ -3095,24 +3205,48 @@ enum ImGuiMouseCursor_
 };
 ```
 
-// Enumeration for AddMouseSourceEvent() actual source of Mouse Input data.
-// Historically we use "Mouse" terminology everywhere to indicate pointer data, e.g. MousePos, IsMousePressed(), io.AddMousePosEvent()
-// But that "Mouse" data can come from different source which occasionally may be useful for application to know about.
-// You can submit a change of pointer type using io.AddMouseSourceEvent().
+|名前|説明|
+|---|---|
+|ImGuiMouseCursor_None = -1   ||
+|ImGuiMouseCursor_Arrow = 0   ||
+|ImGuiMouseCursor_TextInput   | InputTextなどにカーソルを合わせたとき。|
+|ImGuiMouseCursor_ResizeAll   | (Dear ImGuiの関数で未使用)。|
+|ImGuiMouseCursor_ResizeNS    | 水平ボーダー上にカーソルを置くと|
+|ImGuiMouseCursor_ResizeEW    | 垂直ボーダーまたは列の上にカーソルを置いた場合|
+|ImGuiMouseCursor_ResizeNESW  | ウィンドウの左下にカーソルを置いた場合|
+|ImGuiMouseCursor_ResizeNWSE  | ウィンドウの右下隅にカーソルを置いた場合|
+|ImGuiMouseCursor_Hand        | (Dear ImGuiの関数では未使用。ハイパーリンクなどに使用)|
+|ImGuiMouseCursor_NotAllowed  | 相互作用が許可されていないものをホバリングするとき。通常は十字の円。|
+|ImGuiMouseCursor_COUNT       ||
+
+### AddMouseSourceEvent() のための列挙
+
+マウス入力データの実際のソース。
+歴史的に、ポインタ・データを示すために "Mouse" という用語をあらゆる場所で使用してきました、 例：MousePos、IsMousePressed()、io.AddMousePosEvent()
+しかし、その "マウス "データは異なるソースから来る可能性があり、アプリケーションにとって知っておくと便利な場合がある。
+io.AddMouseSourceEvent()を使えば、ポインタの種類を変更することができます。
 
 ```cpp
 enum ImGuiMouseSource : int
 {
-    ImGuiMouseSource_Mouse = 0,         // Input is coming from an actual mouse.
-    ImGuiMouseSource_TouchScreen,       // Input is coming from a touch screen (no hovering prior to initial press, less precise initial press aiming, dual-axis wheeling possible).
-    ImGuiMouseSource_Pen,               // Input is coming from a pressure/magnetic pen (often used in conjunction with high-sampling rates).
+    ImGuiMouseSource_Mouse = 0,
+    ImGuiMouseSource_TouchScreen,
+    ImGuiMouseSource_Pen,
     ImGuiMouseSource_COUNT
 };
 ```
 
-Enumeration for ImGui::SetWindowXXX(), SetNextWindowXXX(), SetNextItemXXX() functions
-Represent a condition.
-Important: Treat as a regular enum! Do NOT combine multiple values using binary operators! All the functions above treat 0 as a shortcut to ImGuiCond_Always.
+|名前|説明|
+|---|---|
+|ImGuiMouseSource_Mouse       | 入力は実際のマウスから。|
+|ImGuiMouseSource_TouchScreen | 入力はタッチスクリーンから行われる（初回プレス前のホバリングがない、初回プレスの照準精度が低い、2軸ホイール操作が可能）。|
+|ImGuiMouseSource_Pen         | 入力は筆圧／磁気ペンから（しばしば高サンプリングレートと組み合わせて使用される）。|
+|ImGuiMouseSource_COUNT||
+
+### ImGui::SetWindowXXX()、SetNextWindowXXX()、SetNextItemXXX()関数の列挙型
+
+条件を表します。
+重要: 通常の列挙型として扱う！二項演算子を使って複数の値を組み合わせてはいけません！上記の関数はすべて ImGuiCond_Always のショートカットとして 0 を扱います。
 
 ```cpp
 enum ImGuiCond_
@@ -3127,18 +3261,18 @@ enum ImGuiCond_
 
 | 名前                   | 説明                                                                                               |
 |------------------------|----------------------------------------------------------------------------------------------------|
-| ImGuiCond_None         | No condition (always set the variable), same as _Always                                            |
-| ImGuiCond_Always       | No condition (always set the variable), same as _None                                              |
-| ImGuiCond_Once         | Set the variable once per runtime session (only the first call will succeed)                       |
-| ImGuiCond_FirstUseEver | Set the variable if the object/window has no persistently saved data (no entry in .ini file)       |
-| ImGuiCond_Appearing    | Set the variable if the object/window is appearing after being hidden/inactive (or the first time) |
+| ImGuiCond_None         | 条件なし（常に変数をセット）、_Alwaysと同じ |
+| ImGuiCond_Always       | 条件なし（常に変数をセット）、_Noneと同じ |
+| ImGuiCond_Once         | ランタイムセッションごとに1回変数を設定する（最初の呼び出しだけが成功する） |
+| ImGuiCond_FirstUseEver | オブジェクト/ウィンドウに永続的に保存されたデータがない場合（.iniファイルにエントリがない場合）、変数を設定します。 |
+| ImGuiCond_Appearing    | オブジェクト/ウィンドウが非表示/非アクティブになった後（または初めて）表示される場合に変数を設定する。 |
 
 ## ヘルパー: メモリ割り当てマクロ、 `ImVector<>`
 
 `IM_MALLOC()`, `IM_FREE()`, `IM_NEW()`, `IM_PLACEMENT_NEW()`, `IM_DELETE()`
 
-We call C++ constructor on own allocated memory via the placement "`new(ptr)` `Type()`" syntax.
-Defining a custom placement `new()` with a custom parameter allows us to bypass including `<new>` which on some platforms complains when user has disabled exceptions.
+C++のコンストラクタは、「`new(ptr)` `Type()`」という構文で、割り当てられたメモリ上で呼び出される。
+カスタム配置 `new()` をカスタムパラメータで定義することで、`<new>` をインクルードすることを回避することができる。
 
 ```cpp
 struct ImNewWrapper {};
@@ -3151,15 +3285,15 @@ inline void  operator delete(void*, ImNewWrapper, void*)   {} // This is only re
 template<typename T> void IM_DELETE(T* p)   { if (p) { p->~T(); ImGui::MemFree(p); } }
 ```
 
-### ImVector<>
+### `ImVector<>`
 
-Lightweight std::vector<>-like class to avoid dragging dependencies (also, some implementations of STL with debug enabled are absurdly slow, we bypass it so our code runs fast in debug).
+軽量な`std::vector<>`のようなクラスは、依存関係を引きずらないようにする（また、デバッグを有効にしたSTLの実装の中には、とんでもなく遅いものもある。）
 
-- You generally do NOT need to care or use this ever. But we need to make it available in imgui.h because some of our public structures are relying on it.
-- We use std-like naming convention here, which is a little unusual for this codebase.
-- Important: clear() frees memory, resize(0) keep the allocated buffer. We use resize(0) a lot to intentionally recycle allocated buffers across frames and amortize our costs.
-- Important: our implementation does NOT call C++ constructors/destructors, we treat everything as raw data! This is intentional but be extra mindful of that,
-  Do NOT use this class as a std::vector replacement in your own code! Many of the structures used by dear imgui can be safely initialized by a zero-memset.
+- 通常、これを気にしたり使ったりする必要はない。しかし、imgui.hで利用できるようにする必要がある。なぜなら、いくつかの公開構造体がこれに依存しているからだ。
+- ここではstdのような命名規則を使っているが、このコードベースでは少し珍しい。
+- 重要：clear()はメモリを解放し、resize(0)は割り当てられたバッファを保持する。resize(0)を多用するのは、フレーム間で割り当てられたバッファを意図的にリサイクルし、コストを償却するためです。
+- 重要：私たちの実装では、C++のコンストラクタ/デストラクタを呼び出しません！これは意図的なものですが、特に注意してください、
+  このクラスをstd::vectorの代わりとして使わないでください！dear imguiが使う構造体の多くは、zero-memsetで安全に初期化できます。
 
 ```cpp
 IM_MSVC_RUNTIME_CHECKS_OFF
@@ -3348,11 +3482,11 @@ ImGuiIOのコンフィギュレーション・フィールドなどとは異な�
 
 | 名前                      | 説明                                                                                                                                      |
 |---------------------------|-------------------------------------------------------------------------------------------------------------------------------------------|
-| HoverStationaryDelay      | Delay for IsItemHovered(ImGuiHoveredFlags_Stationary). Time required to consider mouse stationary.                                        |
-| HoverDelayShort           | Delay for IsItemHovered(ImGuiHoveredFlags_DelayShort). Usually used along with HoverStationaryDelay.                                      |
-| HoverDelayNormal          | Delay for IsItemHovered(ImGuiHoveredFlags_DelayNormal). "                                                                                 |
-| HoverFlagsForTooltipMouse | Default flags when using IsItemHovered(ImGuiHoveredFlags_ForTooltip) or BeginItemTooltip()/SetItemTooltip() while using mouse.            |
-| HoverFlagsForTooltipNav   | Default flags when using IsItemHovered(ImGuiHoveredFlags_ForTooltip) or BeginItemTooltip()/SetItemTooltip() while using keyboard/gamepad. |
+| HoverStationaryDelay      | IsItemHovered(ImGuiHoveredFlags_Stationary)のディレイ。マウスが静止しているとみなすのに必要な時間。                                        |
+| HoverDelayShort           | IsItemHovered(ImGuiHoveredFlags_DelayShort)の遅延。通常、HoverStationaryDelayと共に使用される。                                      |
+| HoverDelayNormal          | IsItemHovered(ImGuiHoveredFlags_DelayNormal)の遅延。" |
+| HoverFlagsForTooltipMouse | マウス使用時に IsItemHovered(ImGuiHoveredFlags_ForTooltip) または BeginItemTooltip()/SetItemTooltip() を使用した場合のデフォルトのフラグ。            |
+| HoverFlagsForTooltipNav   | キーボード/ゲームパッド使用時にIsItemHovered(ImGuiHoveredFlags_ForTooltip)またはBeginItemTooltip()/SetItemTooltip()を使用した場合のデフォルトフラグ。 |
 
 ## ImGuiIO
 
@@ -3476,13 +3610,13 @@ bool ConfigDebugBeginReturnValueLoop;
 
 | 名前                            | デフォルト値 | 説明                                                                                                                                                                                                                                                               |
 |---------------------------------|---------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| ConfigDebugBeginReturnValueOnce | false   | First-time calls to Begin()/BeginChild() will return false. NEEDS TO BE SET AT APPLICATION BOOT TIME if you don't want to miss windows.                                                                                                                            |
-| ConfigDebugBeginReturnValueLoop | false   | Some calls to Begin()/BeginChild() will return false. Will cycle through window depths then repeat. Suggested use: add "io.ConfigDebugBeginReturnValue = io.KeyShift" in your main loop then occasionally press SHIFT. Windows should be flickering while running. |
+| ConfigDebugBeginReturnValueOnce | false   | Begin()/BeginChild()を初めて呼び出すと、falseが返されます。ウィンドウを見逃したくない場合は、アプリケーションの起動時に設定する必要があります。                                                                                                                            |
+| ConfigDebugBeginReturnValueLoop | false   | Begin()/BeginChild()の呼び出しの中にはfalseを返すものがあります。ウィンドウの深さを循環し、繰り返します。おすすめの使い方：メインループに "io.ConfigDebugBeginReturnValue = io.KeyShift "を追加し、時々SHIFTを押す。実行中はウィンドウがちらつくはずだ。 |
 
 
-Option to deactivate io.AddFocusEvent(false) handling. May facilitate interactions with a debugger when focus loss leads to clearing inputs data.
-Backends may have other side-effects on focus loss, so this will reduce side-effects but not necessary remove all of them.
-Consider using e.g. Win32's IsDebuggerPresent() as an additional filter (or see ImOsIsDebuggerPresent() in imgui_test_engine/imgui_te_utils.cpp for a Unix compatible version).
+io.AddFocusEvent(false)の処理を無効にするオプション。フォーカスの消失が入力データのクリアにつながる場合、デバッガとのインタラクションを容易にするかもしれません。
+バックエンドは、フォーカスを失うという他の副作用を持つかもしれない。, そのため、副作用を減らすことはできるが、すべてを取り除く必要はない。
+追加のフィルタとして、例えばWin32のIsDebuggerPresent()を使用することを検討してください（Unix互換バージョンについてはimgui_test_engine/imgui_te_utils.cppのImOsIsDebuggerPresent()を参照してください）。
 
 ```cpp
 bool ConfigDebugIgnoreFocusLoss;
@@ -3490,7 +3624,7 @@ bool ConfigDebugIgnoreFocusLoss;
 
 | 名前                       | デフォルト値 | 説明                                                                                              |
 |----------------------------|---------|---------------------------------------------------------------------------------------------------|
-| ConfigDebugIgnoreFocusLoss | false   | Ignore io.AddFocusEvent(false), consequently not calling io.ClearInputKeys() in input processing. |
+| ConfigDebugIgnoreFocusLoss | false   | io.AddFocusEvent(false)を無視し、入力処理でio.ClearInputKeys()を呼び出さない。 |
 
 
 #### .iniデータの監査オプション
@@ -3555,38 +3689,54 @@ ImWchar PlatformLocaleDecimalPoint;
 
 | 名前                       | デフォルト値 | 説明                                                                                                                                               |
 |----------------------------|---------|----------------------------------------------------------------------------------------------------------------------------------------------------|
-| PlatformLocaleDecimalPoint | '.'     | [Experimental] Configure decimal point e.g. '.' or ',' useful for some languages (e.g. German), generally pulled from *localeconv()->decimal_point |
+| PlatformLocaleDecimalPoint | '.'     | (実験的) 小数点の設定 例：'.'や','はドイツ語など一部の言語に有効です。, 一般的には `*localeconv()->decimal_point` から引っ張ってくる。 |
 
 
 ### 入力 - NewFrame() を呼び出す前に呼び出します。
 
-Input Functions
+入力関数
 
 ```cpp
-    IMGUI_API void  AddKeyEvent(ImGuiKey key, bool down);                   // Queue a new key down/up event. Key should be "translated" (as in, generally ImGuiKey_A matches the key end-user would use to emit an 'A' character)
-    IMGUI_API void  AddKeyAnalogEvent(ImGuiKey key, bool down, float v);    // Queue a new key down/up event for analog values (e.g. ImGuiKey_Gamepad_ values). Dead-zones should be handled by the backend.
-    IMGUI_API void  AddMousePosEvent(float x, float y);                     // Queue a mouse position update. Use -FLT_MAX,-FLT_MAX to signify no mouse (e.g. app not focused and not hovered)
-    IMGUI_API void  AddMouseButtonEvent(int button, bool down);             // Queue a mouse button change
-    IMGUI_API void  AddMouseWheelEvent(float wheel_x, float wheel_y);       // Queue a mouse wheel update. wheel_y<0: scroll down, wheel_y>0: scroll up, wheel_x<0: scroll right, wheel_x>0: scroll left.
-    IMGUI_API void  AddMouseSourceEvent(ImGuiMouseSource source);           // Queue a mouse source change (Mouse/TouchScreen/Pen)
-    IMGUI_API void  AddFocusEvent(bool focused);                            // Queue a gain/loss of focus for the application (generally based on OS/platform focus of your window)
-    IMGUI_API void  AddInputCharacter(unsigned int c);                      // Queue a new character input
-    IMGUI_API void  AddInputCharacterUTF16(ImWchar16 c);                    // Queue a new character input from a UTF-16 character, it can be a surrogate
-    IMGUI_API void  AddInputCharactersUTF8(const char* str);                // Queue a new characters input from a UTF-8 string
-
-    IMGUI_API void  SetKeyEventNativeData(ImGuiKey key, int native_keycode, int native_scancode, int native_legacy_index = -1); // [Optional] Specify index for legacy <1.87 IsKeyXXX() functions with native indices + specify native keycode, scancode.
-    IMGUI_API void  SetAppAcceptingEvents(bool accepting_events);           // Set master flag for accepting key/mouse/text events (default to true). Useful if you have native dialog boxes that are interrupting your application loop/refresh, and you want to disable events being queued while your app is frozen.
-    IMGUI_API void  ClearEventsQueue();                                     // Clear all incoming events.
-    IMGUI_API void  ClearInputKeys();                                       // Clear current keyboard/mouse/gamepad state + current frame text input buffer. Equivalent to releasing all keys/buttons.
+    IMGUI_API void  AddKeyEvent(ImGuiKey key, bool down);
+    IMGUI_API void  AddKeyAnalogEvent(ImGuiKey key, bool down, float v);
+    IMGUI_API void  AddMousePosEvent(float x, float y);
+    IMGUI_API void  AddMouseButtonEvent(int button, bool down);
+    IMGUI_API void  AddMouseWheelEvent(float wheel_x, float wheel_y);
+    IMGUI_API void  AddMouseSourceEvent(ImGuiMouseSource source);
+    IMGUI_API void  AddFocusEvent(bool focused);
+    IMGUI_API void  AddInputCharacter(unsigned int c);
+    IMGUI_API void  AddInputCharacterUTF16(ImWchar16 c);
+    IMGUI_API void  AddInputCharactersUTF8(const char* str);
+    IMGUI_API void  SetKeyEventNativeData(ImGuiKey key, int native_keycode, int native_scancode, int native_legacy_index = -1);
+    IMGUI_API void  SetAppAcceptingEvents(bool accepting_events);
+    IMGUI_API void  ClearEventsQueue();
+    IMGUI_API void  ClearInputKeys();
 #ifndef IMGUI_DISABLE_OBSOLETE_FUNCTIONS
-    IMGUI_API void  ClearInputCharacters();                                 // [Obsolete] Clear the current frame text input buffer. Now included within ClearInputKeys().
+    IMGUI_API void  ClearInputCharacters(); // [Obsolete] Clear the current frame text input buffer. Now included within ClearInputKeys().
 #endif
 ```
 
+|名前|説明|
+|---|---|
+|AddKeyEvent()            | 新しいキーのダウン/アップイベントをキューに入れる。キーは "翻訳 "されたものでなければならない（一般的に、ImGuiKey_Aはエンドユーザーが'A'文字を発するときに使うキーと一致する）。|
+|AddKeyAnalogEvent()      | アナログ値（例えばImGuiKey_Gamepad_値）用の新しいキーダウン・アップイベントをキューに入れる。デッドゾーンはバックエンドが処理する。|
+|AddMousePosEvent()       | マウス位置の更新をキューに入れる。FLT_MAX,-FLT_MAXを使用して、マウスがないことを示す（例えば、アプリがフォーカスされておらず、ホバーされていない）。|
+|AddMouseButtonEvent()    | マウスボタンの変更をキューに入れる|
+|AddMouseWheelEvent()     | `wheel_y<0`: 下スクロール、`wheel_y>0`: 上スクロール、`wheel_x<0`: 右スクロール、`wheel_x>0`: 左スクロール。|
+|AddMouseSourceEvent()    | マウスソースの変更をキューに入れる（マウス/タッチスクリーン/ペン）|
+|AddFocusEvent()          | アプリケーションのフォーカスの増減をキューに入れる（一般に、OS/プラットフォームのウィンドウのフォーカスに基づく）|
+|AddInputCharacter()      | 新しい文字入力をキューに入れる|
+|AddInputCharacterUTF16() | UTF-16文字からの新しい文字入力をキューに入れる。|
+|AddInputCharactersUTF8() | UTF-8文字列から新しい文字の入力をキューに入れる。|
+|SetKeyEventNativeData()  | (オプション) レガシー `<1.87` IsKeyXXX() 関数のネイティブ・インデックスを指定する。|
+|SetAppAcceptingEvents()  | キー／マウス／テキスト・イベントを受け付けるかどうかのマスター・フラグを設定する（デフォルトはtrue）。ネイティブのダイアログボックスがアプリケーションのループやリフレッシュに割り込み、アプリがフリーズしている間にキューに入れられるイベントを無効にしたい場合に便利です。|
+|ClearEventsQueue()       | すべての受信イベントを消去する。|
+|ClearInputKeys()         | 現在のキーボード／マウス／ゲームパッドの状態＋現在のフレームのテキスト入力バッファをクリアする。すべてのキー/ボタンを解放するのと同じ。|
+
+
 ### 出力 - NewFrame() または EndFrame()/Render() によって更新されます。
 
-(when reading from the io.WantCaptureMouse, io.WantCaptureKeyboard flags to dispatch your inputs, it is
- generally easier and more correct to use their state BEFORE calling NewFrame(). See FAQ for details!)
+io.WantCaptureMouse、io.WantCaptureKeyboardフラグを読み取って入力をディスパッチする場合は、一般的に、NewFrame()を呼び出す前にその状態を使用する方が簡単で、より正しいです。詳細はFAQを参照してください！
 
 ```cpp
 bool   WantCaptureMouse;
@@ -3607,43 +3757,47 @@ ImVec2 MouseDelta;
 
 | 名前                     | 説明                                                                                                                                                                                                                                                                                    |
 |--------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| WantCaptureMouse         | Set when Dear ImGui will use mouse inputs, in this case do not dispatch them to your main game/application (either way, always pass on mouse inputs to imgui). (e.g. unclicked mouse is hovering over an imgui window, widget is active, mouse was clicked over an imgui window, etc.). |
-| WantCaptureKeyboard      | Set when Dear ImGui will use keyboard inputs, in this case do not dispatch them to your main game/application (either way, always pass keyboard inputs to imgui). (e.g. InputText active, or an imgui window is focused and navigation is enabled, etc.).                               |
-| WantTextInput            | Mobile/console: when set, you may display an on-screen keyboard. This is set by Dear ImGui when it wants textual keyboard input to happen (e.g. when a InputText widget is active).                                                                                                     |
-| WantSetMousePos          | MousePos has been altered, backend should reposition mouse on next frame. Rarely used! Set only when ImGuiConfigFlags_NavEnableSetMousePos flag is enabled.                                                                                                                             |
-| WantSaveIniSettings      | When manual .ini load/save is active (io.IniFilename == NULL), this will be set to notify your application that you can call SaveIniSettingsToMemory() and save yourself. Important: clear io.WantSaveIniSettings yourself after saving!                                                |
-| NavActive                | Keyboard/Gamepad navigation is currently allowed (will handle ImGuiKey_NavXXX events) = a window is focused and it doesn't use the ImGuiWindowFlags_NoNavInputs flag.                                                                                                                   |
-| NavVisible               | Keyboard/Gamepad navigation is visible and allowed (will handle ImGuiKey_NavXXX events).                                                                                                                                                                                                |
-| Framerate                | Estimate of application framerate (rolling average over 60 frames, based on io.DeltaTime), in frame per second. Solely for convenience. Slow applications may not want to use a moving average or may want to reset underlying buffers occasionally.                                    |
-| MetricsRenderVertices    | Vertices output during last call to Render()                                                                                                                                                                                                                                            |
-| MetricsRenderIndices     | Indices output during last call to Render() = number of triangles * 3                                                                                                                                                                                                                   |
-| MetricsRenderWindows     | Number of visible windows                                                                                                                                                                                                                                                               |
-| MetricsActiveWindows     | Number of active windows                                                                                                                                                                                                                                                                |
-| MetricsActiveAllocations | Number of active allocations, updated by MemAlloc/MemFree based on current context. May be off if you have multiple imgui contexts.                                                                                                                                                     |
-| MouseDelta               | Mouse delta. Note that this is zero if either current or previous position are invalid (-FLT_MAX,-FLT_MAX), so a disappearing/reappearing mouse won't have a huge delta.                                                                                                                |
+| WantCaptureMouse         | ImGuiがマウス入力を使用するタイミングを設定します。この場合、マウス入力をメインゲーム/アプリケーションにディスパッチしません(いずれにせよ、常にマウス入力をimguiに渡します)。(例：クリックされていないマウスがimguiウィンドウの上にある、ウィジェットがアクティブ、マウスがimguiウィンドウの上でクリックされた、など)。 |
+| WantCaptureKeyboard      | ImGuiがキーボード入力を使用するタイミングを設定します。この場合、キーボード入力をメインゲーム/アプリケーションにディスパッチしません（いずれにせよ、常にキーボード入力をimguiに渡します）。(例：InputTextがアクティブになっている、imguiウィンドウがフォーカスされていてナビゲーションが有効になっている、など)。                               |
+| WantTextInput            | Mobile/console: 設定すると、オンスクリーンキーボードを表示できます。これはDear ImGuiがキーボード入力をさせたい時（InputTextウィジェットがアクティブな時など）に設定します。                                                                                                     |
+| WantSetMousePos          | MousePosが変更され、バックエンドは次のフレームでマウスを再配置する必要があります。めったに使われない！ImGuiConfigFlags_NavEnableSetMousePos フラグが有効な場合のみ設定されます。                                                                                                                             |
+| WantSaveIniSettings      | 手動.iniロード/セーブがアクティブな場合(io.IniFilename == NULL)、これはアプリケーションにSaveIniSettingsToMemory()を呼び出して自分でセーブできることを通知するために設定されます。重要：保存後、io.WantSaveIniSettingsをクリアしてください！                                                |
+| NavActive                | 現在、キーボード／ゲームパッドによるナビゲーションが許可されている (ImGuiKey_NavXXX イベントを処理する。) = ウィンドウがフォーカスされ、ImGuiWindowFlags_NoNavInputsフラグが使われていない。                                                                                                                   |
+| NavVisible               | キーボード／ゲームパッドナビゲーションが表示され、許可されている (ImGuiKey_NavXXX イベントを処理する。).                                                                                                                                                                                                |
+| Framerate                | アプリケーションのフレームレートの見積もり (io.DeltaTimeに基づく60フレームのローリング平均値), フレーム/秒。利便性のためだけだ。 低速のアプリケーションは移動平均を使いたくなかったり、時々バッファをリセットしたくなるかもしれない。                                    |
+| MetricsRenderVertices    | 最後に Render() を呼び出したときに出力された頂点。                                                                                                                                                    |
+| MetricsRenderIndices     | 最後にRender()を呼び出したときに出力されたインデックス = 三角形の数 * 3                                                                                                                                                    |
+| MetricsRenderWindows     | 見える窓の数                                                                                                                                                    |
+| MetricsActiveWindows     | アクティブウィンドウ数                                                                                                                                                    |
+| MetricsActiveAllocations | 現在のコンテキストに基づいてMemAlloc/MemFreeによって更新される、アクティブなアロケーションの数。複数のimguiコンテキストがある場合はずれるかもしれない。                                                                                                                                                    |
+| MouseDelta               | マウスのデルタ。現在の位置と前の位置のどちらかが無効な場合（-FLT_MAX,-FLT_MAX）、これはゼロになるので、マウスが消えたり現れたりしても、大きなデルタは発生しないことに注意。                                                                                                                |
 
-Legacy: before 1.87, we required backend to fill io.KeyMap[] (imgui->native map) during initialization and io.KeysDown[] (native indices) every frame.
-This is still temporarily supported as a legacy feature. However the new preferred scheme is for backend to call io.AddKeyEvent().
-  Old (<1.87):  ImGui::IsKeyPressed(ImGui::GetIO().KeyMap[ImGuiKey_Space]) --> New (1.87+) ImGui::IsKeyPressed(ImGuiKey_Space)
+レガシー：1.87以前では、バックエンドが初期化時にio.KeyMap[]（imgui->ネイティブ・マップ）を満たし、毎フレームio.KeysDown[]（ネイティブ・インデックス）を満たす必要がありました。
+これはレガシー機能としてまだ一時的にサポートされている。しかし、バックエンドがio.AddKeyEvent()を呼び出すのが新しい望ましい方式です。
+  古い (`<1.87`):  ImGui::IsKeyPressed(ImGui::GetIO().KeyMap[ImGuiKey_Space]) --> New (1.87+) ImGui::IsKeyPressed(ImGuiKey_Space)
 
 ```cpp
 #ifndef IMGUI_DISABLE_OBSOLETE_KEYIO
-    int         KeyMap[ImGuiKey_COUNT];             // [LEGACY] Input: map of indices into the KeysDown[512] entries array which represent your "native" keyboard state. The first 512 are now unused and should be kept zero. Legacy backend will write into KeyMap[] using ImGuiKey_ indices which are always >512.
-    bool        KeysDown[ImGuiKey_COUNT];           // [LEGACY] Input: Keyboard keys that are pressed (ideally left in the "native" order your engine has access to keyboard keys, so you can use your own defines/enums for keys). This used to be [512] sized. It is now ImGuiKey_COUNT to allow legacy io.KeysDown[GetKeyIndex(...)] to work without an overflow.
-    float       NavInputs[ImGuiNavInput_COUNT];     // [LEGACY] Since 1.88, NavInputs[] was removed. Backends from 1.60 to 1.86 won't build. Feed gamepad inputs via io.AddKeyEvent() and ImGuiKey_GamepadXXX enums.
+    int   KeyMap[ImGuiKey_COUNT];         // [LEGACY] Input: map of indices into the KeysDown[512] entries array which represent your "native" keyboard state. The first 512 are now unused and should be kept zero. Legacy backend will write into KeyMap[] using ImGuiKey_ indices which are always >512.
+    bool  KeysDown[ImGuiKey_COUNT];       // [LEGACY] Input: Keyboard keys that are pressed (ideally left in the "native" order your engine has access to keyboard keys, so you can use your own defines/enums for keys). This used to be [512] sized. It is now ImGuiKey_COUNT to allow legacy io.KeysDown[GetKeyIndex(...)] to work without an overflow.
+    float NavInputs[ImGuiNavInput_COUNT]; // [LEGACY] Since 1.88, NavInputs[] was removed. Backends from 1.60 to 1.86 won't build. Feed gamepad inputs via io.AddKeyEvent() and ImGuiKey_GamepadXXX enums.
 #endif
 ```
 
-### [Internal] Dear ImGui will maintain those fields. Forward compatibility not guaranteed!
+### (内部) Dear ImGuiはこれらのフィールドを維持します。
+
+前方互換性は保証されません！
 
 ```cpp
-    ImGuiContext* Ctx;                              // Parent UI context (needs to be set explicitly by parent).
+ImGuiContext* Ctx;
 ```
 
-#### Main Input State
+- `Ctx`: 親UIコンテキスト（親が明示的に設定する必要がある）。
 
-(this block used to be written by backend, since 1.87 it is best to NOT write to those directly, call the AddXXX functions above instead)
-(reading from those variables is fair game, as they are extremely unlikely to be moving anywhere)
+#### メイン入力状態
+
+このブロックは以前はバックエンドによって書き込まれていたが、1.87以降は直接書き込まず、代わりに上記のAddXXX関数を呼び出すのがベストである。
+変数がどこかに移動する可能性は極めて低いので、変数からの読み込みはフェアゲームです。
 
 ```cpp
 ImVec2      MousePos;
@@ -3659,43 +3813,43 @@ bool        KeySuper;
 
 | 名前        | 説明                                                                                                                                                                                                                                                                   |
 |-------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| MousePos    | Mouse position, in pixels. Set to ImVec2(-FLT_MAX, -FLT_MAX) if mouse is unavailable (on another screen, etc.)                                                                                                                                                         |
-| MouseDown   | Mouse buttons: 0=left, 1=right, 2=middle + extras (ImGuiMouseButton_COUNT == 5). Dear ImGui mostly uses left and right buttons. Other buttons allow us to track if the mouse is being used by your application + available to user as a convenience via IsMouse** API. |
-| MouseWheel  | Mouse wheel Vertical: 1 unit scrolls about 5 lines text. `>0` scrolls Up, `<0` scrolls Down. Hold SHIFT to turn vertical scroll into horizontal scroll.                                                                                                                |
-| MouseWheelH | Mouse wheel Horizontal. `>0` scrolls Left, `<0` scrolls Right. Most users don't have a mouse with a horizontal wheel, may not be filled by all backends.                                                                                                               |
-| MouseSource | Mouse actual input peripheral (Mouse/TouchScreen/Pen).                                                                                                                                                                                                                 |
-| KeyCtrl     | Keyboard modifier down: Control                                                                                                                                                                                                                                        |
-| KeyShift    | Keyboard modifier down: Shift                                                                                                                                                                                                                                          |
-| KeyAlt      | Keyboard modifier down: Alt                                                                                                                                                                                                                                            |
-| KeySuper    | Keyboard modifier down: Cmd/Super/Windows                                                                                                                                                                                                                              |
+| MousePos    | マウスの位置（ピクセル単位）。マウスが使用できない場合 (別の画面など) は ImVec2(-FLT_MAX, -FLT_MAX) に設定する。                                                                                                                                                         |
+| MouseDown   | マウスボタン：0=左、1=右、2=中央 + extra (ImGuiMouseButton_COUNT == 5)。Dear ImGuiは、主に左右のボタンを使用します。 その他のボタンにより、アプリケーションでマウスが使用されているかどうかを追跡することができます。`IsMouse**` API 経由で便宜的にユーザーに提供する。 |
+| MouseWheel  | マウスホイール 垂直：1ユニットで約5行のテキストをスクロールします。`>0`で上スクロール、`<0`で下スクロール。SHIFTを押し続けると縦スクロールが横スクロールになる。                                                                                                                |
+| MouseWheelH | マウスホイール 水平。`>0`で左スクロール、`<0`で右スクロール。ほとんどのユーザは水平ホイールを持つマウスを持っていないので、すべてのバックエンドで満たされるとは限りません。                                                                                                              |
+| MouseSource | マウス実際の入力周辺機器（マウス/タッチスクリーン/ペン）。                                                                                                                                                                                                                 |
+| KeyCtrl     | キーボードの修飾子を下にコントロール                                                                                                              |
+| KeyShift    | キーボード修飾子を下にシフト                                                                                                              |
+| KeyAlt      | キーボードの修飾子を下げる：Alt                                                                                                              |
+| KeySuper    | キーボード修飾子を下にCmd/Super/Windows                                                                                                              |
 
-Other state maintained from data above + IO function calls
+上記のデータから維持されるその他の状態＋IO関数呼び出し
 
 ```cpp
-    ImGuiKeyChord KeyMods;                          // Key mods flags (any of ImGuiMod_Ctrl/ImGuiMod_Shift/ImGuiMod_Alt/ImGuiMod_Super flags, same as io.KeyCtrl/KeyShift/KeyAlt/KeySuper but merged into flags. DOES NOT CONTAINS ImGuiMod_Shortcut which is pretranslated). Read-only, updated by NewFrame()
-    ImGuiKeyData  KeysData[ImGuiKey_KeysData_SIZE]; // Key state for all known keys. Use IsKeyXXX() functions to access this.
-    bool        WantCaptureMouseUnlessPopupClose;   // Alternative to WantCaptureMouse: (WantCaptureMouse == true && WantCaptureMouseUnlessPopupClose == false) when a click over void is expected to close a popup.
-    ImVec2      MousePosPrev;                       // Previous mouse position (note that MouseDelta is not necessary == MousePos-MousePosPrev, in case either position is invalid)
-    ImVec2      MouseClickedPos[5];                 // Position at time of clicking
-    double      MouseClickedTime[5];                // Time of last click (used to figure out double-click)
-    bool        MouseClicked[5];                    // Mouse button went from !Down to Down (same as MouseClickedCount[x] != 0)
-    bool        MouseDoubleClicked[5];              // Has mouse button been double-clicked? (same as MouseClickedCount[x] == 2)
-    ImU16       MouseClickedCount[5];               // == 0 (not clicked), == 1 (same as MouseClicked[]), == 2 (double-clicked), == 3 (triple-clicked) etc. when going from !Down to Down
-    ImU16       MouseClickedLastCount[5];           // Count successive number of clicks. Stays valid after mouse release. Reset after another click is done.
-    bool        MouseReleased[5];                   // Mouse button went from Down to !Down
-    bool        MouseDownOwned[5];                  // Track if button was clicked inside a dear imgui window or over void blocked by a popup. We don't request mouse capture from the application if click started outside ImGui bounds.
-    bool        MouseDownOwnedUnlessPopupClose[5];  // Track if button was clicked inside a dear imgui window.
-    bool        MouseWheelRequestAxisSwap;          // On a non-Mac system, holding SHIFT requests WheelY to perform the equivalent of a WheelX event. On a Mac system this is already enforced by the system.
-    float       MouseDownDuration[5];               // Duration the mouse button has been down (0.0f == just clicked)
-    float       MouseDownDurationPrev[5];           // Previous time the mouse button has been down
-    float       MouseDragMaxDistanceSqr[5];         // Squared maximum distance of how much mouse has traveled from the clicking point (used for moving thresholds)
-    float       PenPressure;                        // Touch/Pen pressure (0.0f to 1.0f, should be >0.0f only when MouseDown[0] == true). Helper storage currently unused by Dear ImGui.
-    bool        AppFocusLost;                       // Only modify via AddFocusEvent()
-    bool        AppAcceptingEvents;                 // Only modify via SetAppAcceptingEvents()
-    ImS8        BackendUsingLegacyKeyArrays;        // -1: unknown, 0: using AddKeyEvent(), 1: using legacy io.KeysDown[]
-    bool        BackendUsingLegacyNavInputArray;    // 0: using AddKeyAnalogEvent(), 1: writing to legacy io.NavInputs[] directly
-    ImWchar16   InputQueueSurrogate;                // For AddInputCharacterUTF16()
-    ImVector<ImWchar> InputQueueCharacters;         // Queue of _characters_ input (obtained by platform backend). Fill using AddInputCharacter() helper.
+    ImGuiKeyChord KeyMods;
+    ImGuiKeyData  KeysData[ImGuiKey_KeysData_SIZE];
+    bool        WantCaptureMouseUnlessPopupClose;
+    ImVec2      MousePosPrev;
+    ImVec2      MouseClickedPos[5];
+    double      MouseClickedTime[5];
+    bool        MouseClicked[5];
+    bool        MouseDoubleClicked[5];
+    ImU16       MouseClickedCount[5];
+    ImU16       MouseClickedLastCount[5];
+    bool        MouseReleased[5];
+    bool        MouseDownOwned[5];
+    bool        MouseDownOwnedUnlessPopupClose[5];
+    bool        MouseWheelRequestAxisSwap;
+    float       MouseDownDuration[5];
+    float       MouseDownDurationPrev[5];
+    float       MouseDragMaxDistanceSqr[5];
+    float       PenPressure;
+    bool        AppFocusLost;
+    bool        AppAcceptingEvents;
+    ImS8        BackendUsingLegacyKeyArrays;
+    bool        BackendUsingLegacyNavInputArray;
+    ImWchar16   InputQueueSurrogate;
+    ImVector<ImWchar> InputQueueCharacters;
 
     IMGUI_API   ImGuiIO();
 };
@@ -3703,44 +3857,44 @@ Other state maintained from data above + IO function calls
 
 | 名前                             | 説明                                                                                                                                                                                                                                                    |
 |----------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| KeyMods                          | Key mods flags (any of ImGuiMod_Ctrl/ImGuiMod_Shift/ImGuiMod_Alt/ImGuiMod_Super flags, same as io.KeyCtrl/KeyShift/KeyAlt/KeySuper but merged into flags. DOES NOT CONTAINS ImGuiMod_Shortcut which is pretranslated). Read-only, updated by NewFrame() |
-| KeysData                         | Key state for all known keys. Use IsKeyXXX() functions to access this.                                                                                                                                                                                  |
-| WantCaptureMouseUnlessPopupClose | Alternative to WantCaptureMouse: (WantCaptureMouse == true && WantCaptureMouseUnlessPopupClose == false) when a click over void is expected to close a popup.                                                                                           |
-| MousePosPrev                     | Previous mouse position (note that MouseDelta is not necessary == MousePos-MousePosPrev, in case either position is invalid)                                                                                                                            |
-| MouseClickedPos                  | Position at time of clicking                                                                                                                                                                                                                            |
-| MouseClickedTime                 | Time of last click (used to figure out double-click)                                                                                                                                                                                                    |
-| MouseClicked                     | Mouse button went from !Down to Down (same as MouseClickedCount[x] != 0)                                                                                                                                                                                |
-| MouseDoubleClicked               | Has mouse button been double-clicked? (same as MouseClickedCount[x] == 2)                                                                                                                                                                               |
-| MouseClickedCount                | == 0 (not clicked), == 1 (same as MouseClicked[]), == 2 (double-clicked), == 3 (triple-clicked) etc. when going from !Down to Down                                                                                                                      |
-| MouseClickedLastCount            | Count successive number of clicks. Stays valid after mouse release. Reset after another click is done.                                                                                                                                                  |
-| MouseReleased                    | Mouse button went from Down to !Down                                                                                                                                                                                                                    |
-| MouseDownOwned                   | Track if button was clicked inside a dear imgui window or over void blocked by a popup. We don't request mouse capture from the application if click started outside ImGui bounds.                                                                      |
-| MouseDownOwnedUnlessPopupClose   | Track if button was clicked inside a dear imgui window.                                                                                                                                                                                                 |
-| MouseWheelRequestAxisSwap        | On a non-Mac system, holding SHIFT requests WheelY to perform the equivalent of a WheelX event. On a Mac system this is already enforced by the system.                                                                                                 |
-| MouseDownDuration                | Duration the mouse button has been down (0.0f == just clicked)                                                                                                                                                                                          |
-| MouseDownDurationPrev            | Previous time the mouse button has been down                                                                                                                                                                                                            |
-| MouseDragMaxDistanceSqr          | Squared maximum distance of how much mouse has traveled from the clicking point (used for moving thresholds)                                                                                                                                            |
-| PenPressure                      | Touch/Pen pressure (0.0f to 1.0f, should be >0.0f only when MouseDown[0] == true). Helper storage currently unused by Dear ImGui.                                                                                                                       |
-| AppFocusLost                     | Only modify via AddFocusEvent()                                                                                                                                                                                                                         |
-| AppAcceptingEvents               | Only modify via SetAppAcceptingEvents()                                                                                                                                                                                                                 |
-| BackendUsingLegacyKeyArrays      | -1: unknown, 0: using AddKeyEvent(), 1: using legacy io.KeysDown[]                                                                                                                                                                                      |
-| BackendUsingLegacyNavInputArray  | 0: using AddKeyAnalogEvent(), 1: writing to legacy io.NavInputs[] directly                                                                                                                                                                              |
-| InputQueueSurrogate              | For AddInputCharacterUTF16()                                                                                                                                                                                                                            |
-| InputQueueCharacters             | Queue of _characters_ input (obtained by platform backend). Fill using AddInputCharacter() helper.                                                                                                                                                      |
+| KeyMods                          | キー修飾フラグ (ImGuiMod_Ctrl/ImGuiMod_Shift/ImGuiMod_Alt/ImGuiMod_Super フラグのいずれか, io.KeyCtrl/KeyShift/KeyAlt/KeySuperと同じですが、フラグに統合されています。 ImGuiMod_Shortcut は含まれていません。). 読み取り専用。NewFrame()によって更新される。 |
+| KeysData                         | すべての既知のキーのキー状態。これにアクセスするには IsKeyXXX() 関数を使用します。                                                                                                                                                                                  |
+| WantCaptureMouseUnlessPopupClose | WantCaptureMouseの代替: (WantCaptureMouse == true && WantCaptureMouseUnlessPopupClose == false) when a click over void is expected to close a popup.                                                                                           |
+| MousePosPrev                     | 前のマウスの位置 (どちらかの位置が無効な場合、MouseDeltaは== MousePos-MousePosPrevである必要はないことに注意。)                                                                                                                            |
+| MouseClickedPos                  | クリック時のポジション                                                                                                                                                                             |
+| MouseClickedTime                 | 最後にクリックした時間（ダブルクリックの計算に使用）                                                                                                                                                                             |
+| MouseClicked                     | マウスボタンが`!Down`から`Down`になった（`MouseClickedCount[x] != 0`と同じ）                                                                                                                                                                             |
+| MouseDoubleClicked               | マウスボタンがダブルクリックされたか (`MouseClickedCount[x] == 2` と同じ)                                                                                                                                                                             |
+| MouseClickedCount                | == 0（クリックされていない）、== 1（`MouseClicked[]`と同じ）、== 2（ダブルクリック）、== 3（トリプルクリック）など。 `!ダウン`から`ダウン`になるとき。                                                                                                                      |
+| MouseClickedLastCount            | クリックの連続回数をカウントする。マウスを離しても有効。再度クリックするとリセットされます。                                                                                                                                                  |
+| MouseReleased                    | マウスボタンが`Down`から`!Down`になった。                                                                                                                                                                                                                    |
+| MouseDownOwned                   | dear ImGuiウィンドウの中でボタンがクリックされたか、ポップアップによってブロックされたボイドの上でボタンがクリックされたかを追跡する。 ImGuiの範囲外でクリックが開始された場合、アプリケーションからマウス・キャプチャを要求しない。                                                                      |
+| MouseDownOwnedUnlessPopupClose   | dear imguiウィンドウ内でボタンがクリックされたかどうかを追跡する。                                                                                                                                                                                                 |
+| MouseWheelRequestAxisSwap        | Mac以外のシステムでは、SHIFTを押したままWheelYにWheelXと同等のイベントを実行するように要求します。 Macのシステムでは、これはすでにシステムによって強制されている。                                                                                                 |
+| MouseDownDuration                | マウスボタンが押されていた時間 (0.0f == クリックされた直後)                                                                                                                    |
+| MouseDownDurationPrev            | マウスボタンが押されていた時間                                                                                                                    |
+| MouseDragMaxDistanceSqr          | クリックポイントからのマウスの移動距離の最大値の2乗（閾値の移動に使用）                                                                                                                    |
+| PenPressure                      | タッチ/ペンの圧力（0.0f～1.0f、MouseDown[0] == trueの時のみ0.0fを超えるはずです）。現在ImGuiでは未使用のヘルパーストレージです。                                                                                                                       |
+| AppFocusLost                     | AddFocusEvent() でのみ変更可能。                                                                                                                    |
+| AppAcceptingEvents               | SetAppAcceptingEvents() でのみ変更可能。                                                                                                                    |
+| BackendUsingLegacyKeyArrays      | -1: 不明, 0: AddKeyEvent() を使用, 1: レガシーio.KeysDown[]を使用                                                                                                                    |
+| BackendUsingLegacyNavInputArray  | 0: AddKeyAnalogEvent()を使用、1: レガシーio.NavInputs[]に直接書き込む。                                                                                                                    |
+| InputQueueSurrogate              | AddInputCharacterUTF16()用                                                                                                                    |
+| InputQueueCharacters             | 入力された文字のキュー (プラットフォームバックエンドによって取得される)。AddInputCharacter() ヘルパーを使って入力する。                                                                                                                                                      |
 
 
 ## その他のデータ構造
 
-Shared state of InputText(), passed as an argument to your callback when a ImGuiInputTextFlags_Callback* flag is used. The callback function should return 0 by default.
+`ImGuiInputTextFlags_Callback*` フラグが使用されている場合、コールバック関数の引数として渡されます。コールバック関数はデフォルトで0を返す必要があります。
 
-Callbacks (follow a flag name and see comments in ImGuiInputTextFlags_ declarations for more details)
+コールバック (詳細は ImGuiInputTextFlags_ declarations のコメントを参照してください。)
 
-- ImGuiInputTextFlags_CallbackEdit:        Callback on buffer edit (note that InputText() already returns true on edit, the callback is useful mainly to manipulate the underlying buffer while focus is active)
-- ImGuiInputTextFlags_CallbackAlways:      Callback on each iteration
-- ImGuiInputTextFlags_CallbackCompletion:  Callback on pressing TAB
-- ImGuiInputTextFlags_CallbackHistory:     Callback on pressing Up/Down arrows
-- ImGuiInputTextFlags_CallbackCharFilter:  Callback on character inputs to replace or discard them. Modify 'EventChar' to replace or discard, or return 1 in callback to discard.
-- ImGuiInputTextFlags_CallbackResize:      Callback on buffer capacity changes request (beyond 'buf_size' parameter value), allowing the string to grow.
+- ImGuiInputTextFlags_CallbackEdit: バッファ編集時のコールバック(InputText()は編集時にすでにtrueを返していることに注意。コールバックは主に、フォーカスがアクティブな間にその下のバッファを操作するのに便利です)
+- ImGuiInputTextFlags_CallbackAlways: 各反復のコールバック
+- ImGuiInputTextFlags_CallbackCompletion: TABボタン押下時のコールバック
+- ImGuiInputTextFlags_CallbackHistory: 上下の矢印を押すとコールバック
+- ImGuiInputTextFlags_CallbackCharFilter: 文字入力を置換または破棄するためのコールバック。EventChar'を変更して置換または破棄するか、コールバックで1を返して破棄する。
+- ImGuiInputTextFlags_CallbackResize: バッファの容量変更要求時にコールバックされ、(パラメータ 'buf_size' の値を超えて) 文字列が大きくなる。
 
 ```cpp
 struct ImGuiInputTextCallbackData
@@ -3774,8 +3928,8 @@ struct ImGuiInputTextCallbackData
 };
 ```
 
-Resizing callback data to apply custom constraint. As enabled by SetNextWindowSizeConstraints(). Callback is called during the next Begin().
-NB: For basic min/max size constraint on each axis you don't need to use the callback! The SetNextWindowSizeConstraints() parameters are enough.
+カスタム制約を適用するためのリサイズ コールバック データ。SetNextWindowSizeConstraints() によって有効になります。コールバックは、次の Begin() の間に呼び出されます。
+注釈: 各軸の基本的な最小/最大サイズ制約の場合は、コールバックを使用する必要はありません！SetNextWindowSizeConstraints() パラメータで十分です。
 
 ```cpp
 struct ImGuiSizeCallbackData
@@ -3787,7 +3941,7 @@ struct ImGuiSizeCallbackData
 };
 ```
 
-Data payload for Drag and Drop operations: AcceptDragDropPayload(), GetDragDropPayload()
+ドラッグ＆ドロップ操作のデータペイロード：AcceptDragDropPayload() および GetDragDropPayload() 。
 
 ```cpp
 struct ImGuiPayload
@@ -3812,7 +3966,7 @@ struct ImGuiPayload
 };
 ```
 
-Sorting specification for one column of a table (sizeof == 12 bytes)
+テーブルの1カラムのソート指定 (sizeof == 12 bytes)
 
 ```cpp
 struct ImGuiTableColumnSortSpecs
@@ -3826,10 +3980,10 @@ struct ImGuiTableColumnSortSpecs
 };
 ```
 
-Sorting specifications for a table (often handling sort specs for a single column, occasionally more)
-Obtained by calling TableGetSortSpecs().
-When 'SpecsDirty == true' you can sort your data. It will be true with sorting specs have changed since last call, or the first time.
-Make sure to set 'SpecsDirty = false' after sorting, else you may wastefully sort your data every frame!
+テーブルのソート仕様 (多くの場合は単一のカラムのソート仕様を扱いますが、場合によってはそれ以上のものもあります)。
+TableGetSortSpecs()をコールすることで得られる。
+SpecsDirty == true' の場合、データをソートすることができます。前回コールしたとき、あるいは初めてコールしたときからソート仕様が変更されている場合に真になります。
+ソート後に必ず 'SpecsDirty = false' を設定しないと、毎フレームデータを無駄にソートしてしまう可能性があります！
 
 ```cpp
 struct ImGuiTableSortSpecs
@@ -3852,7 +4006,7 @@ struct ImGuiTableSortSpecs
 - Math Operators
 - ImColor
 
-// Helper: Unicode defines
+ヘルパー: Unicodeの定義
 
 ```cpp
 #define IM_UNICODE_CODEPOINT_INVALID 0xFFFD     // Invalid Unicode code point (standard value).
@@ -3863,8 +4017,11 @@ struct ImGuiTableSortSpecs
 #endif
 ```
 
-Helper: Execute a block of code at maximum once a frame. Convenient if you want to quickly create a UI within deep-nested code that runs multiple times every frame.
-Usage: static ImGuiOnceUponAFrame oaf; if (oaf) ImGui::Text("This will be called only once per frame");
+### ImGuiOnceUponAFrame ヘルパー
+
+1フレームに最大1回、コードのブロックを実行する。フレームごとに複数回実行される深いネストされたコードの中にUIを素早く作成したい場合に便利です。
+
+使用法: `static ImGuiOnceUponAFrame oaf; if (oaf) ImGui::Text("This will be called only once per frame")；`
 
 ```cpp
 struct ImGuiOnceUponAFrame
@@ -3875,7 +4032,9 @@ struct ImGuiOnceUponAFrame
 };
 ```
 
-Helper: Parse and apply text filters. In format "aaaaa[,bbbb][,ccccc]"
+### ImGuiTextFilter ヘルパー
+
+テキストフィルタを解析し、適用する。形式 "aaaaa[,bbbb][,ccccc]"
 
 ```cpp
 struct ImGuiTextFilter
@@ -3904,8 +4063,11 @@ struct ImGuiTextFilter
 };
 ```
 
-Helper: Growable text buffer for logging/accumulating text
-(this could be called 'ImGuiTextBuilder' / 'ImGuiStringBuilder')
+### ImGuiTextBuffer ヘルパー
+
+テキストを記録/蓄積するための成長可能なテキストバッファ
+
+これは'ImGuiTextBuilder'/'ImGuiStringBuilder'と呼ぶこともできる
 
 ```cpp
 struct ImGuiTextBuffer
@@ -3928,15 +4090,17 @@ struct ImGuiTextBuffer
 };
 ```
 
-Helper: Key->Value storage
+### ImGuiStorage ヘルパー
 
-Typically you don't have to worry about this since a storage is held within each Window.
-We use it to e.g. store collapse state for a tree (Int 0/1)
-This is optimized for efficient lookup (dichotomy into a contiguous buffer) and rare insertion (typically tied to user interactions aka max once a frame)
-You can use it as custom user storage for temporary values. Declare your own storage if, for example:
-- You want to manipulate the open/close state of a particular sub-tree in your interface (tree node uses Int 0/1 to store their state).
-- You want to store custom debug data easily without adding or editing structures in your code (probably not efficient, but convenient)
-Types are NOT stored, so it is up to you to make sure your Key don't collide with different types.
+`Key->Value` ストレージ
+
+通常、各ウィンドウ内にストレージが保持されているため、これを気にする必要はない。
+例えば、ツリー（Int 0/1）の崩壊状態を保存するために使用します。
+これは効率的なルックアップ（連続したバッファへの二分割）とまれな挿入（通常、ユーザーとのインタラクション、つまり1フレームに1回まで）のために最適化されています。
+一時的な値のためのカスタム・ユーザー・ストレージとして使用できる。例えば次のような場合、独自のストレージを宣言する：
+- インターフェイスの特定のサブツリーの開閉状態を操作したい場合（ツリーノードはInt 0/1を使用して状態を保存します）。
+- コードに構造を追加したり編集したりすることなく、カスタム・デバッグ・データを簡単に保存したい場合（おそらく効率的ではないが、便利である）。
+型は保存されないので、Keyが異なる型と衝突しないようにするのはあなた次第です。
 
 ```cpp
 struct ImGuiStorage
@@ -3983,27 +4147,30 @@ struct ImGuiStorage
 };
 ```
 
-Helper: Manually clip large list of items.
+### ImGuiListClipper ヘルパー
 
-If you have lots evenly spaced items and you have random access to the list, you can perform coarse
-clipping based on visibility to only submit items that are in view.
-The clipper calculates the range of visible items and advance the cursor to compensate for the non-visible items we have skipped.
-(Dear ImGui already clip items based on their bounds but: it needs to first layout the item to do so, and generally
- fetching/submitting your own data incurs additional cost. Coarse clipping using ImGuiListClipper allows you to easily
- scale using lists with tens of thousands of items without a problem)
-Usage:
-  ImGuiListClipper clipper;
-  clipper.Begin(1000);         // We have 1000 elements, evenly spaced.
-  while (clipper.Step())
-      for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; i++)
-          ImGui::Text("line number %d", i);
-Generally what happens is:
-- Clipper lets you process the first element (DisplayStart = 0, DisplayEnd = 1) regardless of it being visible or not.
-- User code submit that one element.
-- Clipper can measure the height of the first element
-- Clipper calculate the actual range of elements to display based on the current clipping rectangle, position the cursor before the first visible element.
-- User code submit visible elements.
-- The clipper also handles various subtleties related to keyboard/gamepad navigation, wrapping etc.
+大量のリストを手動でクリップ。
+
+たくさんのアイテムが等間隔に並んでいて、リストへのランダムアクセスが可能な場合、可視性に基づいて粗いクリッピングを実行し、表示されているアイテムだけをサブミットすることができます。
+クリッパーは可視アイテムの範囲を計算し、カーソルを進めて、スキップした非可視アイテムを補います。
+(ImGuiはすでにアイテムの境界に基づいてアイテムをクリッピングしていますが、: そのためにはまずアイテムをレイアウトする必要があり、一般的に独自のデータをフェッチ/サブミットするには追加のコストがかかります。ImGuiListClipperを使った粗いクリッピングは、数万アイテムのリストでも問題なく簡単に拡大縮小できます)
+
+```cpp
+//使い方
+ImGuiListClipper clipper;
+clipper.Begin(1000); // 1000個のエレメントが等間隔に並んでいる。
+while (clipper.Step())
+    for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; i++)
+        ImGui::Text("line number %d", i);
+```
+
+一般的に何が起こるかというと
+- クリッパーは、最初の要素（DisplayStart = 0, DisplayEnd = 1）を、それが表示されているかどうかに関係なく処理します。
+- ユーザーコードはその1つの要素を送信します。
+- Clipper は最初の要素の高さを測定できます。
+- クリッパーは、現在のクリッピング矩形に基づいて表示する要素の実際の範囲を計算し、カーソルを最初の可視要素の前に配置します。
+- ユーザー・コードで可視要素をサブミットします。
+- クリッパーはまた、キーボード/ゲームパッドのナビゲーションや折り返しなどに関連する様々な微妙な処理も行います。
 
 ```cpp
 struct ImGuiListClipper
@@ -4037,11 +4204,11 @@ struct ImGuiListClipper
 };
 ```
 
-ヘルパー: ImVec2/ImVec4 演算子
+#### ImVec2/ImVec4 演算子
 
-- It is important that we are keeping those disabled by default so they don't leak in user space.
-- This is in order to allow user enabling implicit cast operators between ImVec2/ImVec4 and their own types (using IM_VEC2_CLASS_EXTRA in imconfig.h)
-- You can use '#define IMGUI_DEFINE_MATH_OPERATORS' to import our operators, provided as a courtesy.
+- ユーザー空間に漏れないように、デフォルトで無効にしておくことが重要だ。
+- これは、ImVec2/ImVec4 と独自の型との間の暗黙のキャスト演算を可能にするためである。 (imconfig.hでIM_VEC2_CLASS_EXTRAを使用する。)
+- `define IMGUI_DEFINE_MATH_OPERATORS`を使って、我々の演算子をインポートすることができます。
 
 ```cpp
 #ifdef IMGUI_DEFINE_MATH_OPERATORS
@@ -4067,9 +4234,9 @@ IM_MSVC_RUNTIME_CHECKS_RESTORE
 #endif
 ```
 
-32ビット・エンコード・カラーを生成するヘルパー・マクロ
+#### 32ビット・エンコード・カラーを生成するマクロ
 
-User can declare their own format by #defining the 5 _SHIFT/_MASK macros in their imconfig file.
+ユーザーは、imconfigファイルに5つの_SHIFT/_MASKマクロを#defineすることで、独自のフォーマットを宣言できる。
 
 ```cpp
 #ifndef IM_COL32_R_SHIFT
@@ -4093,11 +4260,13 @@ User can declare their own format by #defining the 5 _SHIFT/_MASK macros in thei
 #define IM_COL32_BLACK_TRANS IM_COL32(0,0,0,0)          // Transparent black = 0x00000000
 ```
 
-Helper: ImColor() implicitly converts colors to either ImU32 (packed 4x1 byte) or ImVec4 (4x1 float)
+### ImColor ヘルパー
 
-Prefer using IM_COL32() macros if you want a guaranteed compile-time ImU32 for usage with ImDrawList API.
-Avoid storing ImColor! Store either u32 of ImVec4. This is not a full-featured color class. MAY OBSOLETE.
-None of the ImGui API are using ImColor directly but you can use it as a convenience to pass colors in either ImU32 or ImVec4 formats. Explicitly cast to ImU32 or ImVec4 if needed.
+ImColor() は暗黙的に、色を ImU32 (4x1 バイト詰め) または ImVec4 (4x1 float) に変換します。
+
+ImDrawList APIで使用するために、コンパイル時に保証されたImU32が必要な場合は、IM_COL32()マクロを使用することをお勧めします。
+ImColorの保存は避ける！ImVec4のu32を保存する。これはフル機能のカラー・クラスではありません。MAY OBSOLETE.
+ImGuiのどのAPIもImColorを直接使用していませんが、ImU32またはImVec4形式で色を渡すための便宜として使用できます。必要であればImU32またはImVec4に明示的にキャストしてください。
 
 ```cpp
 struct ImColor
@@ -4139,13 +4308,12 @@ struct ImColor
 #endif
 ```
 
-ImDrawCallback: Draw callbacks for advanced uses [configurable type: override in imconfig.h]
-NB: You most likely do NOT need to use draw callbacks just to create your own widget or customized UI rendering,
-you can poke into the draw list for that! Draw callback may be useful for example to:
-A. Change your GPU render state,
-B. render a complex 3D scene inside a UI element without an intermediate texture/render target, etc.
-The expected behavior from your rendering function is 'if (cmd.UserCallback != NULL) { cmd.UserCallback(parent_list, cmd); } else { RenderTriangles() }'
-If you want to override the signature of ImDrawCallback, you can simply use e.g. '#define ImDrawCallback MyDrawCallback' (in imconfig.h) + update rendering backend accordingly.
+ImDrawCallback：高度な用途のための描画コールバック [設定可能なタイプ: imconfig.hのoverride]。
+注意：独自のウィジェットやカスタマイズされたUIレンダリングを作成するためだけに、描画コールバックを使用する必要はないでしょう！描画コールバックは、例えば以下のような場合に便利です：
+A.GPUのレンダリング状態を変更する、
+B. UIエレメント内の複雑な3Dシーンを、中間テクスチャ/レンダーターゲットなしでレンダリングする、など。
+レンダリング関数から期待される動作は '`if (cmd.UserCallback != NULL) { cmd.UserCallback(parent_list, cmd); } else { RenderTriangles() }`' です。
+ImDrawCallbackのシグネチャをオーバーライドしたい場合は、例えば '#define ImDrawCallback MyDrawCallback' (in imconfig.h) を使用し、それに応じてレンダリングバックエンドを更新するだけです。
 
 ```cpp
 #ifndef ImDrawCallback
@@ -4153,20 +4321,19 @@ typedef void (*ImDrawCallback)(const ImDrawList* parent_list, const ImDrawCmd* c
 #endif
 ```
 
-Special Draw callback value to request renderer backend to reset the graphics/render state.
-The renderer backend needs to handle this special value, otherwise it will crash trying to call a function at this address.
-This is useful for example if you submitted callbacks which you know have altered the render state and you want it to be restored.
-It is not done by default because they are many perfectly useful way of altering render state for imgui contents (e.g. changing shader/blending settings before an Image call).
+グラフィックス/レンダリング状態のリセットをレンダラーのバックエンドに要求するための特別な Draw コールバック値。
+レンダラーのバックエンドはこの特別な値を処理する必要があります。そうしないと、このアドレスの関数を呼び出そうとしてクラッシュします。
+これは、レンダリング状態が変更されたことがわかっているコールバックを送信し、それを復元したい場合などに便利です。
+これはデフォルトでは行われません。というのも、imguiコンテンツのレンダリング状態を変更する方法として、コールバックは非常に有用だからです（イメージ呼び出しの前にシェーダー/ブレンド設定を変更する場合など）。
 
 ```cpp
 #define ImDrawCallback_ResetRenderState     (ImDrawCallback)(-1)
 ```
 
-Typically, 1 command = 1 GPU draw call (unless command is a callback)
-- VtxOffset: When 'io.BackendFlags & ImGuiBackendFlags_RendererHasVtxOffset' is enabled,
-  this fields allow us to render meshes larger than 64K vertices while keeping 16-bit indices.
-  Backends made for <1.71. will typically ignore the VtxOffset fields.
-- The ClipRect/TextureId/VtxOffset fields must be contiguous as we memcmp() them together (this is asserted for).
+通常、1コマンド＝1GPUドローコール（コマンドがコールバックでない限り）
+- VtxOffset：io.BackendFlags & ImGuiBackendFlags_RendererHasVtxOffset' が有効な場合、このフィールドによって16ビットインデックスを維持したまま64K頂点より大きなメッシュをレンダリングできます。
+  `<1.71.`用に作られたバックエンドは、通常VtxOffsetフィールドを無視します。
+- ClipRect/TextureId/VtxOffsetフィールドは、一緒にmemcmp()するので、連続している必要があります（これはアサートされます）。
 
 ```cpp
 struct ImDrawCmd
@@ -4199,17 +4366,17 @@ struct ImDrawVert
 #else
 ```
 
-You can override the vertex format layout by defining IMGUI_OVERRIDE_DRAWVERT_STRUCT_LAYOUT in imconfig.h
-The code expect ImVec2 pos (8 bytes), ImVec2 uv (8 bytes), ImU32 col (4 bytes), but you can re-order them or add other fields as needed to simplify integration in your engine.
-The type has to be described within the macro (you can either declare the struct or use a typedef). This is because ImVec2/ImU32 are likely not declared at the time you'd want to set your type up.
-NOTE: IMGUI DOESN'T CLEAR THE STRUCTURE AND DOESN'T CALL A CONSTRUCTOR SO ANY CUSTOM FIELD WILL BE UNINITIALIZED. IF YOU ADD EXTRA FIELDS (SUCH AS A 'Z' COORDINATES) YOU WILL NEED TO CLEAR THEM DURING RENDER OR TO IGNORE THEM.
+imconfig.hでIMGUI_OVERRIDE_DRAWVERT_STRUCT_LAYOUTを定義することで、頂点フォーマットのレイアウトをオーバーライドできます。
+コードでは、ImVec2 pos (8バイト)、ImVec2 uv (8バイト)、ImU32 col (4バイト)を想定していますが、エンジンへの統合を簡単にするために、必要に応じて並べ替えたり、他のフィールドを追加することができます。
+型はマクロ内に記述する必要があります（構造体を宣言するか、typedefを使用します）。これは、ImVec2/ImU32は、型を設定したい時点では宣言されていない可能性が高いためです。
+注意：imguiは構造体をクリアせず、コンストラクタも呼び出さないので、カスタムフィールドは初期化されません。余分なフィールド（z座標など）を追加した場合は、レンダリング時にクリアするか、無視する必要があります。
 
 ```cpp
 IMGUI_OVERRIDE_DRAWVERT_STRUCT_LAYOUT;
 #endif
 ```
 
-[Internal] For use by ImDrawList
+[内部] ImDrawListで使用
 
 ```cpp
 struct ImDrawCmdHeader
@@ -4220,7 +4387,7 @@ struct ImDrawCmdHeader
 };
 ```
 
-[Internal] For use by ImDrawListSplitter
+[内部] ImDrawListSplitter で使用する。
 
 ```cpp
 struct ImDrawChannel
@@ -4230,7 +4397,9 @@ struct ImDrawChannel
 };
 ```
 
-Split/Merge関数は、描画リストを異なるレイヤーに分割するために使用されます。
+### Split/Merge関数
+
+描画リストを異なるレイヤーに分割するために使用されます。
 これはColumns/Tables APIで使用され、各カラムのアイテムを同じ描画呼び出しでまとめて描画することができます。
 
 ```cpp
@@ -4250,9 +4419,9 @@ struct ImDrawListSplitter
 };
 ```
 
-ImDrawList 関数のフラグ
+### ImDrawList 関数のフラグ
 
-(Legacy: bit 0 must always correspond to ImDrawFlags_Closed to be backward compatible with old API using a bool. Bits 1..3 must be unused)
+レガシー：ビット0は常にImDrawFlags_Closedに対応しなければならない。ビット1～3は未使用。
 
 ```cpp
 enum ImDrawFlags_
@@ -4288,7 +4457,7 @@ enum ImDrawListFlags_
 };
 ```
 
-描画コマンドリスト
+### 描画コマンドリスト
 
 これは、ImGui::関数が充填するポリゴンの低レベルリストです。フレームの終わりには、すべてのコマンドリストがレンダリングのために ImGuiIO::RenderDrawListFn 関数に渡されます。
 それぞれの親愛なるimguiウィンドウはそれ自身のImDrawListを含んでいます。ImGui::GetWindowDrawList()を使って、現在のウィンドウ描画リストにアクセスし、カスタムプリミティブを描画することができます。
@@ -4487,9 +4656,9 @@ struct ImFontConfig
 };
 ```
 
-Hold rendering data for one glyph.
+1グリフ分のレンダリングデータを保持する。
 
-(Note: some language parsers may fail to convert the 31+1 bitfield members, in this case maybe drop store a single u32 or we can rework this)
+(注：言語パーサによっては、31+1ビットフィールドのメンバの変換に失敗することがあります。)
 
 ```cpp
 struct ImFontGlyph
@@ -4538,7 +4707,7 @@ struct ImFontAtlasCustomRect
 };
 ```
 
-ImFontAtlas ビルドのフラグ
+### ImFontAtlas ビルドのフラグ
 
 ```cpp
 enum ImFontAtlasFlags_
@@ -4550,23 +4719,23 @@ enum ImFontAtlasFlags_
 };
 ```
 
-Load and rasterize multiple TTF/OTF fonts into a same texture. The font atlas will build a single texture holding:
- - One or more fonts.
- - Custom graphics data needed to render the shapes needed by Dear ImGui.
- - Mouse cursor shapes for software cursor rendering (unless setting 'Flags |= ImFontAtlasFlags_NoMouseCursors' in the font atlas).
-It is the user-code responsibility to setup/build the atlas, then upload the pixel data into a texture accessible by your graphics api.
- - Optionally, call any of the AddFont*** functions. If you don't call any, the default font embedded in the code will be loaded for you.
- - Call GetTexDataAsAlpha8() or GetTexDataAsRGBA32() to build and retrieve pixels data.
- - Upload the pixels data into a texture within your graphics system (see imgui_impl_xxxx.cpp examples)
- - Call SetTexID(my_tex_id); and pass the pointer/identifier to your texture in a format natural to your graphics API.
-   This value will be passed back to you during rendering to identify the texture. Read FAQ entry about ImTextureID for more details.
-Common pitfalls:
-- If you pass a 'glyph_ranges' array to AddFont*** functions, you need to make sure that your array persist up until the
-  atlas is build (when calling GetTexData*** or Build()). We only copy the pointer, not the data.
-- Important: By default, AddFontFromMemoryTTF() takes ownership of the data. Even though we are not writing to it, we will free the pointer on destruction.
-  You can set font_cfg->FontDataOwnedByAtlas=false to keep ownership of your data and it won't be freed,
-- Even though many functions are suffixed with "TTF", OTF data is supported just as well.
-- This is an old API and it is currently awkward for those and various other reasons! We will address them in the future!
+複数のTTF/OTFフォントを同じテクスチャにロードしてラスタライズ。フォントアトラスは単一のテクスチャ保持を構築します：
+ - 1つまたは複数のフォント。
+ - Dear ImGuiが必要とするシェイプをレンダリングするために必要なカスタムグラフィックデータ。
+ - ソフトウェアカーソルレンダリングのためのマウスカーソル形状（フォントアトラスの'Flags |= ImFontAtlasFlags_NoMouseCursors'を設定しない限り）。
+アトラスをセットアップ/ビルドし、ピクセルデータをグラフィックスAPIでアクセス可能なテクスチャにアップロードするのは、ユーザーコードの責任です。
+ - オプションとして、AddFont***関数のいずれかを呼び出します。何も呼び出さない場合は、コードに埋め込まれたデフォルトフォントが読み込まれます。
+ - GetTexDataAsAlpha8()またはGetTexDataAsRGBA32()を呼び出して、ピクセルデータを構築し、取得します。
+ - ピクセルデータをグラフィックシステム内のテクスチャにアップロードします（imgui_impl_xxxx.cppの例を参照）。
+ - SetTexID(my_tex_id)を呼び出し、グラフィックスAPIに適したフォーマットでテクスチャへのポインタ/識別子を渡します。
+   この値は、テクスチャを識別するために、レンダリング中にあなたに返されます。詳しくはImTextureIDに関するFAQを参照してください。
+よくある落とし穴
+- `AddFont***` 関数に 'glyph_ranges' 配列を渡す場合、その配列がアトラスが構築されるまで持続することを確認する必要があります。
+  (`GetTexData***`またはBuild()を呼び出すとき)。ポインタをコピーするだけで、データはコピーしません。
+- 重要: デフォルトでは、AddFontFromMemoryTTF() はデータの所有権を取ります。たとえ書き込みを行わなくても、破棄時にポインタを解放します。
+  font_cfg->FontDataOwnedByAtlas=false に設定すれば、データの所有権を保持し、解放されることはありません、
+- 多くの関数に "TTF" というサフィックスがついていますが、OTF データも同様にサポートされています。
+- これは古いAPIであり、現状ではこれらの理由やその他さまざまな理由で不便です！将来的には対応する予定です！
 
 ```cpp
 struct ImFontAtlas
@@ -4672,9 +4841,9 @@ struct ImFontAtlas
 };
 ```
 
-フォント・ランタイム・データとレンダリング
+### フォント・ランタイム・データとレンダリング
 
-ImFontAtlas automatically loads a default embedded font for you when you call GetTexDataAsAlpha8() or GetTexDataAsRGBA32().
+ImFontAtlasは、GetTexDataAsAlpha8()またはGetTexDataAsRGBA32()を呼び出すと、自動的にデフォルトの埋め込みフォントをロードします。
 
 ```cpp
 struct ImFont
@@ -4745,13 +4914,13 @@ enum ImGuiViewportFlags_
 };
 ```
 
-- Currently represents the Platform Window created by the application which is hosting our Dear ImGui windows.
-- In 'docking' branch with multi-viewport enabled, we extend this concept to have multiple active viewports.
-- In the future we will extend this concept further to also represent Platform Monitor and support a "no main platform window" operation mode.
-- About Main Area vs Work Area:
-  - Main Area = entire viewport.
-  - Work Area = entire viewport minus sections used by main menu bars (for platform windows), or by task bar (for platform monitor).
-  - Windows are generally trying to stay within the Work Area of their host viewport.
+- 現在、親愛なるImGuiウィンドウをホストしているアプリケーションによって作成されたプラットフォームウィンドウを表しています。
+- マルチビューポートを有効にした'ドッキング'ブランチでは、このコンセプトを拡張して、複数のアクティブビューポートを持つことができます。
+- 将来的には、この概念をさらに拡張して、Platform Monitorも表現し、「メインプラットフォームウィンドウなし」の操作モードをサポートする予定です。
+- メインエリアとワークエリアについて：
+  - メインエリア＝ビューポート全体。
+  - ワークエリア＝ビューポート全体から、メインメニューバー（プラットフォームウィンドウの場合）、またはタスクバー（プラットフォームモニターの場合）が使用する部分を除いたもの。
+  - ウィンドウは通常、ホストビューポートのワークエリア内に留まろうとします。
 
 ```cpp
 struct ImGuiViewport
