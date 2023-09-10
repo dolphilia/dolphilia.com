@@ -115,11 +115,18 @@ XYYZZとしてエンコードされた整数で、`#if`プリプロセッサの�
 ### インクルード
 
 ```cpp
-#include <float.h>  // FLT_MIN, FLT_MAX
-#include <stdarg.h> // va_list, va_start, va_end
-#include <stddef.h> // ptrdiff_t, NULL
-#include <string.h> // memset, memmove, memcpy, strlen, strchr, strcpy, strcmp
+#include <float.h>
+#include <stdarg.h>
+#include <stddef.h>
+#include <string.h>
 ```
+
+|名前|説明|
+|---|---|
+| float.h  | FLT_MIN, FLT_MAX |
+| stdarg.h | va_list, va_start, va_end |
+| stddef.h | ptrdiff_t, NULL |
+| string.h | memset, memmove, memcpy, strlen, strchr, strcpy, strcmp |
 
 ### すべてのAPIシンボル宣言の属性を定義する（例：WindowsのDLLの場合）
 
@@ -139,13 +146,21 @@ XYYZZとしてエンコードされた整数で、`#if`プリプロセッサの�
 ```cpp
 #ifndef IM_ASSERT
 #include <assert.h>
-#define IM_ASSERT(_EXPR)            assert(_EXPR)                               // You can override the default assert handler by editing imconfig.h
+#define IM_ASSERT(_EXPR)           assert(_EXPR)
 #endif
-#define IM_ARRAYSIZE(_ARR)          ((int)(sizeof(_ARR) / sizeof(*(_ARR))))     // Size of a static C-style array. Don't use on pointers!
-#define IM_UNUSED(_VAR)             ((void)(_VAR))                              // Used to silence "unused variable warnings". Often useful as asserts may be stripped out from final builds.
-#define IM_OFFSETOF(_TYPE,_MEMBER)  offsetof(_TYPE, _MEMBER)                    // Offset of _MEMBER within _TYPE. Standardized as offsetof() in C++11
-#define IMGUI_CHECKVERSION()        ImGui::DebugCheckVersionAndDataLayout(IMGUI_VERSION, sizeof(ImGuiIO), sizeof(ImGuiStyle), sizeof(ImVec2), sizeof(ImVec4), sizeof(ImDrawVert), sizeof(ImDrawIdx))
+#define IM_ARRAYSIZE(_ARR)         ((int)(sizeof(_ARR) / sizeof(*(_ARR))))
+#define IM_UNUSED(_VAR)            ((void)(_VAR))
+#define IM_OFFSETOF(_TYPE,_MEMBER) offsetof(_TYPE, _MEMBER)
+#define IMGUI_CHECKVERSION()       ImGui::DebugCheckVersionAndDataLayout(IMGUI_VERSION, sizeof(ImGuiIO), sizeof(ImGuiStyle), sizeof(ImVec2), sizeof(ImVec4), sizeof(ImDrawVert), sizeof(ImDrawIdx))
 ```
+
+|名前|説明|
+|---|---|
+| IM_ASSERT    | `imconfig.h`を編集することで、デフォルトのアサートハンドラをオーバーライドできる。 |
+| IM_ARRAYSIZE | C形式の静的配列のサイズ。ポインタには使用しないこと！ |
+| IM_UNUSED    | 「未使用変数の警告」を黙らせるために使用する。最終的なビルドからアサートが取り除かれる可能性があるため、しばしば有用である。 |
+| IM_OFFSETOF  | `TYPE`内の`_MEMBER`のオフセット。C++11 では `offsetof()` として標準化されています。 |
+
 
 ヘルパー・マクロ - `IM_FMTARGS`、`IM_FMTLIST：printf`スタイルの警告をフォーマット関数に適用する
 
@@ -687,11 +702,11 @@ IMGUI_API void SetWindowFocus(const char* name);
 | SetNextWindowFocus()           | 次のウィンドウを最前面にする。`Begin()`の前に呼び出す。                                                                                                                                                               |
 | SetNextWindowScroll()          | 次のウィンドウのスクロール値を設定する (指定された軸に影響を与えない場合は、`< 0.0f`を使用する。).                                                                                                                                 |
 | SetNextWindowBgAlpha()         | 次のウィンドウの背景色アルファを設定する。 ImGuiCol_WindowBg/ChildBg/PopupBg の Alpha コンポーネントを簡単にオーバーライドするためのヘルパーです。`ImGuiWindowFlags_NoBackground`を使うこともできる。                                                      |
-| SetWindowPos()                 | (非推奨) 現在のウィンドウ位置を設定する - call within Begin()/End(). prefer using SetNextWindowPos(), as this may incur tearing and side-effects.                                                              |
-| SetWindowSize()                | (非推奨) set current window size - call within Begin()/End(). set to ImVec2(0, 0) to force an auto-fit. prefer using SetNextWindowSize(), as this may incur tearing and minor side-effects.           |
-| SetWindowCollapsed()           | (非推奨) set current window collapsed state. prefer using SetNextWindowCollapsed().                                                                                                                   |
-| SetWindowFocus()               | (非推奨) set current window to be focused / top-most. prefer using SetNextWindowFocus().                                                                                                              |
-| SetWindowFontScale()           | 廃止: フォントスケールを設定する。 Adjust IO.FontGlobalScale if you want to scale all windows. This is an old API! For correct scaling, prefer to reload font + rebuild ImFontAtlas + call style.ScaleAllSizes(). |
+| SetWindowPos()                 | (非推奨) 現在のウィンドウ位置を設定する - Begin()/End()内の呼び出し. SetNextWindowPos()を使用すると、ティアリングや副作用が発生する可能性があります。                                                              |
+| SetWindowSize()                | (非推奨) 現在のウィンドウ・サイズを設定する - Begin()/End()内の呼び出し. ImVec2(0, 0)に設定するとオートフィットを強制する. SetNextWindowSize()を使用することを推奨します。この場合、ティアリングや小さな副作用が発生する可能性があります。           |
+| SetWindowCollapsed()           | (非推奨) 現在のウィンドウの折りたたみ状態を設定する。 SetNextWindowCollapsed() を使用することを推奨します。                                                                                                                   |
+| SetWindowFocus()               | (非推奨) 現在のウィンドウを最前面に設定する. SetNextWindowFocus() を使用することを推奨します。.                                                                                                              |
+| SetWindowFontScale()           | 廃止: フォントスケールを設定する。 すべてのウィンドウを拡大縮小したい場合は、IO.FontGlobalScaleを調整する。 これは古いAPIです！正しいスケーリングを行うには、フォントの再読み込み + ImFontAtlasの再構築 + style.ScaleAllSizes()の呼び出しが必要です。 |
 | SetWindowPos()                 | 名前付きウィンドウの位置を設定します。                                                                                                                                                                            |
 | SetWindowSize()                | 名前付きウィンドウサイズを設定する。軸を`0.0f`に設定して、この軸にオートフィットを強制する。                                                                                                                                          |
 | SetWindowCollapsed()           | 名前付きウィンドウの折りたたみ状態を設定する                                                                                                                                                                        |
@@ -2614,8 +2629,8 @@ enum ImGuiDragDropFlags_
 | ImGuiDragDropFlags_SourceNoPreviewTooltip   | プレビューのツールチップを無効にします。デフォルトでは、BeginDragDropSource の呼び出しに成功すると、ツールチップが開き、ソースの内容のプレビューや説明を表示できます。このフラグは、この動作を無効にします。                                                                  |
 | ImGuiDragDropFlags_SourceNoDisableHover     | デフォルトでは、ドラッグ時にデータをクリアして IsItemHovered() が false を返すようにします。このフラグはこの動作を無効にするので、ソース・アイテムの IsItemHovered() を呼び出すことができます。                                     |
 | ImGuiDragDropFlags_SourceNoHoldToOpenOthers | ソース・アイテムをドラッグしている間、その上にホールドすることによって、ツリー・ノードを開いたり、ヘッダーを折りたたんだりすることができる動作を無効にする。                                                                                                                                         |
-| ImGuiDragDropFlags_SourceAllowNullID        | Text()やImage()のような一意な識別子を持たないアイテムを、ウィンドウの相対位置に基づいて一時的な識別子を生成することで、ドラッグソースとして使用できるようにしました。これは親愛なるimguiエコシステムの中では非常に珍しいことなので、明示しました。 |
-| ImGuiDragDropFlags_SourceExtern             | 外部ソース（親愛なるimguiの外部）から、現在のアイテム/ウィンドウ情報を読み取ろうとしません。常にtrueを返します。同時にアクティブにできる外部ソースは1つだけです。                                                                                          |
+| ImGuiDragDropFlags_SourceAllowNullID        | Text()やImage()のような一意な識別子を持たないアイテムを、ウィンドウの相対位置に基づいて一時的な識別子を生成することで、ドラッグソースとして使用できるようにしました。これはdear imguiエコシステムの中では非常に珍しいことなので、明示しました。 |
+| ImGuiDragDropFlags_SourceExtern             | 外部ソース（dear imguiの外部）から、現在のアイテム/ウィンドウ情報を読み取ろうとしません。常にtrueを返します。同時にアクティブにできる外部ソースは1つだけです。                                                                                          |
 | ImGuiDragDropFlags_SourceAutoExpirePayload  | ソースが送信されなくなった場合、ペイロードは自動的に期限切れになります。 |
 | (無効)AcceptDragDropPayload() flags         |                                                                                                                                                                                                                                                                      |
 | ImGuiDragDropFlags_AcceptBeforeDelivery     | AcceptDragDropPayload() は、マウス・ボタンが離される前でも真を返します。その後、IsDelivery() を呼び出して、ペイロードを配信する必要があるかどうかをテストできます。                                                                                                     |
@@ -2715,56 +2730,56 @@ enum ImGuiKey : int
 #### キーボード
 
 ```cpp
-    ImGuiKey_None = 0,
-    ImGuiKey_Tab = 512,             // == ImGuiKey_NamedKey_BEGIN
-    ImGuiKey_LeftArrow,
-    ImGuiKey_RightArrow,
-    ImGuiKey_UpArrow,
-    ImGuiKey_DownArrow,
-    ImGuiKey_PageUp,
-    ImGuiKey_PageDown,
-    ImGuiKey_Home,
-    ImGuiKey_End,
-    ImGuiKey_Insert,
-    ImGuiKey_Delete,
-    ImGuiKey_Backspace,
-    ImGuiKey_Space,
-    ImGuiKey_Enter,
-    ImGuiKey_Escape,
-    ImGuiKey_LeftCtrl, ImGuiKey_LeftShift, ImGuiKey_LeftAlt, ImGuiKey_LeftSuper,
-    ImGuiKey_RightCtrl, ImGuiKey_RightShift, ImGuiKey_RightAlt, ImGuiKey_RightSuper,
-    ImGuiKey_Menu,
-    ImGuiKey_0, ImGuiKey_1, ImGuiKey_2, ImGuiKey_3, ImGuiKey_4, ImGuiKey_5, ImGuiKey_6, ImGuiKey_7, ImGuiKey_8, ImGuiKey_9,
-    ImGuiKey_A, ImGuiKey_B, ImGuiKey_C, ImGuiKey_D, ImGuiKey_E, ImGuiKey_F, ImGuiKey_G, ImGuiKey_H, ImGuiKey_I, ImGuiKey_J,
-    ImGuiKey_K, ImGuiKey_L, ImGuiKey_M, ImGuiKey_N, ImGuiKey_O, ImGuiKey_P, ImGuiKey_Q, ImGuiKey_R, ImGuiKey_S, ImGuiKey_T,
-    ImGuiKey_U, ImGuiKey_V, ImGuiKey_W, ImGuiKey_X, ImGuiKey_Y, ImGuiKey_Z,
-    ImGuiKey_F1, ImGuiKey_F2, ImGuiKey_F3, ImGuiKey_F4, ImGuiKey_F5, ImGuiKey_F6,
-    ImGuiKey_F7, ImGuiKey_F8, ImGuiKey_F9, ImGuiKey_F10, ImGuiKey_F11, ImGuiKey_F12,
-    ImGuiKey_Apostrophe,        // '
-    ImGuiKey_Comma,             // ,
-    ImGuiKey_Minus,             // -
-    ImGuiKey_Period,            // .
-    ImGuiKey_Slash,             // /
-    ImGuiKey_Semicolon,         // ;
-    ImGuiKey_Equal,             // =
-    ImGuiKey_LeftBracket,       // [
-    ImGuiKey_Backslash,         // \ (this text inhibit multiline comment caused by backslash)
-    ImGuiKey_RightBracket,      // ]
-    ImGuiKey_GraveAccent,       // `
-    ImGuiKey_CapsLock,
-    ImGuiKey_ScrollLock,
-    ImGuiKey_NumLock,
-    ImGuiKey_PrintScreen,
-    ImGuiKey_Pause,
-    ImGuiKey_Keypad0, ImGuiKey_Keypad1, ImGuiKey_Keypad2, ImGuiKey_Keypad3, ImGuiKey_Keypad4,
-    ImGuiKey_Keypad5, ImGuiKey_Keypad6, ImGuiKey_Keypad7, ImGuiKey_Keypad8, ImGuiKey_Keypad9,
-    ImGuiKey_KeypadDecimal,
-    ImGuiKey_KeypadDivide,
-    ImGuiKey_KeypadMultiply,
-    ImGuiKey_KeypadSubtract,
-    ImGuiKey_KeypadAdd,
-    ImGuiKey_KeypadEnter,
-    ImGuiKey_KeypadEqual,
+ImGuiKey_None = 0,
+ImGuiKey_Tab = 512, // == ImGuiKey_NamedKey_BEGIN
+ImGuiKey_LeftArrow,
+ImGuiKey_RightArrow,
+ImGuiKey_UpArrow,
+ImGuiKey_DownArrow,
+ImGuiKey_PageUp,
+ImGuiKey_PageDown,
+ImGuiKey_Home,
+ImGuiKey_End,
+ImGuiKey_Insert,
+ImGuiKey_Delete,
+ImGuiKey_Backspace,
+ImGuiKey_Space,
+ImGuiKey_Enter,
+ImGuiKey_Escape,
+ImGuiKey_LeftCtrl, ImGuiKey_LeftShift, ImGuiKey_LeftAlt, ImGuiKey_LeftSuper,
+ImGuiKey_RightCtrl, ImGuiKey_RightShift, ImGuiKey_RightAlt, ImGuiKey_RightSuper,
+ImGuiKey_Menu,
+ImGuiKey_0, ImGuiKey_1, ImGuiKey_2, ImGuiKey_3, ImGuiKey_4, ImGuiKey_5, ImGuiKey_6, ImGuiKey_7, ImGuiKey_8, ImGuiKey_9,
+ImGuiKey_A, ImGuiKey_B, ImGuiKey_C, ImGuiKey_D, ImGuiKey_E, ImGuiKey_F, ImGuiKey_G, ImGuiKey_H, ImGuiKey_I, ImGuiKey_J,
+ImGuiKey_K, ImGuiKey_L, ImGuiKey_M, ImGuiKey_N, ImGuiKey_O, ImGuiKey_P, ImGuiKey_Q, ImGuiKey_R, ImGuiKey_S, ImGuiKey_T,
+ImGuiKey_U, ImGuiKey_V, ImGuiKey_W, ImGuiKey_X, ImGuiKey_Y, ImGuiKey_Z,
+ImGuiKey_F1, ImGuiKey_F2, ImGuiKey_F3, ImGuiKey_F4, ImGuiKey_F5, ImGuiKey_F6,
+ImGuiKey_F7, ImGuiKey_F8, ImGuiKey_F9, ImGuiKey_F10, ImGuiKey_F11, ImGuiKey_F12,
+ImGuiKey_Apostrophe,        // '
+ImGuiKey_Comma,             // ,
+ImGuiKey_Minus,             // -
+ImGuiKey_Period,            // .
+ImGuiKey_Slash,             // /
+ImGuiKey_Semicolon,         // ;
+ImGuiKey_Equal,             // =
+ImGuiKey_LeftBracket,       // [
+ImGuiKey_Backslash,         // \ (this text inhibit multiline comment caused by backslash)
+ImGuiKey_RightBracket,      // ]
+ImGuiKey_GraveAccent,       // `
+ImGuiKey_CapsLock,
+ImGuiKey_ScrollLock,
+ImGuiKey_NumLock,
+ImGuiKey_PrintScreen,
+ImGuiKey_Pause,
+ImGuiKey_Keypad0, ImGuiKey_Keypad1, ImGuiKey_Keypad2, ImGuiKey_Keypad3, ImGuiKey_Keypad4,
+ImGuiKey_Keypad5, ImGuiKey_Keypad6, ImGuiKey_Keypad7, ImGuiKey_Keypad8, ImGuiKey_Keypad9,
+ImGuiKey_KeypadDecimal,
+ImGuiKey_KeypadDivide,
+ImGuiKey_KeypadMultiply,
+ImGuiKey_KeypadSubtract,
+ImGuiKey_KeypadAdd,
+ImGuiKey_KeypadEnter,
+ImGuiKey_KeypadEqual,
 ```
 
 #### ゲームパッド
@@ -2773,30 +2788,30 @@ enum ImGuiKey : int
 コントローラマッピングPNG/PSDのダウンロードは、`http://dearimgui.com/controls_sheets`から。
 
 ```cpp
-    ImGuiKey_GamepadStart,
-    ImGuiKey_GamepadBack,
-    ImGuiKey_GamepadFaceLeft,
-    ImGuiKey_GamepadFaceRight,
-    ImGuiKey_GamepadFaceUp,
-    ImGuiKey_GamepadFaceDown,
-    ImGuiKey_GamepadDpadLeft,
-    ImGuiKey_GamepadDpadRight,
-    ImGuiKey_GamepadDpadUp,
-    ImGuiKey_GamepadDpadDown,
-    ImGuiKey_GamepadL1,
-    ImGuiKey_GamepadR1,
-    ImGuiKey_GamepadL2,
-    ImGuiKey_GamepadR2,
-    ImGuiKey_GamepadL3,
-    ImGuiKey_GamepadR3,
-    ImGuiKey_GamepadLStickLeft,
-    ImGuiKey_GamepadLStickRight,
-    ImGuiKey_GamepadLStickUp,
-    ImGuiKey_GamepadLStickDown,
-    ImGuiKey_GamepadRStickLeft,
-    ImGuiKey_GamepadRStickRight,
-    ImGuiKey_GamepadRStickUp,
-    ImGuiKey_GamepadRStickDown,
+ImGuiKey_GamepadStart,
+ImGuiKey_GamepadBack,
+ImGuiKey_GamepadFaceLeft,
+ImGuiKey_GamepadFaceRight,
+ImGuiKey_GamepadFaceUp,
+ImGuiKey_GamepadFaceDown,
+ImGuiKey_GamepadDpadLeft,
+ImGuiKey_GamepadDpadRight,
+ImGuiKey_GamepadDpadUp,
+ImGuiKey_GamepadDpadDown,
+ImGuiKey_GamepadL1,
+ImGuiKey_GamepadR1,
+ImGuiKey_GamepadL2,
+ImGuiKey_GamepadR2,
+ImGuiKey_GamepadL3,
+ImGuiKey_GamepadR3,
+ImGuiKey_GamepadLStickLeft,
+ImGuiKey_GamepadLStickRight,
+ImGuiKey_GamepadLStickUp,
+ImGuiKey_GamepadLStickDown,
+ImGuiKey_GamepadRStickLeft,
+ImGuiKey_GamepadRStickRight,
+ImGuiKey_GamepadRStickUp,
+ImGuiKey_GamepadRStickDown,
 ```
 
 |名前|ゲームパッド|説明|
@@ -2833,14 +2848,14 @@ AddMouseButtonEvent()呼び出しから自動サブミットされる。
 - これは、io.MouseDown[]、io.MouseWheelにも書き込まれたデータを、標準のキーAPIでアクセスできる形式にミラーリングしている。
 
 ```cpp
-    ImGuiKey_MouseLeft, ImGuiKey_MouseRight, ImGuiKey_MouseMiddle, ImGuiKey_MouseX1, ImGuiKey_MouseX2, ImGuiKey_MouseWheelX, ImGuiKey_MouseWheelY,
+ImGuiKey_MouseLeft, ImGuiKey_MouseRight, ImGuiKey_MouseMiddle, ImGuiKey_MouseX1, ImGuiKey_MouseX2, ImGuiKey_MouseWheelX, ImGuiKey_MouseWheelY,
 ```
 
 #### (内部) MODストレージ用に予約
 
 ```cpp
-    ImGuiKey_ReservedForModCtrl, ImGuiKey_ReservedForModShift, ImGuiKey_ReservedForModAlt, ImGuiKey_ReservedForModSuper,
-    ImGuiKey_COUNT,
+ImGuiKey_ReservedForModCtrl, ImGuiKey_ReservedForModShift, ImGuiKey_ReservedForModAlt, ImGuiKey_ReservedForModSuper,
+ImGuiKey_COUNT,
 ```
 
 #### キーボード修飾子
@@ -2853,13 +2868,13 @@ AddKeyEvent() 呼び出しによってバックエンドから明示的に送信
   - 実際には複雑です。モディファイアはしばしば異なるソースから提供されます。キーボードレイアウト、IME、スティッキーキー、バックエンドが干渉し、その等価性を壊す傾向があります。より安全な決定は、その曖昧さをエンドユーザーに伝えることです。
 
 ```cpp
-    ImGuiMod_None     = 0,
-    ImGuiMod_Ctrl     = 1 << 12,
-    ImGuiMod_Shift    = 1 << 13,
-    ImGuiMod_Alt      = 1 << 14,
-    ImGuiMod_Super    = 1 << 15,
-    ImGuiMod_Shortcut = 1 << 11,
-    ImGuiMod_Mask_    = 0xF800,
+ImGuiMod_None     = 0,
+ImGuiMod_Ctrl     = 1 << 12,
+ImGuiMod_Shift    = 1 << 13,
+ImGuiMod_Alt      = 1 << 14,
+ImGuiMod_Super    = 1 << 15,
+ImGuiMod_Shortcut = 1 << 11,
+ImGuiMod_Mask_    = 0xF800,
 ```
 
 |名前|説明|
@@ -3077,17 +3092,29 @@ enum ImGuiStyleVar_
 };
 ```
 
-### Flags for InvisibleButton() [extended in imgui_internal.h]
+### InvisibleButton() のフラグ
+    
+imgui_internal.h で拡張。
 
 ```cpp
 enum ImGuiButtonFlags_
 {
-    ImGuiButtonFlags_None                   = 0,
-    ImGuiButtonFlags_MouseButtonLeft        = 1 << 0,   // React on left mouse button (default)
-    ImGuiButtonFlags_MouseButtonRight       = 1 << 1,   // React on right mouse button
-    ImGuiButtonFlags_MouseButtonMiddle      = 1 << 2,   // React on center mouse button
+    ImGuiButtonFlags_None              = 0,
+    ImGuiButtonFlags_MouseButtonLeft   = 1 << 0,
+    ImGuiButtonFlags_MouseButtonRight  = 1 << 1,
+    ImGuiButtonFlags_MouseButtonMiddle = 1 << 2,
+```
 
-    // [Internal]
+|名前|説明|
+|---|---|
+| ImGuiButtonFlags_None              | |
+| ImGuiButtonFlags_MouseButtonLeft   | マウスの左ボタンで反応（デフォルト） |
+| ImGuiButtonFlags_MouseButtonRight  | マウスの右ボタンで反応 |
+| ImGuiButtonFlags_MouseButtonMiddle | マウス中央ボタンに反応 |
+
+(Internal)
+
+```cpp
     ImGuiButtonFlags_MouseButtonMask_       = ImGuiButtonFlags_MouseButtonLeft | ImGuiButtonFlags_MouseButtonRight | ImGuiButtonFlags_MouseButtonMiddle,
     ImGuiButtonFlags_MouseButtonDefault_    = ImGuiButtonFlags_MouseButtonLeft,
 };
@@ -3099,41 +3126,80 @@ enum ImGuiButtonFlags_
 enum ImGuiColorEditFlags_
 {
     ImGuiColorEditFlags_None            = 0,
-    ImGuiColorEditFlags_NoAlpha         = 1 << 1,   //              // ColorEdit, ColorPicker, ColorButton: ignore Alpha component (will only read 3 components from the input pointer).
-    ImGuiColorEditFlags_NoPicker        = 1 << 2,   //              // ColorEdit: disable picker when clicking on color square.
-    ImGuiColorEditFlags_NoOptions       = 1 << 3,   //              // ColorEdit: disable toggling options menu when right-clicking on inputs/small preview.
-    ImGuiColorEditFlags_NoSmallPreview  = 1 << 4,   //              // ColorEdit, ColorPicker: disable color square preview next to the inputs. (e.g. to show only the inputs)
-    ImGuiColorEditFlags_NoInputs        = 1 << 5,   //              // ColorEdit, ColorPicker: disable inputs sliders/text widgets (e.g. to show only the small preview color square).
-    ImGuiColorEditFlags_NoTooltip       = 1 << 6,   //              // ColorEdit, ColorPicker, ColorButton: disable tooltip when hovering the preview.
-    ImGuiColorEditFlags_NoLabel         = 1 << 7,   //              // ColorEdit, ColorPicker: disable display of inline text label (the label is still forwarded to the tooltip and picker).
-    ImGuiColorEditFlags_NoSidePreview   = 1 << 8,   //              // ColorPicker: disable bigger color preview on right side of the picker, use small color square preview instead.
-    ImGuiColorEditFlags_NoDragDrop      = 1 << 9,   //              // ColorEdit: disable drag and drop target. ColorButton: disable drag and drop source.
-    ImGuiColorEditFlags_NoBorder        = 1 << 10,  //              // ColorButton: disable border (which is enforced by default)
+    ImGuiColorEditFlags_NoAlpha         = 1 << 1,
+    ImGuiColorEditFlags_NoPicker        = 1 << 2,
+    ImGuiColorEditFlags_NoOptions       = 1 << 3,
+    ImGuiColorEditFlags_NoSmallPreview  = 1 << 4,
+    ImGuiColorEditFlags_NoInputs        = 1 << 5,
+    ImGuiColorEditFlags_NoTooltip       = 1 << 6,
+    ImGuiColorEditFlags_NoLabel         = 1 << 7,
+    ImGuiColorEditFlags_NoSidePreview   = 1 << 8,
+    ImGuiColorEditFlags_NoDragDrop      = 1 << 9,
+    ImGuiColorEditFlags_NoBorder        = 1 << 10,
+```
 
-    // User Options (right-click on widget to change some of them).
-    ImGuiColorEditFlags_AlphaBar        = 1 << 16,  //              // ColorEdit, ColorPicker: show vertical alpha bar/gradient in picker.
-    ImGuiColorEditFlags_AlphaPreview    = 1 << 17,  //              // ColorEdit, ColorPicker, ColorButton: display preview as a transparent color over a checkerboard, instead of opaque.
-    ImGuiColorEditFlags_AlphaPreviewHalf= 1 << 18,  //              // ColorEdit, ColorPicker, ColorButton: display half opaque / half checkerboard, instead of opaque.
-    ImGuiColorEditFlags_HDR             = 1 << 19,  //              // (WIP) ColorEdit: Currently only disable 0.0f..1.0f limits in RGBA edition (note: you probably want to use ImGuiColorEditFlags_Float flag as well).
-    ImGuiColorEditFlags_DisplayRGB      = 1 << 20,  // [Display]    // ColorEdit: override _display_ type among RGB/HSV/Hex. ColorPicker: select any combination using one or more of RGB/HSV/Hex.
-    ImGuiColorEditFlags_DisplayHSV      = 1 << 21,  // [Display]    // "
-    ImGuiColorEditFlags_DisplayHex      = 1 << 22,  // [Display]    // "
-    ImGuiColorEditFlags_Uint8           = 1 << 23,  // [DataType]   // ColorEdit, ColorPicker, ColorButton: _display_ values formatted as 0..255.
-    ImGuiColorEditFlags_Float           = 1 << 24,  // [DataType]   // ColorEdit, ColorPicker, ColorButton: _display_ values formatted as 0.0f..1.0f floats instead of 0..255 integers. No round-trip of value via integers.
-    ImGuiColorEditFlags_PickerHueBar    = 1 << 25,  // [Picker]     // ColorPicker: bar for Hue, rectangle for Sat/Value.
-    ImGuiColorEditFlags_PickerHueWheel  = 1 << 26,  // [Picker]     // ColorPicker: wheel for Hue, triangle for Sat/Value.
-    ImGuiColorEditFlags_InputRGB        = 1 << 27,  // [Input]      // ColorEdit, ColorPicker: input and output data in RGB format.
-    ImGuiColorEditFlags_InputHSV        = 1 << 28,  // [Input]      // ColorEdit, ColorPicker: input and output data in HSV format.
+|名前|使用|説明|
+|---|---|---|
+| ImGuiColorEditFlags_None            | | |
+| ImGuiColorEditFlags_NoAlpha         | ColorEdit, ColorPicker, ColorButton| アルファ成分を無視 (入力ポインタから3つのコンポーネントだけを読み取る。). |
+| ImGuiColorEditFlags_NoPicker        | ColorEdit| 色の四角をクリックするとピッカーが表示されないようにした。 |
+| ImGuiColorEditFlags_NoOptions       | ColorEdit| 入力/スモールプレビュー上で右クリックしたときに、オプションメニューが切り替わらないようにした。 |
+| ImGuiColorEditFlags_NoSmallPreview  | ColorEdit, ColorPicker| 入力の横にある四角いプレビューの色を無効にする。(例：入力だけを表示する) |
+| ImGuiColorEditFlags_NoInputs        | ColorEdit, ColorPicker| 入力スライダー/テキストウィジェットを無効にする（例：小さなプレビューカラーの四角だけを表示する）。 |
+| ImGuiColorEditFlags_NoTooltip       | ColorEdit, ColorPicker, ColorButton| プレビューのホバー時にツールチップを表示しないようにした。 |
+| ImGuiColorEditFlags_NoLabel         | ColorEdit, ColorPicker| インラインテキストラベルを表示しないようにしました（ラベルはツールチップとピッカーに転送されます）。 |
+| ImGuiColorEditFlags_NoSidePreview   | ColorPicker| ピッカー右側の大きなカラープレビューを無効にし、代わりに小さなカラースクエアプレビューを使用する。 |
+| ImGuiColorEditFlags_NoDragDrop      | ColorEdit, ColorButton| (ColorEdit)ドラッグ＆ドロップのターゲットを無効にします。(ColorButton)ドラッグ＆ドロップ元を無効にします。 |
+| ImGuiColorEditFlags_NoBorder        | ColorButton| ボーダーを無効にする（デフォルトで適用される） |
 
-    // Defaults Options. You can set application defaults using SetColorEditOptions(). The intent is that you probably don't want to
-    // override them in most of your calls. Let the user choose via the option menu and/or call SetColorEditOptions() once during startup.
-    ImGuiColorEditFlags_DefaultOptions_ = ImGuiColorEditFlags_Uint8 | ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_InputRGB | ImGuiColorEditFlags_PickerHueBar,
 
-    // [Internal] Masks
-    ImGuiColorEditFlags_DisplayMask_    = ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_DisplayHSV | ImGuiColorEditFlags_DisplayHex,
-    ImGuiColorEditFlags_DataTypeMask_   = ImGuiColorEditFlags_Uint8 | ImGuiColorEditFlags_Float,
-    ImGuiColorEditFlags_PickerMask_     = ImGuiColorEditFlags_PickerHueWheel | ImGuiColorEditFlags_PickerHueBar,
-    ImGuiColorEditFlags_InputMask_      = ImGuiColorEditFlags_InputRGB | ImGuiColorEditFlags_InputHSV,
+ユーザーオプション(ウィジェットを右クリックして、いくつかのオプションを変更できます)。
+
+```cpp
+ImGuiColorEditFlags_AlphaBar        = 1 << 16,
+ImGuiColorEditFlags_AlphaPreview    = 1 << 17,
+ImGuiColorEditFlags_AlphaPreviewHalf= 1 << 18,
+ImGuiColorEditFlags_HDR             = 1 << 19,
+ImGuiColorEditFlags_DisplayRGB      = 1 << 20,
+ImGuiColorEditFlags_DisplayHSV      = 1 << 21,
+ImGuiColorEditFlags_DisplayHex      = 1 << 22,
+ImGuiColorEditFlags_Uint8           = 1 << 23,
+ImGuiColorEditFlags_Float           = 1 << 24,
+ImGuiColorEditFlags_PickerHueBar    = 1 << 25,
+ImGuiColorEditFlags_PickerHueWheel  = 1 << 26,
+ImGuiColorEditFlags_InputRGB        = 1 << 27,
+ImGuiColorEditFlags_InputHSV        = 1 << 28,
+```
+
+|名前|種類|使用|説明|
+|---|---|---|---|
+| ImGuiColorEditFlags_AlphaBar         |          | ColorEdit, ColorPicker| ピッカーに垂直アルファバー/グラデーションを表示する。 |
+| ImGuiColorEditFlags_AlphaPreview     |          | ColorEdit, ColorPicker, ColorButton| プレビューを不透明ではなく、市松模様の上に透明色で表示する。 |
+| ImGuiColorEditFlags_AlphaPreviewHalf |          | ColorEdit, ColorPicker, ColorButton| 不透明の代わりに、半分不透明/半分市松を表示する。 |
+| ImGuiColorEditFlags_HDR              |          | ColorEdit| (WIP) 現在のところ、RGBAエディションでは0.0f～1.0fの制限を無効にするのみです（注意：ImGuiColorEditFlags_Floatフラグも使用したいでしょう）。 |
+| ImGuiColorEditFlags_DisplayRGB       | Display  | ColorEdit| RGB/HSV/Hexの中から表示タイプを上書きします。カラーピッカー：RGB/HSV/Hexのうち1つ以上を使用して任意の組み合わせを選択します。 |
+| ImGuiColorEditFlags_DisplayHSV       | Display  | | |
+| ImGuiColorEditFlags_DisplayHex       | Display  | | |
+| ImGuiColorEditFlags_Uint8            | DataType | ColorEdit, ColorPicker, ColorButton | 0～255の値を表示する。 |
+| ImGuiColorEditFlags_Float            | DataType | ColorEdit, ColorPicker, ColorButton | 0～255の整数ではなく、0.0f～1.0fの浮動小数点数で表示する。整数による値のラウンドトリップはありません。 |
+| ImGuiColorEditFlags_PickerHueBar     | Picker   | ColorPicker | バーが色相、矩形が彩度／値を表す。 |
+| ImGuiColorEditFlags_PickerHueWheel   | Picker   | ColorPicker | ホイールで色相を、三角形で彩度/値を指定する。 |
+| ImGuiColorEditFlags_InputRGB         | Input    | ColorEdit, ColorPicker| RGBフォーマットの入出力データ。 |
+| ImGuiColorEditFlags_InputHSV         | Input    | ColorEdit, ColorPicker| HSV形式の入出力データ。 |
+
+デフォルト・オプション。アプリケーションのデフォルトは SetColorEditOptions() で設定できます。その意図は、おそらくほとんどの呼び出しでそれらをオーバーライドしたくないということです。ユーザーにオプションメニューから選択させるか、起動時に一度だけ SetColorEditOptions() を呼び出します。
+
+```cpp
+ImGuiColorEditFlags_DefaultOptions_ = ImGuiColorEditFlags_Uint8 | ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_InputRGB | ImGuiColorEditFlags_PickerHueBar,
+```
+
+(Internal) Masks
+
+```cpp
+    ImGuiColorEditFlags_DisplayMask_  = ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_DisplayHSV | ImGuiColorEditFlags_DisplayHex,
+    ImGuiColorEditFlags_DataTypeMask_ = ImGuiColorEditFlags_Uint8 | ImGuiColorEditFlags_Float,
+    ImGuiColorEditFlags_PickerMask_   = ImGuiColorEditFlags_PickerHueWheel | ImGuiColorEditFlags_PickerHueBar,
+    ImGuiColorEditFlags_InputMask_    = ImGuiColorEditFlags_InputRGB | ImGuiColorEditFlags_InputHSV,
 
     // Obsolete names
     //ImGuiColorEditFlags_RGB = ImGuiColorEditFlags_DisplayRGB, ImGuiColorEditFlags_HSV = ImGuiColorEditFlags_DisplayHSV, ImGuiColorEditFlags_HEX = ImGuiColorEditFlags_DisplayHex  // [renamed in 1.69]
@@ -3193,14 +3259,14 @@ enum ImGuiMouseCursor_
 {
     ImGuiMouseCursor_None = -1,
     ImGuiMouseCursor_Arrow = 0,
-    ImGuiMouseCursor_TextInput,         // When hovering over InputText, etc.
-    ImGuiMouseCursor_ResizeAll,         // (Unused by Dear ImGui functions)
-    ImGuiMouseCursor_ResizeNS,          // When hovering over a horizontal border
-    ImGuiMouseCursor_ResizeEW,          // When hovering over a vertical border or a column
-    ImGuiMouseCursor_ResizeNESW,        // When hovering over the bottom-left corner of a window
-    ImGuiMouseCursor_ResizeNWSE,        // When hovering over the bottom-right corner of a window
-    ImGuiMouseCursor_Hand,              // (Unused by Dear ImGui functions. Use for e.g. hyperlinks)
-    ImGuiMouseCursor_NotAllowed,        // When hovering something with disallowed interaction. Usually a crossed circle.
+    ImGuiMouseCursor_TextInput,
+    ImGuiMouseCursor_ResizeAll,
+    ImGuiMouseCursor_ResizeNS,
+    ImGuiMouseCursor_ResizeEW,
+    ImGuiMouseCursor_ResizeNESW,
+    ImGuiMouseCursor_ResizeNWSE,
+    ImGuiMouseCursor_Hand,
+    ImGuiMouseCursor_NotAllowed,
     ImGuiMouseCursor_COUNT
 };
 ```
@@ -3223,7 +3289,7 @@ enum ImGuiMouseCursor_
 
 マウス入力データの実際のソース。
 歴史的に、ポインタ・データを示すために "Mouse" という用語をあらゆる場所で使用してきました、 例：MousePos、IsMousePressed()、io.AddMousePosEvent()
-しかし、その "マウス "データは異なるソースから来る可能性があり、アプリケーションにとって知っておくと便利な場合がある。
+しかし、その "マウス" データは異なるソースから来る可能性があり、アプリケーションにとって知っておくと便利な場合がある。
 io.AddMouseSourceEvent()を使えば、ポインタの種類を変更することができます。
 
 ```cpp
@@ -3303,48 +3369,53 @@ struct ImVector
     int                 Size;
     int                 Capacity;
     T*                  Data;
+```
 
-    // Provide standard typedefs but we don't use them ourselves.
-    typedef T                   value_type;
-    typedef value_type*         iterator;
-    typedef const value_type*   const_iterator;
+標準的な型定義は提供するが、自分たちでは使わない。
 
-    // Constructors, destructor
-    inline ImVector()                                       { Size = Capacity = 0; Data = NULL; }
-    inline ImVector(const ImVector<T>& src)                 { Size = Capacity = 0; Data = NULL; operator=(src); }
-    inline ImVector<T>& operator=(const ImVector<T>& src)   { clear(); resize(src.Size); if (src.Data) memcpy(Data, src.Data, (size_t)Size * sizeof(T)); return *this; }
-    inline ~ImVector()                                      { if (Data) IM_FREE(Data); } // Important: does not destruct anything
+```cpp
+typedef T                   value_type;
+typedef value_type*         iterator;
+typedef const value_type*   const_iterator;
+```
 
-    inline void         clear()                             { if (Data) { Size = Capacity = 0; IM_FREE(Data); Data = NULL; } }  // Important: does not destruct anything
-    inline void         clear_delete()                      { for (int n = 0; n < Size; n++) IM_DELETE(Data[n]); clear(); }     // Important: never called automatically! always explicit.
-    inline void         clear_destruct()                    { for (int n = 0; n < Size; n++) Data[n].~T(); clear(); }           // Important: never called automatically! always explicit.
+コンストラクタ、デストラクタ
 
-    inline bool         empty() const                       { return Size == 0; }
-    inline int          size() const                        { return Size; }
-    inline int          size_in_bytes() const               { return Size * (int)sizeof(T); }
-    inline int          max_size() const                    { return 0x7FFFFFFF / (int)sizeof(T); }
-    inline int          capacity() const                    { return Capacity; }
-    inline T&           operator[](int i)                   { IM_ASSERT(i >= 0 && i < Size); return Data[i]; }
-    inline const T&     operator[](int i) const             { IM_ASSERT(i >= 0 && i < Size); return Data[i]; }
+```cpp
+inline ImVector()                                       { Size = Capacity = 0; Data = NULL; }
+inline ImVector(const ImVector<T>& src)                 { Size = Capacity = 0; Data = NULL; operator=(src); }
+inline ImVector<T>& operator=(const ImVector<T>& src)   { clear(); resize(src.Size); if (src.Data) memcpy(Data, src.Data, (size_t)Size * sizeof(T)); return *this; }
+inline ~ImVector()                                      { if (Data) IM_FREE(Data); } // Important: does not destruct anything
+inline void         clear()                             { if (Data) { Size = Capacity = 0; IM_FREE(Data); Data = NULL; } }  // Important: does not destruct anything
+inline void         clear_delete()                      { for (int n = 0; n < Size; n++) IM_DELETE(Data[n]); clear(); }     // Important: never called automatically! always explicit.
+inline void         clear_destruct()                    { for (int n = 0; n < Size; n++) Data[n].~T(); clear(); }           // Important: never called automatically! always explicit.
+inline bool         empty() const                       { return Size == 0; }
+inline int          size() const                        { return Size; }
+inline int          size_in_bytes() const               { return Size * (int)sizeof(T); }
+inline int          max_size() const                    { return 0x7FFFFFFF / (int)sizeof(T); }
+inline int          capacity() const                    { return Capacity; }
+inline T&           operator[](int i)                   { IM_ASSERT(i >= 0 && i < Size); return Data[i]; }
+inline const T&     operator[](int i) const             { IM_ASSERT(i >= 0 && i < Size); return Data[i]; }
+inline T*           begin()                             { return Data; }
+inline const T*     begin() const                       { return Data; }
+inline T*           end()                               { return Data + Size; }
+inline const T*     end() const                         { return Data + Size; }
+inline T&           front()                             { IM_ASSERT(Size > 0); return Data[0]; }
+inline const T&     front() const                       { IM_ASSERT(Size > 0); return Data[0]; }
+inline T&           back()                              { IM_ASSERT(Size > 0); return Data[Size - 1]; }
+inline const T&     back() const                        { IM_ASSERT(Size > 0); return Data[Size - 1]; }
+inline void         swap(ImVector<T>& rhs)              { int rhs_size = rhs.Size; rhs.Size = Size; Size = rhs_size; int rhs_cap = rhs.Capacity; rhs.Capacity = Capacity; Capacity = rhs_cap; T* rhs_data = rhs.Data; rhs.Data = Data; Data = rhs_data; }
+inline int          _grow_capacity(int sz) const        { int new_capacity = Capacity ? (Capacity + Capacity / 2) : 8; return new_capacity > sz ? new_capacity : sz; }
+inline void         resize(int new_size)                { if (new_size > Capacity) reserve(_grow_capacity(new_size)); Size = new_size; }
+inline void         resize(int new_size, const T& v)    { if (new_size > Capacity) reserve(_grow_capacity(new_size)); if (new_size > Size) for (int n = Size; n < new_size; n++) memcpy(&Data[n], &v, sizeof(v)); Size = new_size; }
+inline void         shrink(int new_size)                { IM_ASSERT(new_size <= Size); Size = new_size; } // Resize a vector to a smaller size, guaranteed not to cause a reallocation
+inline void         reserve(int new_capacity)           { if (new_capacity <= Capacity) return; T* new_data = (T*)IM_ALLOC((size_t)new_capacity * sizeof(T)); if (Data) { memcpy(new_data, Data, (size_t)Size * sizeof(T)); IM_FREE(Data); } Data = new_data; Capacity = new_capacity; }
+inline void         reserve_discard(int new_capacity)   { if (new_capacity <= Capacity) return; if (Data) IM_FREE(Data); Data = (T*)IM_ALLOC((size_t)new_capacity * sizeof(T)); Capacity = new_capacity; }
+```
 
-    inline T*           begin()                             { return Data; }
-    inline const T*     begin() const                       { return Data; }
-    inline T*           end()                               { return Data + Size; }
-    inline const T*     end() const                         { return Data + Size; }
-    inline T&           front()                             { IM_ASSERT(Size > 0); return Data[0]; }
-    inline const T&     front() const                       { IM_ASSERT(Size > 0); return Data[0]; }
-    inline T&           back()                              { IM_ASSERT(Size > 0); return Data[Size - 1]; }
-    inline const T&     back() const                        { IM_ASSERT(Size > 0); return Data[Size - 1]; }
-    inline void         swap(ImVector<T>& rhs)              { int rhs_size = rhs.Size; rhs.Size = Size; Size = rhs_size; int rhs_cap = rhs.Capacity; rhs.Capacity = Capacity; Capacity = rhs_cap; T* rhs_data = rhs.Data; rhs.Data = Data; Data = rhs_data; }
+注意：ImVectorデータ自体の内部を指す参照でpush_back/push_front/insertを呼び出すことは禁止です！例えば、`v.push_back(v[10])`は禁止されています。
 
-    inline int          _grow_capacity(int sz) const        { int new_capacity = Capacity ? (Capacity + Capacity / 2) : 8; return new_capacity > sz ? new_capacity : sz; }
-    inline void         resize(int new_size)                { if (new_size > Capacity) reserve(_grow_capacity(new_size)); Size = new_size; }
-    inline void         resize(int new_size, const T& v)    { if (new_size > Capacity) reserve(_grow_capacity(new_size)); if (new_size > Size) for (int n = Size; n < new_size; n++) memcpy(&Data[n], &v, sizeof(v)); Size = new_size; }
-    inline void         shrink(int new_size)                { IM_ASSERT(new_size <= Size); Size = new_size; } // Resize a vector to a smaller size, guaranteed not to cause a reallocation
-    inline void         reserve(int new_capacity)           { if (new_capacity <= Capacity) return; T* new_data = (T*)IM_ALLOC((size_t)new_capacity * sizeof(T)); if (Data) { memcpy(new_data, Data, (size_t)Size * sizeof(T)); IM_FREE(Data); } Data = new_data; Capacity = new_capacity; }
-    inline void         reserve_discard(int new_capacity)   { if (new_capacity <= Capacity) return; if (Data) IM_FREE(Data); Data = (T*)IM_ALLOC((size_t)new_capacity * sizeof(T)); Capacity = new_capacity; }
-
-    // NB: It is illegal to call push_back/push_front/insert with a reference pointing inside the ImVector data itself! e.g. v.push_back(v[10]) is forbidden.
+```cpp
     inline void         push_back(const T& v)               { if (Size == Capacity) reserve(_grow_capacity(Size + 1)); memcpy(&Data[Size], &v, sizeof(v)); Size++; }
     inline void         pop_back()                          { IM_ASSERT(Size > 0); Size--; }
     inline void         push_front(const T& v)              { if (Size == 0) push_back(v); else insert(Data, v); }
@@ -3462,7 +3533,7 @@ struct ImGuiStyle
 | AntiAliasedFill            | bool     | 塗りつぶされたシェイプ（丸みを帯びた長方形、円など）のエッジにアンチエイリアスをかける。 CPU/GPUに余裕がない場合は無効にしてください。フレームの最初にラッチされる（`ImDrawList`にコピーされる）。                             |
 | CurveTessellationTol       | float    | 特定のセグメント数を指定せずに `PathBezierCurveTo()`を使用した場合のテセレーション許容度。 高度にテッセレーションされたカーブ（より高い品質、より多くのポリゴン）の場合は減少させ、品質を低下させる場合は増加させる。   |
 | CircleTessellationMaxError | float    | `AddCircle()`/`AddCircleFilled()`を使用する場合、またはセグメント数が明示的に指定されていない角丸矩形を描画する場合に許容される最大誤差（ピクセル単位）。品質が高いがジオメトリが多い場合は減少させる。 |
-| Colors[ImGuiCol_COUNT]     | ImVec4   |                                                                                                                                                        |
+| Colors     | ImVec4   |                                                                                                                                                        |
 
 ### ビヘイビア
 
@@ -3772,9 +3843,9 @@ ImVec2 MouseDelta;
 | MetricsActiveAllocations | 現在のコンテキストに基づいてMemAlloc/MemFreeによって更新される、アクティブなアロケーションの数。複数のimguiコンテキストがある場合はずれるかもしれない。                                                                                                                                                    |
 | MouseDelta               | マウスのデルタ。現在の位置と前の位置のどちらかが無効な場合（-FLT_MAX,-FLT_MAX）、これはゼロになるので、マウスが消えたり現れたりしても、大きなデルタは発生しないことに注意。                                                                                                                |
 
-レガシー：1.87以前では、バックエンドが初期化時にio.KeyMap[]（imgui->ネイティブ・マップ）を満たし、毎フレームio.KeysDown[]（ネイティブ・インデックス）を満たす必要がありました。
+レガシー：1.87以前では、バックエンドが初期化時に`io.KeyMap[]`（imgui->ネイティブ・マップ）を満たし、毎フレーム`io.KeysDown[]`（ネイティブ・インデックス）を満たす必要がありました。
 これはレガシー機能としてまだ一時的にサポートされている。しかし、バックエンドがio.AddKeyEvent()を呼び出すのが新しい望ましい方式です。
-  古い (`<1.87`):  ImGui::IsKeyPressed(ImGui::GetIO().KeyMap[ImGuiKey_Space]) --> New (1.87+) ImGui::IsKeyPressed(ImGuiKey_Space)
+  古い (`<1.87`):  `ImGui::IsKeyPressed(ImGui::GetIO().KeyMap[ImGuiKey_Space])` --> New (1.87+) `ImGui::IsKeyPressed(ImGuiKey_Space)`
 
 ```cpp
 #ifndef IMGUI_DISABLE_OBSOLETE_KEYIO
@@ -3859,7 +3930,7 @@ bool        KeySuper;
 |----------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | KeyMods                          | キー修飾フラグ (ImGuiMod_Ctrl/ImGuiMod_Shift/ImGuiMod_Alt/ImGuiMod_Super フラグのいずれか, io.KeyCtrl/KeyShift/KeyAlt/KeySuperと同じですが、フラグに統合されています。 ImGuiMod_Shortcut は含まれていません。). 読み取り専用。NewFrame()によって更新される。 |
 | KeysData                         | すべての既知のキーのキー状態。これにアクセスするには IsKeyXXX() 関数を使用します。                                                                                                                                                                                  |
-| WantCaptureMouseUnlessPopupClose | WantCaptureMouseの代替: (WantCaptureMouse == true && WantCaptureMouseUnlessPopupClose == false) when a click over void is expected to close a popup.                                                                                           |
+| WantCaptureMouseUnlessPopupClose | WantCaptureMouseの代替: (`WantCaptureMouse == true && WantCaptureMouseUnlessPopupClose == false`) voidをクリックするとポップアップが閉じる場合.                                                                                           |
 | MousePosPrev                     | 前のマウスの位置 (どちらかの位置が無効な場合、MouseDeltaは== MousePos-MousePosPrevである必要はないことに注意。)                                                                                                                            |
 | MouseClickedPos                  | クリック時のポジション                                                                                                                                                                             |
 | MouseClickedTime                 | 最後にクリックした時間（ダブルクリックの計算に使用）                                                                                                                                                                             |
@@ -3874,11 +3945,11 @@ bool        KeySuper;
 | MouseDownDuration                | マウスボタンが押されていた時間 (0.0f == クリックされた直後)                                                                                                                    |
 | MouseDownDurationPrev            | マウスボタンが押されていた時間                                                                                                                    |
 | MouseDragMaxDistanceSqr          | クリックポイントからのマウスの移動距離の最大値の2乗（閾値の移動に使用）                                                                                                                    |
-| PenPressure                      | タッチ/ペンの圧力（0.0f～1.0f、MouseDown[0] == trueの時のみ0.0fを超えるはずです）。現在ImGuiでは未使用のヘルパーストレージです。                                                                                                                       |
+| PenPressure                      | タッチ/ペンの圧力（0.0f～1.0f、`MouseDown[0] == true`の時のみ0.0fを超えるはずです）。現在ImGuiでは未使用のヘルパーストレージです。                                                                                                                       |
 | AppFocusLost                     | AddFocusEvent() でのみ変更可能。                                                                                                                    |
 | AppAcceptingEvents               | SetAppAcceptingEvents() でのみ変更可能。                                                                                                                    |
-| BackendUsingLegacyKeyArrays      | -1: 不明, 0: AddKeyEvent() を使用, 1: レガシーio.KeysDown[]を使用                                                                                                                    |
-| BackendUsingLegacyNavInputArray  | 0: AddKeyAnalogEvent()を使用、1: レガシーio.NavInputs[]に直接書き込む。                                                                                                                    |
+| BackendUsingLegacyKeyArrays      | -1: 不明, 0: AddKeyEvent() を使用, 1: レガシー`io.KeysDown[]`を使用                                                                                                                    |
+| BackendUsingLegacyNavInputArray  | 0: AddKeyAnalogEvent()を使用、1: レガシー`io.NavInputs[]`に直接書き込む。                                                                                                                    |
 | InputQueueSurrogate              | AddInputCharacterUTF16()用                                                                                                                    |
 | InputQueueCharacters             | 入力された文字のキュー (プラットフォームバックエンドによって取得される)。AddInputCharacter() ヘルパーを使って入力する。                                                                                                                                                      |
 
@@ -3899,26 +3970,53 @@ bool        KeySuper;
 ```cpp
 struct ImGuiInputTextCallbackData
 {
-    ImGuiContext*       Ctx;            // Parent UI context
-    ImGuiInputTextFlags EventFlag;      // One ImGuiInputTextFlags_Callback*    // Read-only
-    ImGuiInputTextFlags Flags;          // What user passed to InputText()      // Read-only
-    void*               UserData;       // What user passed to InputText()      // Read-only
+    ImGuiContext*       Ctx;
+    ImGuiInputTextFlags EventFlag;
+    ImGuiInputTextFlags Flags;
+    void*               UserData;
+```
 
-    // Arguments for the different callback events
-    // - To modify the text buffer in a callback, prefer using the InsertChars() / DeleteChars() function. InsertChars() will take care of calling the resize callback if necessary.
-    // - If you know your edits are not going to resize the underlying buffer allocation, you may modify the contents of 'Buf[]' directly. You need to update 'BufTextLen' accordingly (0 <= BufTextLen < BufSize) and set 'BufDirty'' to true so InputText can update its internal state.
-    ImWchar             EventChar;      // Character input                      // Read-write   // [CharFilter] Replace character with another one, or set to zero to drop. return 1 is equivalent to setting EventChar=0;
-    ImGuiKey            EventKey;       // Key pressed (Up/Down/TAB)            // Read-only    // [Completion,History]
-    char*               Buf;            // Text buffer                          // Read-write   // [Resize] Can replace pointer / [Completion,History,Always] Only write to pointed data, don't replace the actual pointer!
-    int                 BufTextLen;     // Text length (in bytes)               // Read-write   // [Resize,Completion,History,Always] Exclude zero-terminator storage. In C land: == strlen(some_text), in C++ land: string.length()
-    int                 BufSize;        // Buffer size (in bytes) = capacity+1  // Read-only    // [Resize,Completion,History,Always] Include zero-terminator storage. In C land == ARRAYSIZE(my_char_array), in C++ land: string.capacity()+1
-    bool                BufDirty;       // Set if you modify Buf/BufTextLen!    // Write        // [Completion,History,Always]
-    int                 CursorPos;      //                                      // Read-write   // [Completion,History,Always]
-    int                 SelectionStart; //                                      // Read-write   // [Completion,History,Always] == to SelectionEnd when no selection)
-    int                 SelectionEnd;   //                                      // Read-write   // [Completion,History,Always]
+|名前|説明|I/O|
+|---|---|---|
+| Ctx       | 親UIコンテキスト | |
+| EventFlag | 1つの`ImGuiInputTextFlags_Callback*`。 | 読み取り専用 |
+| Flags     | ユーザが`InputText()`に渡したもの | 読み取り専用 |
+| UserData  | ユーザが`InputText()`に渡したもの | 読み取り専用 |
 
-    // Helper functions for text manipulation.
-    // Use those function to benefit from the CallbackResize behaviors. Calling those function reset the selection.
+### 各種コールバック・イベントの引数
+
+- コールバックでテキスト・バッファを変更するには、`InsertChars()` / `DeleteChars()`関数を使用することをお勧めします。`InsertChars()`は、必要に応じてリサイズ・コールバックを呼び出します。
+- 編集によってバッファの割り当てサイズが変更されないことがわかっている場合は、`Buf[]`の内容を直接変更することができます。それに応じて `BufTextLen` を更新し（`0 <= BufTextLen < BufSize`）、`BufDirty` を `true` に設定して、`InputText` が内部状態を更新できるようにする必要がある。
+
+```cpp
+ImWchar  EventChar;
+ImGuiKey EventKey;
+char*    Buf;
+int      BufTextLen;
+int      BufSize;
+bool     BufDirty;
+int      CursorPos;
+int      SelectionStart;
+int      SelectionEnd;
+```
+
+|名前|概要|I/O|説明|
+|---|---|---|---|
+| EventChar      | 文字入力  | 読み書き可能   | (CharFilter) 文字を別の文字に置き換えるか、ゼロに設定して削除する。 return 1 は、EventChar=0 に設定するのと同じです； |
+| EventKey       | キーが押された（Up/Down/TAB）  | 読み取り専用   | (Completion,History)                   |
+| Buf            | テキストバッファ  | 読み書き可能   | (Resize) ポインターを交換可能 / (Completion,History,Always) ポイントされたデータにのみ書き込み、実際のポインタを置き換えない！ |
+| BufTextLen     | テキストの長さ（バイト）  | 読み書き可能   | (Resize,Completion,History,Always) ゼロ・ターミネーター・ストレージは除く。 In C land: == strlen(some_text), in C++ land: string.length() |
+| BufSize        | バッファサイズ（バイト） = 容量+1  | 読み取り専用   | (Resize,Completion,History,Always) ゼロ・ターミネーター・ストレージを含む。 In C land: == ARRAYSIZE(my_char_array), in C++ land: string.capacity()+1 |
+| BufDirty       | Buf/BufTextLenを変更した場合に設定する！    | 書き込み可能   | (Completion,History,Always) |
+| CursorPos      |                                      | 読み書き可能   | (Completion,History,Always) |
+| SelectionStart |                                      | 読み書き可能   | (Completion,History,Always) == 選択されていない場合は SelectionEnd |
+| SelectionEnd   |                                      | 読み書き可能   | (Completion,History,Always) |
+
+### テキスト操作のためのヘルパー関数
+
+CallbackResizeビヘイビアを利用するには、これらの関数を使用します。これらの関数を呼び出すと、選択範囲がリセットされます。
+
+```cpp
     IMGUI_API ImGuiInputTextCallbackData();
     IMGUI_API void      DeleteChars(int pos, int bytes_count);
     IMGUI_API void      InsertChars(int pos, const char* text, const char* text_end = NULL);
@@ -3928,36 +4026,71 @@ struct ImGuiInputTextCallbackData
 };
 ```
 
-カスタム制約を適用するためのリサイズ コールバック データ。SetNextWindowSizeConstraints() によって有効になります。コールバックは、次の Begin() の間に呼び出されます。
-注釈: 各軸の基本的な最小/最大サイズ制約の場合は、コールバックを使用する必要はありません！SetNextWindowSizeConstraints() パラメータで十分です。
+### カスタム制約を適用するためのリサイズ・コールバック・データ
+
+SetNextWindowSizeConstraints() によって有効になります。コールバックは、次の Begin() の間に呼び出されます。
+
+注: 各軸の基本的な最小/最大サイズ制約の場合は、コールバックを使用する必要はありません！SetNextWindowSizeConstraints() パラメータで十分です。
 
 ```cpp
 struct ImGuiSizeCallbackData
 {
-    void*   UserData;       // Read-only.   What user passed to SetNextWindowSizeConstraints(). Generally store an integer or float in here (need reinterpret_cast<>).
-    ImVec2  Pos;            // Read-only.   Window position, for reference.
-    ImVec2  CurrentSize;    // Read-only.   Current window size.
-    ImVec2  DesiredSize;    // Read-write.  Desired size, based on user's mouse position. Write to this field to restrain resizing.
+    void*   UserData;
+    ImVec2  Pos;
+    ImVec2  CurrentSize;
+    ImVec2  DesiredSize;
 };
 ```
 
-ドラッグ＆ドロップ操作のデータペイロード：AcceptDragDropPayload() および GetDragDropPayload() 。
+|名前|I/O|説明|
+|---|---|---|
+| UserData       | 読み取り専用 | SetNextWindowSizeConstraints() に渡されるもの。通常、ここには整数か浮動小数点数を格納します (`reinterpret_cast<>` が必要です)。 |
+| Pos            | 読み取り専用 | ウィンドウの位置, リファレンスのため。 |
+| CurrentSize    | 読み取り専用 | 現在のウィンドウサイズ。 |
+| DesiredSize    | 読み書き可能 | ユーザーのマウス位置に基づいた希望サイズ。リサイズを抑制するには、このフィールドに書き込みます。 |
+
+### ドラッグ＆ドロップ操作のデータペイロード
+
+AcceptDragDropPayload() および GetDragDropPayload() 。
 
 ```cpp
 struct ImGuiPayload
 {
-    // Members
-    void*           Data;               // Data (copied and owned by dear imgui)
-    int             DataSize;           // Data size
+```
 
-    // [Internal]
-    ImGuiID         SourceId;           // Source item id
-    ImGuiID         SourceParentId;     // Source parent id (if available)
-    int             DataFrameCount;     // Data timestamp
-    char            DataType[32 + 1];   // Data type tag (short user-supplied string, 32 characters max)
-    bool            Preview;            // Set when AcceptDragDropPayload() was called and mouse has been hovering the target item (nb: handle overlapping drag targets)
-    bool            Delivery;           // Set when AcceptDragDropPayload() was called and mouse button is released over the target item.
+Members
 
+```cpp
+void* Data;
+int   DataSize;
+```
+
+|名前|説明|
+|---|---|
+| Data     | データ（dear imguiによってコピーされ、所有されている） |
+| DataSize | データサイズ |
+
+(内部)
+
+```cpp
+ImGuiID SourceId;
+ImGuiID SourceParentId;
+int     DataFrameCount;
+char    DataType[32 + 1];
+bool    Preview;
+bool    Delivery;
+```
+
+|名前|説明|
+|---|---|
+| SourceId       | ソースアイテムID |
+| SourceParentId | ソースペアレントID（あれば） |
+| DataFrameCount | データのタイムスタンプ |
+| DataType       | データ型タグ（ユーザー提供の短い文字列、最大32文字） |
+| Preview        | AcceptDragDropPayload()が呼び出され、マウスがターゲットアイテムをホバーしたときに設定されます。 |
+| Delivery       | AcceptDragDropPayload() が呼び出され、マウスボタンがターゲットアイテムの上で離されたときに設定されます。 |
+
+```cpp
     ImGuiPayload()  { Clear(); }
     void Clear()    { SourceId = SourceParentId = 0; Data = NULL; DataSize = 0; memset(DataType, 0, sizeof(DataType)); DataFrameCount = -1; Preview = Delivery = false; }
     bool IsDataType(const char* type) const { return DataFrameCount != -1 && strcmp(type, DataType) == 0; }
@@ -3966,35 +4099,50 @@ struct ImGuiPayload
 };
 ```
 
-テーブルの1カラムのソート指定 (sizeof == 12 bytes)
+### テーブルの1カラムのソート指定
+
+sizeof == 12バイト
 
 ```cpp
 struct ImGuiTableColumnSortSpecs
 {
-    ImGuiID                     ColumnUserID;       // User id of the column (if specified by a TableSetupColumn() call)
-    ImS16                       ColumnIndex;        // Index of the column
-    ImS16                       SortOrder;          // Index within parent ImGuiTableSortSpecs (always stored in order starting from 0, tables sorted on a single criteria will always have a 0 here)
-    ImGuiSortDirection          SortDirection : 8;  // ImGuiSortDirection_Ascending or ImGuiSortDirection_Descending (you can use this or SortSign, whichever is more convenient for your sort function)
+    ImGuiID            ColumnUserID;
+    ImS16              ColumnIndex;
+    ImS16              SortOrder;
+    ImGuiSortDirection SortDirection : 8;
 
     ImGuiTableColumnSortSpecs() { memset(this, 0, sizeof(*this)); }
 };
 ```
 
+|名前|説明|
+|---|---|
+| ColumnUserID  | カラムのユーザ ID (TableSetupColumn() のコールで指定した場合)。 |
+| ColumnIndex   | 列のインデックス |
+| SortOrder     | 親 ImGuiTableSortSpecs 内のインデックス。 (常に0から始まる順序で格納され、単一の基準でソートされたテーブルは常に0を持つ。) |
+| SortDirection | ImGuiSortDirection_Ascending または ImGuiSortDirection_Descending (ソート関数には、これかSortSignのどちらか使いやすい方を使う。) |
+
 テーブルのソート仕様 (多くの場合は単一のカラムのソート仕様を扱いますが、場合によってはそれ以上のものもあります)。
 TableGetSortSpecs()をコールすることで得られる。
-SpecsDirty == true' の場合、データをソートすることができます。前回コールしたとき、あるいは初めてコールしたときからソート仕様が変更されている場合に真になります。
-ソート後に必ず 'SpecsDirty = false' を設定しないと、毎フレームデータを無駄にソートしてしまう可能性があります！
+`SpecsDirty == true` の場合、データをソートすることができます。前回コールしたとき、あるいは初めてコールしたときからソート仕様が変更されている場合に真になります。
+ソート後に必ず `SpecsDirty = false` を設定しないと、毎フレームデータを無駄にソートしてしまう可能性があります！
 
 ```cpp
 struct ImGuiTableSortSpecs
 {
-    const ImGuiTableColumnSortSpecs* Specs;     // Pointer to sort spec array.
-    int                         SpecsCount;     // Sort spec count. Most often 1. May be > 1 when ImGuiTableFlags_SortMulti is enabled. May be == 0 when ImGuiTableFlags_SortTristate is enabled.
-    bool                        SpecsDirty;     // Set to true when specs have changed since last time! Use this to sort again, then clear the flag.
+    const ImGuiTableColumnSortSpecs* Specs;
+    int                         SpecsCount;
+    bool                        SpecsDirty;
 
     ImGuiTableSortSpecs()       { memset(this, 0, sizeof(*this)); }
 };
 ```
+
+|名前|説明|
+|---|---|
+| Specs      | ソート指定配列へのポインタ。 |
+| SpecsCount | ソート指定数。ImGuiTableFlags_SortMulti が有効な場合、1 を超えることがあります。ImGuiTableFlags_SortTristate が有効な場合、== 0 になる可能性があります。 |
+| SpecsDirty | 前回から仕様が変更された場合、trueに設定する！これを使用して再度ソートし、フラグをクリアします。 |
 
 ## ヘルパー
 
@@ -4006,16 +4154,22 @@ struct ImGuiTableSortSpecs
 - Math Operators
 - ImColor
 
-ヘルパー: Unicodeの定義
+### Unicodeの定義 ヘルパー
 
 ```cpp
-#define IM_UNICODE_CODEPOINT_INVALID 0xFFFD     // Invalid Unicode code point (standard value).
+#define IM_UNICODE_CODEPOINT_INVALID 0xFFFD
 #ifdef IMGUI_USE_WCHAR32
-#define IM_UNICODE_CODEPOINT_MAX     0x10FFFF   // Maximum Unicode code point supported by this build.
+#define IM_UNICODE_CODEPOINT_MAX     0x10FFFF
 #else
-#define IM_UNICODE_CODEPOINT_MAX     0xFFFF     // Maximum Unicode code point supported by this build.
+#define IM_UNICODE_CODEPOINT_MAX     0xFFFF
 #endif
 ```
+
+|名前|説明|
+|---|---|
+| IM_UNICODE_CODEPOINT_INVALID | 無効な Unicode コードポイント（標準値）。        |
+| IM_UNICODE_CODEPOINT_MAX     | このビルドがサポートする最大 Unicode コードポイント。 |
+| IM_UNICODE_CODEPOINT_MAX     | このビルドがサポートする最大 Unicode コードポイント。 |
 
 ### ImGuiOnceUponAFrame ヘルパー
 
@@ -4040,13 +4194,18 @@ struct ImGuiOnceUponAFrame
 struct ImGuiTextFilter
 {
     IMGUI_API           ImGuiTextFilter(const char* default_filter = "");
-    IMGUI_API bool      Draw(const char* label = "Filter (inc,-exc)", float width = 0.0f);  // Helper calling InputText+Build
+    IMGUI_API bool      Draw(const char* label = "Filter (inc,-exc)", float width = 0.0f);
     IMGUI_API bool      PassFilter(const char* text, const char* text_end = NULL) const;
     IMGUI_API void      Build();
     void                Clear()          { InputBuf[0] = 0; Build(); }
     bool                IsActive() const { return !Filters.empty(); }
+```
 
-    // [Internal]
+- `Draw()`: InputText+Buildを呼び出すヘルパー
+
+(内部)
+
+```cpp
     struct ImGuiTextRange
     {
         const char*     b;
@@ -4078,7 +4237,7 @@ struct ImGuiTextBuffer
     ImGuiTextBuffer()   { }
     inline char         operator[](int i) const { IM_ASSERT(Buf.Data != NULL); return Buf.Data[i]; }
     const char*         begin() const           { return Buf.Data ? &Buf.front() : EmptyString; }
-    const char*         end() const             { return Buf.Data ? &Buf.back() : EmptyString; }   // Buf is zero-terminated, so end() will point on the zero-terminator
+    const char*         end() const             { return Buf.Data ? &Buf.back() : EmptyString; }
     int                 size() const            { return Buf.Size ? Buf.Size - 1 : 0; }
     bool                empty() const           { return Buf.Size <= 1; }
     void                clear()                 { Buf.clear(); }
@@ -4089,6 +4248,8 @@ struct ImGuiTextBuffer
     IMGUI_API void      appendfv(const char* fmt, va_list args) IM_FMTLIST(2);
 };
 ```
+
+- `end()`: Bufはゼロ終端なので、end()はゼロ終端を指す。
 
 ### ImGuiStorage ヘルパー
 
@@ -4105,44 +4266,62 @@ struct ImGuiTextBuffer
 ```cpp
 struct ImGuiStorage
 {
-    // [Internal]
-    struct ImGuiStoragePair
-    {
-        ImGuiID key;
-        union { int val_i; float val_f; void* val_p; };
-        ImGuiStoragePair(ImGuiID _key, int _val_i)      { key = _key; val_i = _val_i; }
-        ImGuiStoragePair(ImGuiID _key, float _val_f)    { key = _key; val_f = _val_f; }
-        ImGuiStoragePair(ImGuiID _key, void* _val_p)    { key = _key; val_p = _val_p; }
-    };
+```
 
-    ImVector<ImGuiStoragePair>      Data;
+（内部）
 
-    // - Get***() functions find pair, never add/allocate. Pairs are sorted so a query is O(log N)
-    // - Set***() functions find pair, insertion on demand if missing.
-    // - Sorted insertion is costly, paid once. A typical frame shouldn't need to insert any new pair.
-    void                Clear() { Data.clear(); }
-    IMGUI_API int       GetInt(ImGuiID key, int default_val = 0) const;
-    IMGUI_API void      SetInt(ImGuiID key, int val);
-    IMGUI_API bool      GetBool(ImGuiID key, bool default_val = false) const;
-    IMGUI_API void      SetBool(ImGuiID key, bool val);
-    IMGUI_API float     GetFloat(ImGuiID key, float default_val = 0.0f) const;
-    IMGUI_API void      SetFloat(ImGuiID key, float val);
-    IMGUI_API void*     GetVoidPtr(ImGuiID key) const; // default_val is NULL
-    IMGUI_API void      SetVoidPtr(ImGuiID key, void* val);
+```cpp
+struct ImGuiStoragePair
+{
+    ImGuiID key;
+    union { int val_i; float val_f; void* val_p; };
+    ImGuiStoragePair(ImGuiID _key, int _val_i)      { key = _key; val_i = _val_i; }
+    ImGuiStoragePair(ImGuiID _key, float _val_f)    { key = _key; val_f = _val_f; }
+    ImGuiStoragePair(ImGuiID _key, void* _val_p)    { key = _key; val_p = _val_p; }
+};
 
-    // - Get***Ref() functions finds pair, insert on demand if missing, return pointer. Useful if you intend to do Get+Set.
-    // - References are only valid until a new value is added to the storage. Calling a Set***() function or a Get***Ref() function invalidates the pointer.
-    // - A typical use case where this is convenient for quick hacking (e.g. add storage during a live Edit&Continue session if you can't modify existing struct)
-    //      float* pvar = ImGui::GetFloatRef(key); ImGui::SliderFloat("var", pvar, 0, 100.0f); some_var += *pvar;
-    IMGUI_API int*      GetIntRef(ImGuiID key, int default_val = 0);
-    IMGUI_API bool*     GetBoolRef(ImGuiID key, bool default_val = false);
-    IMGUI_API float*    GetFloatRef(ImGuiID key, float default_val = 0.0f);
-    IMGUI_API void**    GetVoidPtrRef(ImGuiID key, void* default_val = NULL);
+ImVector<ImGuiStoragePair> Data;
+```
 
-    // Use on your own storage if you know only integer are being stored (open/close all tree nodes)
-    IMGUI_API void      SetAllInt(int val);
+- ` Get***()` 関数はペアを見つけるだけで、追加や割り当てはしない。ペアはソートされているので、クエリはO(log N)
+- ` Set***()` 関数はペアを検索し、欠落していればオンデマンドで挿入する。
+- 並べ替えの挿入にはコストがかかる。一般的なフレームでは、新しいペアを挿入する必要はありません。
 
-    // For quicker full rebuild of a storage (instead of an incremental one), you may add all your contents and then sort once.
+```cpp
+void                Clear() { Data.clear(); }
+IMGUI_API int       GetInt(ImGuiID key, int default_val = 0) const;
+IMGUI_API void      SetInt(ImGuiID key, int val);
+IMGUI_API bool      GetBool(ImGuiID key, bool default_val = false) const;
+IMGUI_API void      SetBool(ImGuiID key, bool val);
+IMGUI_API float     GetFloat(ImGuiID key, float default_val = 0.0f) const;
+IMGUI_API void      SetFloat(ImGuiID key, float val);
+IMGUI_API void*     GetVoidPtr(ImGuiID key) const;
+IMGUI_API void      SetVoidPtr(ImGuiID key, void* val);
+```
+
+- `GetVoidPtr()`: default_valはNULL
+
+- `Get****Ref()`関数はペアを見つけ、見つからない場合はオンデマンドで挿入し、ポインタを返す。Get+Setを行う場合に便利。
+- 参照は、新しい値がストレージに追加されるまで有効である。`Set***()` 関数や `Get***Ref()` 関数を呼び出すと、ポインタは無効になる。
+- 迅速なハッキングに便利な典型的な使用例 (例えば、既存の構造体を変更できない場合、ライブのEdit&Continueセッション中にストレージを追加する。)
+  - `float* pvar = ImGui::GetFloatRef(key); ImGui::SliderFloat("var", pvar, 0, 100.0f); some_var += *pvar;`
+
+```cpp
+IMGUI_API int*      GetIntRef(ImGuiID key, int default_val = 0);
+IMGUI_API bool*     GetBoolRef(ImGuiID key, bool default_val = false);
+IMGUI_API float*    GetFloatRef(ImGuiID key, float default_val = 0.0f);
+IMGUI_API void**    GetVoidPtrRef(ImGuiID key, void* default_val = NULL);
+```
+
+整数だけが保存されていることが分かっている場合、自分のストレージで使用する（すべてのツリーノードを開く/閉じる）
+ 
+```cpp
+IMGUI_API void      SetAllInt(int val);
+```
+
+ストレージの完全な再構築を（インクリメンタルではなく）迅速に行うには、すべてのコンテンツを追加してから、一度ソートすることができます。
+
+```cpp
     IMGUI_API void      BuildSortByKey();
 };
 ```
@@ -4175,27 +4354,52 @@ while (clipper.Step())
 ```cpp
 struct ImGuiListClipper
 {
-    ImGuiContext*   Ctx;                // Parent UI context
-    int             DisplayStart;       // First item to display, updated by each call to Step()
-    int             DisplayEnd;         // End of items to display (exclusive)
-    int             ItemsCount;         // [Internal] Number of items
-    float           ItemsHeight;        // [Internal] Height of item after a first step and item submission can calculate it
-    float           StartPosY;          // [Internal] Cursor position at the time of Begin() or after table frozen rows are all processed
-    void*           TempData;           // [Internal] Internal data
+    ImGuiContext* Ctx;
+    int           DisplayStart;
+    int           DisplayEnd;
+    int           ItemsCount;
+    float         ItemsHeight;
+    float         StartPosY;
+    void*         TempData;
+```
 
-    // items_count: Use INT_MAX if you don't know how many items you have (in which case the cursor won't be advanced in the final step)
-    // items_height: Use -1.0f to be calculated automatically on first step. Otherwise pass in the distance between your items, typically GetTextLineHeightWithSpacing() or GetFrameHeightWithSpacing().
-    IMGUI_API ImGuiListClipper();
-    IMGUI_API ~ImGuiListClipper();
-    IMGUI_API void  Begin(int items_count, float items_height = -1.0f);
-    IMGUI_API void  End();             // Automatically called on the last call of Step() that returns false.
-    IMGUI_API bool  Step();            // Call until it returns false. The DisplayStart/DisplayEnd fields will be set and you can process/draw those items.
+|名前|説明|
+|---|---|
+| Ctx          | 親UIコンテキスト |
+| DisplayStart | Step()を呼び出すたびに更新される、最初に表示される項目。 |
+| DisplayEnd   | 表示項目終了（排他的） |
+| ItemsCount   | (内部) アイテム数 |
+| ItemsHeight  | (内部) 最初のステップとアイテム提出後のアイテムの高さを計算することができる |
+| StartPosY    | (内部) Begin()時点、あるいはテーブルの凍結行がすべて処理された後のカーソル位置。 |
+| TempData     | (内部) 内部データ|
 
-    // Call IncludeItemByIndex() or IncludeItemsByIndex() *BEFORE* first call to Step() if you need a range of items to not be clipped, regardless of their visibility.
-    // (Due to alignment / padding of certain items it is possible that an extra item may be included on either end of the display range).
-    inline void     IncludeItemByIndex(int item_index)                  { IncludeItemsByIndex(item_index, item_index + 1); }
-    IMGUI_API void  IncludeItemsByIndex(int item_begin, int item_end);  // item_end is exclusive e.g. use (42, 42+1) to make item 42 never clipped.
+- `items_count`: アイテムの数がわからない場合は`INT_MAX`を使用する（その場合、最終ステップでカーソルは進められない）。
+- `items_height`: 最初のステップで自動的に計算される場合は、`-1.0f` を使用します。そうでない場合は、アイテム間の距離を渡します。通常は GetTextLineHeightWithSpacing() または GetFrameHeightWithSpacing() を使用します。
 
+```cpp
+IMGUI_API ImGuiListClipper();
+IMGUI_API ~ImGuiListClipper();
+IMGUI_API void  Begin(int items_count, float items_height = -1.0f);
+IMGUI_API void  End();
+IMGUI_API bool  Step();
+```
+
+| 名前 | 説明 |
+|---|---|
+| End()  | Step() の最後の呼び出しで false を返したときに自動的に呼び出される。 |
+| Step() | false を返すまで呼び出す。DisplayStart/DisplayEndフィールドが設定され、それらの項目を処理/描画できるようになります。 |
+
+アイテムの可視性に関係なく、クリッピングされないアイテムの範囲が必要な場合は、Step() の最初の呼び出しの前に IncludeItemByIndex() または IncludeItemsByIndex() を呼び出します。
+(特定の項目のアライメント/パディングのため、表示範囲の両端に余分な項目が含まれる可能性があります。).
+
+```cpp
+inline void     IncludeItemByIndex(int item_index) { IncludeItemsByIndex(item_index, item_index + 1); }
+IMGUI_API void  IncludeItemsByIndex(int item_begin, int item_end);
+```
+
+- `IncludeItemsByIndex()`: item_endは排他的である。例えば、(42, 42+1)を使えば、item42はクリップされない。
+
+```cpp
 #ifndef IMGUI_DISABLE_OBSOLETE_FUNCTIONS
     inline void IncludeRangeByIndices(int item_begin, int item_end)      { IncludeItemsByIndex(item_begin, item_end); } // [renamed in 1.89.9]
     inline void ForceDisplayRangeByIndices(int item_begin, int item_end) { IncludeItemsByIndex(item_begin, item_end); } // [renamed in 1.89.6]
@@ -4255,10 +4459,14 @@ IM_MSVC_RUNTIME_CHECKS_RESTORE
 #endif
 #endif
 #define IM_COL32(R,G,B,A)    (((ImU32)(A)<<IM_COL32_A_SHIFT) | ((ImU32)(B)<<IM_COL32_B_SHIFT) | ((ImU32)(G)<<IM_COL32_G_SHIFT) | ((ImU32)(R)<<IM_COL32_R_SHIFT))
-#define IM_COL32_WHITE       IM_COL32(255,255,255,255)  // Opaque white = 0xFFFFFFFF
-#define IM_COL32_BLACK       IM_COL32(0,0,0,255)        // Opaque black
-#define IM_COL32_BLACK_TRANS IM_COL32(0,0,0,0)          // Transparent black = 0x00000000
+#define IM_COL32_WHITE       IM_COL32(255,255,255,255)
+#define IM_COL32_BLACK       IM_COL32(0,0,0,255)
+#define IM_COL32_BLACK_TRANS IM_COL32(0,0,0,0)
 ```
+
+- `IM_COL32_WHITE`: 不透明な白 = 0xFFFFFFFF
+- `IM_COL32_BLACK`: 不透明な黒
+- `IM_COL32_BLACK_TRANS`: 透明な黒 = 0x00000000
 
 ### ImColor ヘルパー
 
@@ -4338,22 +4546,39 @@ typedef void (*ImDrawCallback)(const ImDrawList* parent_list, const ImDrawCmd* c
 ```cpp
 struct ImDrawCmd
 {
-    ImVec4          ClipRect;           // 4*4  // Clipping rectangle (x1, y1, x2, y2). Subtract ImDrawData->DisplayPos to get clipping rectangle in "viewport" coordinates
-    ImTextureID     TextureId;          // 4-8  // User-provided texture ID. Set by user in ImfontAtlas::SetTexID() for fonts or passed to Image*() functions. Ignore if never using images or multiple fonts atlas.
-    unsigned int    VtxOffset;          // 4    // Start offset in vertex buffer. ImGuiBackendFlags_RendererHasVtxOffset: always 0, otherwise may be >0 to support meshes larger than 64K vertices with 16-bit indices.
-    unsigned int    IdxOffset;          // 4    // Start offset in index buffer.
-    unsigned int    ElemCount;          // 4    // Number of indices (multiple of 3) to be rendered as triangles. Vertices are stored in the callee ImDrawList's vtx_buffer[] array, indices in idx_buffer[].
-    ImDrawCallback  UserCallback;       // 4-8  // If != NULL, call the function instead of rendering the vertices. clip_rect and texture_id will be set normally.
-    void*           UserCallbackData;   // 4-8  // The draw callback code can access this.
+    ImVec4          ClipRect;
+    ImTextureID     TextureId;
+    unsigned int    VtxOffset;
+    unsigned int    IdxOffset;
+    unsigned int    ElemCount;
+    ImDrawCallback  UserCallback;
+    void*           UserCallbackData;
+```
 
-    ImDrawCmd() { memset(this, 0, sizeof(*this)); } // Also ensure our padding fields are zeroed
+|名前|値|説明|
+|---|---|---|
+| ClipRect         | `4*4` | クリッピング矩形(x1, y1, x2, y2)。ImDrawData->DisplayPosを減算して、"viewport "座標でのクリッピング矩形を得る。 |
+| TextureId        | `4-8` | ユーザー提供のテクスチャ ID。ユーザーがフォントに対して ImfontAtlas::SetTexID() で設定するか、 Image*() 関数に渡す。画像や複数のフォントアトラスを使用しない場合は無視する。 |
+| VtxOffset        | `4`   | 頂点バッファの開始オフセット。ImGuiBackendFlags_RendererHasVtxOffset: 常に0、そうでない場合は16ビットインデックスで64K頂点より大きいメッシュをサポートするために`>0`にすることができる。 |
+| IdxOffset        | `4`   | インデックスバッファの開始オフセット。 |
+| ElemCount        | `4`   | 三角形としてレンダリングするインデックスの数（3の倍数）。頂点はImDrawListの`vtx_buffer[]`配列に、インデックスは`idx_buffer[]`に格納される。 |
+| UserCallback     | `4-8` | != NULLの場合、頂点をレンダリングする代わりに関数を呼び出します。clip_rectとtexture_idは通常通り設定されます。 |
+| UserCallbackData | `4-8` | 描画コールバックコードはこれにアクセスできる。 |
 
-    // Since 1.83: returns ImTextureID associated with this draw call. Warning: DO NOT assume this is always same as 'TextureId' (we will change this function for an upcoming feature)
+```cpp
+ImDrawCmd() { memset(this, 0, sizeof(*this)); }
+```
+
+- `ImDrawCmd()`: また、パディング・フィールドがゼロであることを確認する。
+
+1.83 以降: この描画呼び出しに関連する ImTextureID を返します。警告：警告: これは常に 'TextureId' と同じだと思わないでください。
+
+```cpp
     inline ImTextureID GetTexID() const { return TextureId; }
 };
 ```
 
-頂点レイアウト
+### 頂点レイアウト
 
 ```cpp
 #ifndef IMGUI_OVERRIDE_DRAWVERT_STRUCT_LAYOUT
@@ -4376,7 +4601,7 @@ IMGUI_OVERRIDE_DRAWVERT_STRUCT_LAYOUT;
 #endif
 ```
 
-[内部] ImDrawListで使用
+(内部) ImDrawListで使用
 
 ```cpp
 struct ImDrawCmdHeader
@@ -4387,7 +4612,7 @@ struct ImDrawCmdHeader
 };
 ```
 
-[内部] ImDrawListSplitter で使用する。
+(内部) ImDrawListSplitter で使用する。
 
 ```cpp
 struct ImDrawChannel
@@ -4405,19 +4630,29 @@ struct ImDrawChannel
 ```cpp
 struct ImDrawListSplitter
 {
-    int                         _Current;    // Current channel number (0)
-    int                         _Count;      // Number of active channels (1+)
-    ImVector<ImDrawChannel>     _Channels;   // Draw channels (not resized down so _Count might be < Channels.Size)
+    int                     _Current;
+    int                     _Count;
+    ImVector<ImDrawChannel> _Channels;
+```
 
+|名前|説明|
+|---|---|
+| _Current  | 現在のチャンネル番号 (0) |
+| _Count    | アクティブ・チャンネル数 (1+) |
+| _Channels | ドロー・チャンネル (リサイズされていないので、_Count は `< Channels.Size` になるかもしれない) |
+
+```cpp
     inline ImDrawListSplitter()  { memset(this, 0, sizeof(*this)); }
     inline ~ImDrawListSplitter() { ClearFreeMemory(); }
-    inline void                 Clear() { _Current = 0; _Count = 1; } // Do not clear Channels[] so our allocations are reused next frame
+    inline void                 Clear() { _Current = 0; _Count = 1; }
     IMGUI_API void              ClearFreeMemory();
     IMGUI_API void              Split(ImDrawList* draw_list, int count);
     IMGUI_API void              Merge(ImDrawList* draw_list);
     IMGUI_API void              SetCurrentChannel(ImDrawList* draw_list, int channel_idx);
 };
 ```
+
+- `Clear()`: `Channels[]`をクリアしない。そのため、次のフレームでアロケーションが再利用される。
 
 ### ImDrawList 関数のフラグ
 
@@ -4426,22 +4661,39 @@ struct ImDrawListSplitter
 ```cpp
 enum ImDrawFlags_
 {
-    ImDrawFlags_None                        = 0,
-    ImDrawFlags_Closed                      = 1 << 0, // PathStroke(), AddPolyline(): specify that shape should be closed (Important: this is always == 1 for legacy reason)
-    ImDrawFlags_RoundCornersTopLeft         = 1 << 4, // AddRect(), AddRectFilled(), PathRect(): enable rounding top-left corner only (when rounding > 0.0f, we default to all corners). Was 0x01.
-    ImDrawFlags_RoundCornersTopRight        = 1 << 5, // AddRect(), AddRectFilled(), PathRect(): enable rounding top-right corner only (when rounding > 0.0f, we default to all corners). Was 0x02.
-    ImDrawFlags_RoundCornersBottomLeft      = 1 << 6, // AddRect(), AddRectFilled(), PathRect(): enable rounding bottom-left corner only (when rounding > 0.0f, we default to all corners). Was 0x04.
-    ImDrawFlags_RoundCornersBottomRight     = 1 << 7, // AddRect(), AddRectFilled(), PathRect(): enable rounding bottom-right corner only (when rounding > 0.0f, we default to all corners). Wax 0x08.
-    ImDrawFlags_RoundCornersNone            = 1 << 8, // AddRect(), AddRectFilled(), PathRect(): disable rounding on all corners (when rounding > 0.0f). This is NOT zero, NOT an implicit flag!
-    ImDrawFlags_RoundCornersTop             = ImDrawFlags_RoundCornersTopLeft | ImDrawFlags_RoundCornersTopRight,
-    ImDrawFlags_RoundCornersBottom          = ImDrawFlags_RoundCornersBottomLeft | ImDrawFlags_RoundCornersBottomRight,
-    ImDrawFlags_RoundCornersLeft            = ImDrawFlags_RoundCornersBottomLeft | ImDrawFlags_RoundCornersTopLeft,
-    ImDrawFlags_RoundCornersRight           = ImDrawFlags_RoundCornersBottomRight | ImDrawFlags_RoundCornersTopRight,
-    ImDrawFlags_RoundCornersAll             = ImDrawFlags_RoundCornersTopLeft | ImDrawFlags_RoundCornersTopRight | ImDrawFlags_RoundCornersBottomLeft | ImDrawFlags_RoundCornersBottomRight,
-    ImDrawFlags_RoundCornersDefault_        = ImDrawFlags_RoundCornersAll, // Default to ALL corners if none of the _RoundCornersXX flags are specified.
-    ImDrawFlags_RoundCornersMask_           = ImDrawFlags_RoundCornersAll | ImDrawFlags_RoundCornersNone,
+    ImDrawFlags_None                    = 0,
+    ImDrawFlags_Closed                  = 1 << 0,
+    ImDrawFlags_RoundCornersTopLeft     = 1 << 4,
+    ImDrawFlags_RoundCornersTopRight    = 1 << 5,
+    ImDrawFlags_RoundCornersBottomLeft  = 1 << 6,
+    ImDrawFlags_RoundCornersBottomRight = 1 << 7,
+    ImDrawFlags_RoundCornersNone        = 1 << 8,
+    ImDrawFlags_RoundCornersTop         = ImDrawFlags_RoundCornersTopLeft | ImDrawFlags_RoundCornersTopRight,
+    ImDrawFlags_RoundCornersBottom      = ImDrawFlags_RoundCornersBottomLeft | ImDrawFlags_RoundCornersBottomRight,
+    ImDrawFlags_RoundCornersLeft        = ImDrawFlags_RoundCornersBottomLeft | ImDrawFlags_RoundCornersTopLeft,
+    ImDrawFlags_RoundCornersRight       = ImDrawFlags_RoundCornersBottomRight | ImDrawFlags_RoundCornersTopRight,
+    ImDrawFlags_RoundCornersAll         = ImDrawFlags_RoundCornersTopLeft | ImDrawFlags_RoundCornersTopRight | ImDrawFlags_RoundCornersBottomLeft | ImDrawFlags_RoundCornersBottomRight,
+    ImDrawFlags_RoundCornersDefault_    = ImDrawFlags_RoundCornersAll,
+    ImDrawFlags_RoundCornersMask_       = ImDrawFlags_RoundCornersAll | ImDrawFlags_RoundCornersNone,
 };
 ```
+
+|名前|使用|説明|
+|---|---|---|
+| ImDrawFlags_None                    | | |
+| ImDrawFlags_Closed                  | PathStroke(), AddPolyline()| 形状を閉じることを指定する（重要：レガシーな理由から、これは常に== 1である）。|
+| ImDrawFlags_RoundCornersTopLeft     | AddRect(), AddRectFilled(), PathRect()| 左上の角のみを丸めるようにした（丸め `> 0.0f` の場合、デフォルトではすべての角を丸める）。0x01だった     |
+| ImDrawFlags_RoundCornersTopRight    | AddRect(), AddRectFilled(), PathRect()| 右上隅の丸めのみを有効にする（丸め `> 0.0f` の場合、デフォルトですべての角を丸める）。0x02だった    |
+| ImDrawFlags_RoundCornersBottomLeft  | AddRect(), AddRectFilled(), PathRect()| 左下の角のみを丸めるようにした（丸め `> 0.0f` の場合、デフォルトではすべての角を丸める）。0x04だった |
+| ImDrawFlags_RoundCornersBottomRight | AddRect(), AddRectFilled(), PathRect()| 右下隅の丸めのみを有効にする（丸め `> 0.0f` の場合、デフォルトですべての角を丸める）。0x08だった |
+| ImDrawFlags_RoundCornersNone        | AddRect(), AddRectFilled(), PathRect()| すべての角の丸めを無効にする（丸め `> 0.0f` の場合）。これは 0 ではないし、暗黙のフラグでもない！       |
+| ImDrawFlags_RoundCornersTop         | | ImDrawFlags_RoundCornersTopLeft + ImDrawFlags_RoundCornersTopRight|
+| ImDrawFlags_RoundCornersBottom      | | ImDrawFlags_RoundCornersBottomLeft + ImDrawFlags_RoundCornersBottomRight|
+| ImDrawFlags_RoundCornersLeft        | | ImDrawFlags_RoundCornersBottomLeft + ImDrawFlags_RoundCornersTopLeft|
+| ImDrawFlags_RoundCornersRight       | | ImDrawFlags_RoundCornersBottomRight + ImDrawFlags_RoundCornersTopRight|
+| ImDrawFlags_RoundCornersAll         | | ImDrawFlags_RoundCornersTopLeft + ImDrawFlags_RoundCornersTopRight + ImDrawFlags_RoundCornersBottomLeft + ImDrawFlags_RoundCornersBottomRight|
+| ImDrawFlags_RoundCornersDefault_    | | ImDrawFlags_RoundCornersAll. RoundCornersXXフラグが指定されていない場合、デフォルトはすべてのコーナー。|
+| ImDrawFlags_RoundCornersMask_       | | ImDrawFlags_RoundCornersAll + ImDrawFlags_RoundCornersNone,|
 
 ImDrawList インスタンスのフラグ。これらは ImGui:: 関数によって ImGuiIO の設定から自動的に設定されるもので、一般的には直接操作することはできません。
 しかし、ImDrawList::関数を呼び出す間にフラグを一時的に変更することは可能です。
@@ -4450,135 +4702,220 @@ ImDrawList インスタンスのフラグ。これらは ImGui:: 関数によっ
 enum ImDrawListFlags_
 {
     ImDrawListFlags_None                    = 0,
-    ImDrawListFlags_AntiAliasedLines        = 1 << 0,  // Enable anti-aliased lines/borders (*2 the number of triangles for 1.0f wide line or lines thin enough to be drawn using textures, otherwise *3 the number of triangles)
-    ImDrawListFlags_AntiAliasedLinesUseTex  = 1 << 1,  // Enable anti-aliased lines/borders using textures when possible. Require backend to render with bilinear filtering (NOT point/nearest filtering).
-    ImDrawListFlags_AntiAliasedFill         = 1 << 2,  // Enable anti-aliased edge around filled shapes (rounded rectangles, circles).
-    ImDrawListFlags_AllowVtxOffset          = 1 << 3,  // Can emit 'VtxOffset > 0' to allow large meshes. Set when 'ImGuiBackendFlags_RendererHasVtxOffset' is enabled.
+    ImDrawListFlags_AntiAliasedLines        = 1 << 0,
+    ImDrawListFlags_AntiAliasedLinesUseTex  = 1 << 1,
+    ImDrawListFlags_AntiAliasedFill         = 1 << 2,
+    ImDrawListFlags_AllowVtxOffset          = 1 << 3,
 };
 ```
+
+|名前|説明|
+|---|---|
+| ImDrawListFlags_None                    | |
+| ImDrawListFlags_AntiAliasedLines        | アンチエイリアス線/ボーダーを有効にする (*2 幅1.0fの線、またはテクスチャを使用して描画できるほど細い線の場合は三角形の数、そうでない場合は *3 三角形の数) |
+| ImDrawListFlags_AntiAliasedLinesUseTex  | 可能な限り、テクスチャを使用してアンチエイリアス線/ボーダーを有効にする。バックエンドにバイリニアフィルタリング（ポイント/ニアレストフィルタリングではない）でのレンダリングを要求する。 |
+| ImDrawListFlags_AntiAliasedFill         | 塗りつぶされたシェイプ（丸みを帯びた長方形、円）の周りのアンチエイリアスエッジを有効にします。 |
+| ImDrawListFlags_AllowVtxOffset          | '`VtxOffset > 0`' を指定して、大きなメッシュを表示できるようにする。ImGuiBackendFlags_RendererHasVtxOffset' が有効な場合に設定する。 |
 
 ### 描画コマンドリスト
 
 これは、ImGui::関数が充填するポリゴンの低レベルリストです。フレームの終わりには、すべてのコマンドリストがレンダリングのために ImGuiIO::RenderDrawListFn 関数に渡されます。
-それぞれの親愛なるimguiウィンドウはそれ自身のImDrawListを含んでいます。ImGui::GetWindowDrawList()を使って、現在のウィンドウ描画リストにアクセスし、カスタムプリミティブを描画することができます。
+それぞれのdear imguiウィンドウはそれ自身のImDrawListを含んでいます。ImGui::GetWindowDrawList()を使って、現在のウィンドウ描画リストにアクセスし、カスタムプリミティブを描画することができます。
 通常のImGui::の呼び出しと、現在の描画リストへのプリミティブの追加をインターリーブすることができます。
-シングルビューポートモードでは、左上は== GetMainViewport()->Pos (一般的には0,0)、右下は== GetMainViewport()->Pos+Size (一般的にはio.DisplaySize)です。
+シングルビューポートモードでは、左上は `== GetMainViewport()->Pos` (一般的には0,0)、右下は `== GetMainViewport()->Pos+Size` (一般的にはio.DisplaySize)です。
 データにどのような変換行列を適用するかは完全に自由です（変換の用途によっては、ClipRectにも適用したくなるかもしれません！）。
 重要：プリミティブは常にリストに追加され、カリングされません（カリングはImGui::関数によってより高いレベルで行われます）。
 
 ```cpp
 struct ImDrawList
 {
-    // This is what you have to render
-    ImVector<ImDrawCmd>     CmdBuffer;          // Draw commands. Typically 1 command = 1 GPU draw call, unless the command is a callback.
-    ImVector<ImDrawIdx>     IdxBuffer;          // Index buffer. Each command consume ImDrawCmd::ElemCount of those
-    ImVector<ImDrawVert>    VtxBuffer;          // Vertex buffer.
-    ImDrawListFlags         Flags;              // Flags, you may poke into these to adjust anti-aliasing settings per-primitive.
+```
 
-    // [Internal, used while building lists]
-    unsigned int            _VtxCurrentIdx;     // [Internal] generally == VtxBuffer.Size unless we are past 64K vertices, in which case this gets reset to 0.
-    ImDrawListSharedData*   _Data;              // Pointer to shared draw data (you can use ImGui::GetDrawListSharedData() to get the one from current ImGui context)
-    const char*             _OwnerName;         // Pointer to owner window's name for debugging
-    ImDrawVert*             _VtxWritePtr;       // [Internal] point within VtxBuffer.Data after each add command (to avoid using the ImVector<> operators too much)
-    ImDrawIdx*              _IdxWritePtr;       // [Internal] point within IdxBuffer.Data after each add command (to avoid using the ImVector<> operators too much)
-    ImVector<ImVec4>        _ClipRectStack;     // [Internal]
-    ImVector<ImTextureID>   _TextureIdStack;    // [Internal]
-    ImVector<ImVec2>        _Path;              // [Internal] current path building
-    ImDrawCmdHeader         _CmdHeader;         // [Internal] template of active commands. Fields should match those of CmdBuffer.back().
-    ImDrawListSplitter      _Splitter;          // [Internal] for channels api (note: prefer using your own persistent instance of ImDrawListSplitter!)
-    float                   _FringeScale;       // [Internal] anti-alias fringe is scaled by this value, this helps to keep things sharp while zooming at vertex buffer content
+これをレンダリングしなければならない
 
-    // If you want to create ImDrawList instances, pass them ImGui::GetDrawListSharedData() or create and use your own ImDrawListSharedData (so you can use ImDrawList without ImGui)
-    ImDrawList(ImDrawListSharedData* shared_data) { memset(this, 0, sizeof(*this)); _Data = shared_data; }
+```cpp
+ImVector<ImDrawCmd>  CmdBuffer;
+ImVector<ImDrawIdx>  IdxBuffer;
+ImVector<ImDrawVert> VtxBuffer;
+ImDrawListFlags      Flags;
+```
 
-    ~ImDrawList() { _ClearFreeMemory(); }
-    IMGUI_API void  PushClipRect(const ImVec2& clip_rect_min, const ImVec2& clip_rect_max, bool intersect_with_current_clip_rect = false);  // Render-level scissoring. This is passed down to your render function but not used for CPU-side coarse clipping. Prefer using higher-level ImGui::PushClipRect() to affect logic (hit-testing and widget culling)
-    IMGUI_API void  PushClipRectFullScreen();
-    IMGUI_API void  PopClipRect();
-    IMGUI_API void  PushTextureID(ImTextureID texture_id);
-    IMGUI_API void  PopTextureID();
-    inline ImVec2   GetClipRectMin() const { const ImVec4& cr = _ClipRectStack.back(); return ImVec2(cr.x, cr.y); }
-    inline ImVec2   GetClipRectMax() const { const ImVec4& cr = _ClipRectStack.back(); return ImVec2(cr.z, cr.w); }
+|名前|説明|
+|---|---|
+| CmdBuffer | 描画コマンド。通常、コマンドがコールバックでない限り、1 コマンド = 1 GPU 描画コールです。 |
+| IdxBuffer | インデックスバッファ。各コマンドはImDrawCmd::ElemCountを消費する。 |
+| VtxBuffer | 頂点バッファ。 |
+| Flags     | フラグを設定すれば、プリミティブごとにアンチエイリアシングの設定を調整できる。 |
 
-    // Primitives
-    // - Filled shapes must always use clockwise winding order. The anti-aliasing fringe depends on it. Counter-clockwise shapes will have "inward" anti-aliasing.
-    // - For rectangular primitives, "p_min" and "p_max" represent the upper-left and lower-right corners.
-    // - For circle primitives, use "num_segments == 0" to automatically calculate tessellation (preferred).
-    //   In older versions (until Dear ImGui 1.77) the AddCircle functions defaulted to num_segments == 12.
-    //   In future versions we will use textures to provide cheaper and higher-quality circles.
-    //   Use AddNgon() and AddNgonFilled() functions if you need to guarantee a specific number of sides.
-    IMGUI_API void  AddLine(const ImVec2& p1, const ImVec2& p2, ImU32 col, float thickness = 1.0f);
-    IMGUI_API void  AddRect(const ImVec2& p_min, const ImVec2& p_max, ImU32 col, float rounding = 0.0f, ImDrawFlags flags = 0, float thickness = 1.0f);   // a: upper-left, b: lower-right (== upper-left + size)
-    IMGUI_API void  AddRectFilled(const ImVec2& p_min, const ImVec2& p_max, ImU32 col, float rounding = 0.0f, ImDrawFlags flags = 0);                     // a: upper-left, b: lower-right (== upper-left + size)
-    IMGUI_API void  AddRectFilledMultiColor(const ImVec2& p_min, const ImVec2& p_max, ImU32 col_upr_left, ImU32 col_upr_right, ImU32 col_bot_right, ImU32 col_bot_left);
-    IMGUI_API void  AddQuad(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, ImU32 col, float thickness = 1.0f);
-    IMGUI_API void  AddQuadFilled(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, ImU32 col);
-    IMGUI_API void  AddTriangle(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, ImU32 col, float thickness = 1.0f);
-    IMGUI_API void  AddTriangleFilled(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, ImU32 col);
-    IMGUI_API void  AddCircle(const ImVec2& center, float radius, ImU32 col, int num_segments = 0, float thickness = 1.0f);
-    IMGUI_API void  AddCircleFilled(const ImVec2& center, float radius, ImU32 col, int num_segments = 0);
-    IMGUI_API void  AddNgon(const ImVec2& center, float radius, ImU32 col, int num_segments, float thickness = 1.0f);
-    IMGUI_API void  AddNgonFilled(const ImVec2& center, float radius, ImU32 col, int num_segments);
-    IMGUI_API void  AddText(const ImVec2& pos, ImU32 col, const char* text_begin, const char* text_end = NULL);
-    IMGUI_API void  AddText(const ImFont* font, float font_size, const ImVec2& pos, ImU32 col, const char* text_begin, const char* text_end = NULL, float wrap_width = 0.0f, const ImVec4* cpu_fine_clip_rect = NULL);
-    IMGUI_API void  AddPolyline(const ImVec2* points, int num_points, ImU32 col, ImDrawFlags flags, float thickness);
-    IMGUI_API void  AddConvexPolyFilled(const ImVec2* points, int num_points, ImU32 col);
-    IMGUI_API void  AddBezierCubic(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, ImU32 col, float thickness, int num_segments = 0); // Cubic Bezier (4 control points)
-    IMGUI_API void  AddBezierQuadratic(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, ImU32 col, float thickness, int num_segments = 0);               // Quadratic Bezier (3 control points)
+内部、リスト作成時に使用
 
-    // Image primitives
-    // - Read FAQ to understand what ImTextureID is.
-    // - "p_min" and "p_max" represent the upper-left and lower-right corners of the rectangle.
-    // - "uv_min" and "uv_max" represent the normalized texture coordinates to use for those corners. Using (0,0)->(1,1) texture coordinates will generally display the entire texture.
-    IMGUI_API void  AddImage(ImTextureID user_texture_id, const ImVec2& p_min, const ImVec2& p_max, const ImVec2& uv_min = ImVec2(0, 0), const ImVec2& uv_max = ImVec2(1, 1), ImU32 col = IM_COL32_WHITE);
-    IMGUI_API void  AddImageQuad(ImTextureID user_texture_id, const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, const ImVec2& uv1 = ImVec2(0, 0), const ImVec2& uv2 = ImVec2(1, 0), const ImVec2& uv3 = ImVec2(1, 1), const ImVec2& uv4 = ImVec2(0, 1), ImU32 col = IM_COL32_WHITE);
-    IMGUI_API void  AddImageRounded(ImTextureID user_texture_id, const ImVec2& p_min, const ImVec2& p_max, const ImVec2& uv_min, const ImVec2& uv_max, ImU32 col, float rounding, ImDrawFlags flags = 0);
+```cpp
+unsigned int          _VtxCurrentIdx;
+ImDrawListSharedData* _Data;
+const char*           _OwnerName;
+ImDrawVert*           _VtxWritePtr;
+ImDrawIdx*            _IdxWritePtr;
+ImVector<ImVec4>      _ClipRectStack;
+ImVector<ImTextureID> _TextureIdStack;
+ImVector<ImVec2>      _Path;
+ImDrawCmdHeader       _CmdHeader;
+ImDrawListSplitter    _Splitter;
+float                 _FringeScale;
+```
 
-    // Stateful path API, add points then finish with PathFillConvex() or PathStroke()
-    // - Filled shapes must always use clockwise winding order. The anti-aliasing fringe depends on it. Counter-clockwise shapes will have "inward" anti-aliasing.
-    inline    void  PathClear()                                                 { _Path.Size = 0; }
-    inline    void  PathLineTo(const ImVec2& pos)                               { _Path.push_back(pos); }
-    inline    void  PathLineToMergeDuplicate(const ImVec2& pos)                 { if (_Path.Size == 0 || memcmp(&_Path.Data[_Path.Size - 1], &pos, 8) != 0) _Path.push_back(pos); }
-    inline    void  PathFillConvex(ImU32 col)                                   { AddConvexPolyFilled(_Path.Data, _Path.Size, col); _Path.Size = 0; }
-    inline    void  PathStroke(ImU32 col, ImDrawFlags flags = 0, float thickness = 1.0f) { AddPolyline(_Path.Data, _Path.Size, col, flags, thickness); _Path.Size = 0; }
-    IMGUI_API void  PathArcTo(const ImVec2& center, float radius, float a_min, float a_max, int num_segments = 0);
-    IMGUI_API void  PathArcToFast(const ImVec2& center, float radius, int a_min_of_12, int a_max_of_12);                // Use precomputed angles for a 12 steps circle
-    IMGUI_API void  PathBezierCubicCurveTo(const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, int num_segments = 0); // Cubic Bezier (4 control points)
-    IMGUI_API void  PathBezierQuadraticCurveTo(const ImVec2& p2, const ImVec2& p3, int num_segments = 0);               // Quadratic Bezier (3 control points)
-    IMGUI_API void  PathRect(const ImVec2& rect_min, const ImVec2& rect_max, float rounding = 0.0f, ImDrawFlags flags = 0);
+|名前|説明|
+|---|---|
+| _VtxCurrentIdx  | (内部) 一般的に`==VtxBuffer.Size`。ただし、64K頂点を超えた場合は0にリセットされる。 |
+| _Data           | 共有ドローデータへのポインタ (ImGui::GetDrawListSharedData()を使って、現在のImGuiコンテキストから取得できます。) |
+| _OwnerName      | デバッグ用オーナーウィンドウ名へのポインタ |
+| _VtxWritePtr    | (内部) 各追加コマンドの後、VtxBuffer.Data内のポインタ (ImVector<>演算子を多用しないようにする。) |
+| _IdxWritePtr    | (内部) 各追加コマンドの後、IdxBuffer.Data内のポインタ (ImVector<>演算子を多用しないようにする。) |
+| _ClipRectStack  | (内部) |
+| _TextureIdStack | (内部) |
+| _Path           | (内部) カレントパスを構築する |
+| _CmdHeader      | (内部) アクティブなコマンドのテンプレート。フィールドはCmdBuffer.back()のものと一致しなければならない。 |
+| _Splitter       | (内部) チャンネル用 (備考: ImDrawListSplitterの永続的なインスタンスを使用することをお勧めします！) |
+| _FringeScale    | (内部) アンチエイリアスのフリンジはこの値でスケーリングされ、頂点バッファの内容をズームする際にシャープさを保つのに役立ちます。 |
 
-    // Advanced
-    IMGUI_API void  AddCallback(ImDrawCallback callback, void* callback_data);  // Your rendering function must check for 'UserCallback' in ImDrawCmd and call the function instead of rendering triangles.
-    IMGUI_API void  AddDrawCmd();                                               // This is useful if you need to forcefully create a new draw call (to allow for dependent rendering / blending). Otherwise primitives are merged into the same draw-call as much as possible
-    IMGUI_API ImDrawList* CloneOutput() const;                                  // Create a clone of the CmdBuffer/IdxBuffer/VtxBuffer.
+ImDrawListインスタンスを作成したい場合は、ImGui::GetDrawListSharedData()を渡すか、独自のImDrawListSharedDataを作成して使用します。
 
-    // Advanced: Channels
-    // - Use to split render into layers. By switching channels to can render out-of-order (e.g. submit FG primitives before BG primitives)
-    // - Use to minimize draw calls (e.g. if going back-and-forth between multiple clipping rectangles, prefer to append into separate channels then merge at the end)
-    // - This API shouldn't have been in ImDrawList in the first place!
-    //   Prefer using your own persistent instance of ImDrawListSplitter as you can stack them.
-    //   Using the ImDrawList::ChannelsXXXX you cannot stack a split over another.
-    inline void     ChannelsSplit(int count)    { _Splitter.Split(this, count); }
-    inline void     ChannelsMerge()             { _Splitter.Merge(this); }
-    inline void     ChannelsSetCurrent(int n)   { _Splitter.SetCurrentChannel(this, n); }
+```cpp
+ImDrawList(ImDrawListSharedData* shared_data) { memset(this, 0, sizeof(*this)); _Data = shared_data; }
 
-    // Advanced: Primitives allocations
-    // - We render triangles (three vertices)
-    // - All primitives needs to be reserved via PrimReserve() beforehand.
-    IMGUI_API void  PrimReserve(int idx_count, int vtx_count);
-    IMGUI_API void  PrimUnreserve(int idx_count, int vtx_count);
-    IMGUI_API void  PrimRect(const ImVec2& a, const ImVec2& b, ImU32 col);      // Axis aligned rectangle (composed of two triangles)
-    IMGUI_API void  PrimRectUV(const ImVec2& a, const ImVec2& b, const ImVec2& uv_a, const ImVec2& uv_b, ImU32 col);
-    IMGUI_API void  PrimQuadUV(const ImVec2& a, const ImVec2& b, const ImVec2& c, const ImVec2& d, const ImVec2& uv_a, const ImVec2& uv_b, const ImVec2& uv_c, const ImVec2& uv_d, ImU32 col);
-    inline    void  PrimWriteVtx(const ImVec2& pos, const ImVec2& uv, ImU32 col)    { _VtxWritePtr->pos = pos; _VtxWritePtr->uv = uv; _VtxWritePtr->col = col; _VtxWritePtr++; _VtxCurrentIdx++; }
-    inline    void  PrimWriteIdx(ImDrawIdx idx)                                     { *_IdxWritePtr = idx; _IdxWritePtr++; }
-    inline    void  PrimVtx(const ImVec2& pos, const ImVec2& uv, ImU32 col)         { PrimWriteIdx((ImDrawIdx)_VtxCurrentIdx); PrimWriteVtx(pos, uv, col); } // Write vertex with unique index
+~ImDrawList() { _ClearFreeMemory(); }
+IMGUI_API void  PushClipRect(const ImVec2& clip_rect_min, const ImVec2& clip_rect_max, bool intersect_with_current_clip_rect = false);
+IMGUI_API void  PushClipRectFullScreen();
+IMGUI_API void  PopClipRect();
+IMGUI_API void  PushTextureID(ImTextureID texture_id);
+IMGUI_API void  PopTextureID();
+inline ImVec2   GetClipRectMin() const { const ImVec4& cr = _ClipRectStack.back(); return ImVec2(cr.x, cr.y); }
+inline ImVec2   GetClipRectMax() const { const ImVec4& cr = _ClipRectStack.back(); return ImVec2(cr.z, cr.w); }
+```
 
-    // Obsolete names
-    //inline  void  AddBezierCurve(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, ImU32 col, float thickness, int num_segments = 0) { AddBezierCubic(p1, p2, p3, p4, col, thickness, num_segments); } // OBSOLETED in 1.80 (Jan 2021)
-    //inline  void  PathBezierCurveTo(const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, int num_segments = 0) { PathBezierCubicCurveTo(p2, p3, p4, num_segments); } // OBSOLETED in 1.80 (Jan 2021)
+- `PushClipRect()`: レンダーレベルのシザリング。これはレンダー関数に渡されますが、CPU 側の粗いクリッピングには使用されません。ロジック（ヒットテストやウィジェットのカリング）に影響を与えるため、より高レベルの ImGui::PushClipRect() を使用することをお勧めします。
 
-    // [Internal helpers]
+### プリミティブ
+
+- 塗りつぶし形状は、常に時計回りの巻き順を使用しなければならない。アンチエイリアスのフリンジはそれに依存します。反時計回りのシェイプは "内向き "のアンチエイリアシングになります。
+- 矩形プリミティブの場合、"p_min "と "p_max "は左上と右下の角を表す。
+- 円プリミティブの場合、"num_segments == 0 "を使用すると自動的にテセレーションが計算されます（推奨）。
+  古いバージョン（Dear ImGui 1.77まで）では、AddCircle関数のデフォルトはnum_segments == 12でした。
+  将来のバージョンでは、テクスチャを使用して、より安価で高品質な円を提供する予定です。
+  特定の辺数を保証する必要がある場合は、AddNgon() および AddNgonFilled() 関数を使用します。
+
+```cpp
+IMGUI_API void  AddLine(const ImVec2& p1, const ImVec2& p2, ImU32 col, float thickness = 1.0f);
+IMGUI_API void  AddRect(const ImVec2& p_min, const ImVec2& p_max, ImU32 col, float rounding = 0.0f, ImDrawFlags flags = 0, float thickness = 1.0f);
+IMGUI_API void  AddRectFilled(const ImVec2& p_min, const ImVec2& p_max, ImU32 col, float rounding = 0.0f, ImDrawFlags flags = 0);
+IMGUI_API void  AddRectFilledMultiColor(const ImVec2& p_min, const ImVec2& p_max, ImU32 col_upr_left, ImU32 col_upr_right, ImU32 col_bot_right, ImU32 col_bot_left);
+IMGUI_API void  AddQuad(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, ImU32 col, float thickness = 1.0f);
+IMGUI_API void  AddQuadFilled(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, ImU32 col);
+IMGUI_API void  AddTriangle(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, ImU32 col, float thickness = 1.0f);
+IMGUI_API void  AddTriangleFilled(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, ImU32 col);
+IMGUI_API void  AddCircle(const ImVec2& center, float radius, ImU32 col, int num_segments = 0, float thickness = 1.0f);
+IMGUI_API void  AddCircleFilled(const ImVec2& center, float radius, ImU32 col, int num_segments = 0);
+IMGUI_API void  AddNgon(const ImVec2& center, float radius, ImU32 col, int num_segments, float thickness = 1.0f);
+IMGUI_API void  AddNgonFilled(const ImVec2& center, float radius, ImU32 col, int num_segments);
+IMGUI_API void  AddText(const ImVec2& pos, ImU32 col, const char* text_begin, const char* text_end = NULL);
+IMGUI_API void  AddText(const ImFont* font, float font_size, const ImVec2& pos, ImU32 col, const char* text_begin, const char* text_end = NULL, float wrap_width = 0.0f, const ImVec4* cpu_fine_clip_rect = NULL);
+IMGUI_API void  AddPolyline(const ImVec2* points, int num_points, ImU32 col, ImDrawFlags flags, float thickness);
+IMGUI_API void  AddConvexPolyFilled(const ImVec2* points, int num_points, ImU32 col);
+IMGUI_API void  AddBezierCubic(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, ImU32 col, float thickness, int num_segments = 0);
+IMGUI_API void  AddBezierQuadratic(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, ImU32 col, float thickness, int num_segments = 0);
+```
+
+- `AddRect()`:   a: upper-left, b: lower-right (== upper-left + size)
+- `AddRectFilled()`:  a: upper-left, b: lower-right (== upper-left + size)
+- `AddBezierCubic()`: Cubic Bezier (4 control points)
+- `AddBezierQuadratic()`: Quadratic Bezier (3 control points)
+
+### 画像プリミティブ
+
+- FAQを読んで、ImTextureIDとは何かを理解しよう。
+- `p_min` と `p_max` は矩形の左上隅と右下隅を表す。
+- `uv_min` と `uv_max` は、それらのコーナーに使用する正規化されたテクスチャ座標を表します。`(0,0)->(1,1)` テクスチャ座標を使用すると、一般的にテクスチャ全体が表示されます。
+
+```cpp
+IMGUI_API void AddImage(ImTextureID user_texture_id, const ImVec2& p_min, const ImVec2& p_max, const ImVec2& uv_min = ImVec2(0, 0), const ImVec2& uv_max = ImVec2(1, 1), ImU32 col = IM_COL32_WHITE);
+IMGUI_API void AddImageQuad(ImTextureID user_texture_id, const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, const ImVec2& uv1 = ImVec2(0, 0), const ImVec2& uv2 = ImVec2(1, 0), const ImVec2& uv3 = ImVec2(1, 1), const ImVec2& uv4 = ImVec2(0, 1), ImU32 col = IM_COL32_WHITE);
+IMGUI_API void AddImageRounded(ImTextureID user_texture_id, const ImVec2& p_min, const ImVec2& p_max, const ImVec2& uv_min, const ImVec2& uv_max, ImU32 col, float rounding, ImDrawFlags flags = 0);
+```
+
+ステートフルパス API、点を追加し、PathFillConvex() または PathStroke() で終了。
+
+- 塗りつぶし形状は、常に時計回りの巻き順を使用しなければならない。アンチエイリアスのフリンジはそれに依存します。反時計回りのシェイプは "内向き "のアンチエイリアシングになります。
+
+```cpp
+inline    void PathClear() { _Path.Size = 0; }
+inline    void PathLineTo(const ImVec2& pos) { _Path.push_back(pos); }
+inline    void PathLineToMergeDuplicate(const ImVec2& pos) { if (_Path.Size == 0 || memcmp(&_Path.Data[_Path.Size - 1], &pos, 8) != 0) _Path.push_back(pos); }
+inline    void PathFillConvex(ImU32 col) { AddConvexPolyFilled(_Path.Data, _Path.Size, col); _Path.Size = 0; }
+inline    void PathStroke(ImU32 col, ImDrawFlags flags = 0, float thickness = 1.0f) { AddPolyline(_Path.Data, _Path.Size, col, flags, thickness); _Path.Size = 0; }
+IMGUI_API void PathArcTo(const ImVec2& center, float radius, float a_min, float a_max, int num_segments = 0);
+IMGUI_API void PathArcToFast(const ImVec2& center, float radius, int a_min_of_12, int a_max_of_12);
+IMGUI_API void PathBezierCubicCurveTo(const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, int num_segments = 0);
+IMGUI_API void PathBezierQuadraticCurveTo(const ImVec2& p2, const ImVec2& p3, int num_segments = 0);
+IMGUI_API void PathRect(const ImVec2& rect_min, const ImVec2& rect_max, float rounding = 0.0f, ImDrawFlags flags = 0);
+```
+
+- `PathArcToFast()`: 12ステップの円に対して事前に計算された角度を使用する。
+- `PathBezierCubicCurveTo()`: キュービックベジェ（4コントロールポイント）
+- `PathBezierQuadraticCurveTo()`: 二次ベジェ（3コントロールポイント）
+
+### 高度
+
+```cpp
+IMGUI_API void  AddCallback(ImDrawCallback callback, void* callback_data);
+IMGUI_API void  AddDrawCmd();
+IMGUI_API ImDrawList* CloneOutput() const;
+```
+
+|名前|説明|
+|---|---|
+| AddCallback() | レンダリング関数はImDrawCmdの'UserCallback'をチェックし、三角形をレンダリングする代わりに関数を呼び出す必要があります。 |
+| AddDrawCmd()  | これは、強制的に新しい描画呼び出しを作成する必要がある場合に便利です（依存レンダリング/ブレンドを可能にするため）。それ以外のプリミティブは、可能な限り同じ描画呼び出しにマージされます。 |
+| CloneOutput() | CmdBuffer/IdxBuffer/VtxBufferのクローンを作成する。 |
+
+### 高度なチャンネル
+
+- レンダリングをレイヤーに分割するために使用します。チャンネルを切り替えることで、レンダリングの順序を入れ替えることができます（例えば、BGプリミティブの前にFGプリミティブを送信する）。
+- 描画コールを最小化するために使用する（例えば、複数のクリッピング矩形間を行ったり来たりする場合、別々のチャンネルに追加し、最後にマージするのが好ましい）。
+- このAPIはそもそもImDrawListにあるべきものではなかった！
+  ImDrawListSplitterのインスタンスをスタックできるので、永続的なインスタンスを使用することをお勧めします。
+  ImDrawList::ChannelsXXXX を使用すると、分割を別の分割に重ねることはできません。
+
+```cpp
+inline void ChannelsSplit(int count)  { _Splitter.Split(this, count); }
+inline void ChannelsMerge()           { _Splitter.Merge(this); }
+inline void ChannelsSetCurrent(int n) { _Splitter.SetCurrentChannel(this, n); }
+```
+
+### 高度なプリミティブの割り当て
+
+- 三角形（3つの頂点）をレンダリングする。
+- すべてのプリミティブはあらかじめPrimReserve()で予約しておく必要がある。
+
+```cpp
+IMGUI_API void  PrimReserve(int idx_count, int vtx_count);
+IMGUI_API void  PrimUnreserve(int idx_count, int vtx_count);
+IMGUI_API void  PrimRect(const ImVec2& a, const ImVec2& b, ImU32 col);
+IMGUI_API void  PrimRectUV(const ImVec2& a, const ImVec2& b, const ImVec2& uv_a, const ImVec2& uv_b, ImU32 col);
+IMGUI_API void  PrimQuadUV(const ImVec2& a, const ImVec2& b, const ImVec2& c, const ImVec2& d, const ImVec2& uv_a, const ImVec2& uv_b, const ImVec2& uv_c, const ImVec2& uv_d, ImU32 col);
+inline    void  PrimWriteVtx(const ImVec2& pos, const ImVec2& uv, ImU32 col)    { _VtxWritePtr->pos = pos; _VtxWritePtr->uv = uv; _VtxWritePtr->col = col; _VtxWritePtr++; _VtxCurrentIdx++; }
+inline    void  PrimWriteIdx(ImDrawIdx idx)                                     { *_IdxWritePtr = idx; _IdxWritePtr++; }
+inline    void  PrimVtx(const ImVec2& pos, const ImVec2& uv, ImU32 col)         { PrimWriteIdx((ImDrawIdx)_VtxCurrentIdx); PrimWriteVtx(pos, uv, col); }
+
+// Obsolete names
+//inline  void  AddBezierCurve(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, ImU32 col, float thickness, int num_segments = 0) { AddBezierCubic(p1, p2, p3, p4, col, thickness, num_segments); } // OBSOLETED in 1.80 (Jan 2021)
+//inline  void  PathBezierCurveTo(const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, int num_segments = 0) { PathBezierCubicCurveTo(p2, p3, p4, num_segments); } // OBSOLETED in 1.80 (Jan 2021)
+```
+
+- `PrimRect()`: 軸の揃った長方形（2つの三角形で構成される）
+- `PrimVtx()`: 一意なインデックスを持つ頂点を書き込む
+
+内部ヘルパー
+
+```cpp
     IMGUI_API void  _ResetForNewFrame();
     IMGUI_API void  _ClearFreeMemory();
     IMGUI_API void  _PopUnusedDrawCmd();
@@ -4592,31 +4929,53 @@ struct ImDrawList
 };
 ```
 
-Dear ImGuiフレームをレンダリングするためのすべての描画データ
+### Dear ImGuiフレームをレンダリングするためのすべての描画データ
 
 注：ここのスタイルと命名規則には少し一貫性がありません。これはライブラリによって公開される最も古い構造の1つであるため、後方互換性の目的のために、現在これらを保存しています！基本的には、ImDrawList == CmdListです。
 
 ```cpp
 struct ImDrawData
 {
-    bool                Valid;              // Only valid after Render() is called and before the next NewFrame() is called.
-    int                 CmdListsCount;      // Number of ImDrawList* to render (should always be == CmdLists.size)
-    int                 TotalIdxCount;      // For convenience, sum of all ImDrawList's IdxBuffer.Size
-    int                 TotalVtxCount;      // For convenience, sum of all ImDrawList's VtxBuffer.Size
-    ImVector<ImDrawList*> CmdLists;         // Array of ImDrawList* to render. The ImDrawLists are owned by ImGuiContext and only pointed to from here.
-    ImVec2              DisplayPos;         // Top-left position of the viewport to render (== top-left of the orthogonal projection matrix to use) (== GetMainViewport()->Pos for the main viewport, == (0.0) in most single-viewport applications)
-    ImVec2              DisplaySize;        // Size of the viewport to render (== GetMainViewport()->Size for the main viewport, == io.DisplaySize in most single-viewport applications)
-    ImVec2              FramebufferScale;   // Amount of pixels for each unit of DisplaySize. Based on io.DisplayFramebufferScale. Generally (1,1) on normal display, (2,2) on OSX with Retina display.
-    ImGuiViewport*      OwnerViewport;      // Viewport carrying the ImDrawData instance, might be of use to the renderer (generally not).
+    bool                Valid;
+    int                 CmdListsCount;
+    int                 TotalIdxCount;
+    int                 TotalVtxCount;
+    ImVector<ImDrawList*> CmdLists;
+    ImVec2              DisplayPos;
+    ImVec2              DisplaySize;
+    ImVec2              FramebufferScale;
+    ImGuiViewport*      OwnerViewport;
+```
 
-    // Functions
+|名前|説明|
+|---|---|
+| Valid            | Render() が呼び出された後、次の NewFrame() が呼び出される前にのみ有効です。 |
+| CmdListsCount    | レンダリングする `ImDrawList*` の数 (常に == CmdLists.size でなければならない) |
+| TotalIdxCount    | 便宜上、すべてのImDrawListのIdxBuffer.Sizeの和をとる。 |
+| TotalVtxCount    | 便宜上、すべてのImDrawListのVtxBuffer.Sizeの和をとる。 |
+| CmdLists         | レンダリングする `ImDrawList*` の配列。ImDrawListはImGuiContextによって所有され、ここからのみ指される。 |
+| DisplayPos       | レンダリングするビューポートの左上位置（使用する直交投影行列の左上位置）（== メインビューポートの場合は `== GetMainViewport()->Pos`、ほとんどのシングルビューポートアプリケーションの場合は `== (0.0)` |
+| DisplaySize      | レンダリングするビューポートのサイズ（メインビューポートの場合は`== GetMainViewport()->Size`、シングルビューポートアプリケーションの場合は `== io.DisplaySize`）。 |
+| FramebufferScale | DisplaySize単位あたりのピクセル量。io.DisplayFramebufferScaleに基づく。通常ディスプレイでは(1,1)、OSX Retinaディスプレイでは(2,2)。 |
+| OwnerViewport    | ImDrawDataインスタンスを運ぶビューポートは、レンダラーにとって役に立つかもしれない（通常はそうではない）。 |
+
+### 関数
+
+```cpp
     ImDrawData()    { Clear(); }
     IMGUI_API void  Clear();
-    IMGUI_API void  AddDrawList(ImDrawList* draw_list);     // Helper to add an external draw list into an existing ImDrawData.
-    IMGUI_API void  DeIndexAllBuffers();                    // Helper to convert all buffers from indexed to non-indexed, in case you cannot render indexed. Note: this is slow and most likely a waste of resources. Always prefer indexed rendering!
-    IMGUI_API void  ScaleClipRects(const ImVec2& fb_scale); // Helper to scale the ClipRect field of each ImDrawCmd. Use if your final output buffer is at a different scale than Dear ImGui expects, or if there is a difference between your window resolution and framebuffer resolution.
+    IMGUI_API void  AddDrawList(ImDrawList* draw_list);
+    IMGUI_API void  DeIndexAllBuffers();
+    IMGUI_API void  ScaleClipRects(const ImVec2& fb_scale);
 };
 ```
+
+|名前|説明|
+|---|---|
+| Clear() | |
+| AddDrawList()       | 既存の ImDrawData に外部ドローリストを追加するヘルパー。 |
+| DeIndexAllBuffers() | インデックス付きレンダリングができない場合に備えて、すべてのバッファをインデックス付きからインデックスなしに変換するヘルパー。注意：これは遅く、リソースの無駄になる可能性が高い。常にインデックス付きレンダリングを優先してください！ |
+| ScaleClipRects()    | 各 ImDrawCmd の ClipRect フィールドを拡大縮小するヘルパーです。最終的な出力バッファがImGuiの期待するスケールと異なる場合や、ウィンドウの解像度とフレームバッファの解像度に差がある場合に使用します。 |
 
 ## フォントAPI
 
@@ -4630,31 +4989,56 @@ struct ImDrawData
 ```cpp
 struct ImFontConfig
 {
-    void*           FontData;               //          // TTF/OTF data
-    int             FontDataSize;           //          // TTF/OTF data size
-    bool            FontDataOwnedByAtlas;   // true     // TTF/OTF data ownership taken by the container ImFontAtlas (will delete memory itself).
-    int             FontNo;                 // 0        // Index of font within TTF/OTF file
-    float           SizePixels;             //          // Size in pixels for rasterizer (more or less maps to the resulting font height).
-    int             OversampleH;            // 2        // Rasterize at higher quality for sub-pixel positioning. Note the difference between 2 and 3 is minimal. You can reduce this to 1 for large glyphs save memory. Read https://github.com/nothings/stb/blob/master/tests/oversample/README.md for details.
-    int             OversampleV;            // 1        // Rasterize at higher quality for sub-pixel positioning. This is not really useful as we don't use sub-pixel positions on the Y axis.
-    bool            PixelSnapH;             // false    // Align every glyph to pixel boundary. Useful e.g. if you are merging a non-pixel aligned font with the default font. If enabled, you can set OversampleH/V to 1.
-    ImVec2          GlyphExtraSpacing;      // 0, 0     // Extra spacing (in pixels) between glyphs. Only X axis is supported for now.
-    ImVec2          GlyphOffset;            // 0, 0     // Offset all glyphs from this font input.
-    const ImWchar*  GlyphRanges;            // NULL     // THE ARRAY DATA NEEDS TO PERSIST AS LONG AS THE FONT IS ALIVE. Pointer to a user-provided list of Unicode range (2 value per range, values are inclusive, zero-terminated list).
-    float           GlyphMinAdvanceX;       // 0        // Minimum AdvanceX for glyphs, set Min to align font icons, set both Min/Max to enforce mono-space font
-    float           GlyphMaxAdvanceX;       // FLT_MAX  // Maximum AdvanceX for glyphs
-    bool            MergeMode;              // false    // Merge into previous ImFont, so you can combine multiple inputs font into one ImFont (e.g. ASCII font + icons + Japanese glyphs). You may want to use GlyphOffset.y when merge font of different heights.
-    unsigned int    FontBuilderFlags;       // 0        // Settings for custom font builder. THIS IS BUILDER IMPLEMENTATION DEPENDENT. Leave as zero if unsure.
-    float           RasterizerMultiply;     // 1.0f     // Brighten (>1.0f) or darken (<1.0f) font output. Brightening small fonts may be a good workaround to make them more readable.
-    ImWchar         EllipsisChar;           // -1       // Explicitly specify unicode codepoint of ellipsis character. When fonts are being merged first specified ellipsis will be used.
+    void*           FontData;
+    int             FontDataSize;
+    bool            FontDataOwnedByAtlas;
+    int             FontNo;
+    float           SizePixels;
+    int             OversampleH;
+    int             OversampleV;
+    bool            PixelSnapH;
+    ImVec2          GlyphExtraSpacing;
+    ImVec2          GlyphOffset;
+    const ImWchar*  GlyphRanges;
+    float           GlyphMinAdvanceX;
+    float           GlyphMaxAdvanceX;
+    bool            MergeMode;
+    unsigned int    FontBuilderFlags;
+    float           RasterizerMultiply;
+    ImWchar         EllipsisChar;
+```
 
-    // [Internal]
-    char            Name[40];               // Name (strictly to ease debugging)
-    ImFont*         DstFont;
+|名前|値|説明|
+|---|---|---|
+| FontData             |         | TTF/OTFデータ |
+| FontDataSize         |         | TTF/OTFデータサイズ |
+| FontDataOwnedByAtlas | true    | コンテナ ImFontAtlas によって取得された TTF/OTF データの所有権。 (メモリ自体を削除する). |
+| FontNo               | 0       | TTF/OTFファイル内のフォントのインデックス |
+| SizePixels           |         | ラスタライザのピクセルサイズ (多かれ少なかれ、結果のフォントの高さに対応する). |
+| OversampleH          | 2       | サブピクセルの位置決めのために、より高い品質でラスタライズする。2 と 3 の差は最小であることに注意.大きなグリフではこれを 1 にするとメモリを節約できる.詳しくは `https://github.com/nothings/stb/blob/master/tests/oversample/README.md` を読むこと. |
+| OversampleV          | 1       | サブピクセル位置決めのために、より高い品質でラスタライズする。Y軸のサブピクセル位置は使わないので、これはあまり役に立たない。 |
+| PixelSnapH           | false   | すべてのグリフをピクセル境界に揃える。ピクセル揃えのないフォントをデフォルトフォントとマージする場合などに便利です。有効にすると、OversampleH/V を 1 に設定できる。 |
+| GlyphExtraSpacing    | 0, 0    | グリフ間の余分な間隔 (ピクセル単位)。今のところ X 軸のみサポート。 |
+| GlyphOffset          | 0, 0    | このフォント入力からすべてのグリフをオフセットする。 |
+| GlyphRanges          | NULL    | 配列のデータは、フォントが生きている限り持続する必要がある。 ユーザが提供する Unicode 範囲のリストへのポインタ。 (1範囲につき2値、値は包括的、ゼロ終端リスト). |
+| GlyphMinAdvanceX     | 0       | グリフの最小AdvanceX、フォントアイコンを揃えるためにMinを設定、モノスペースフォントを強制するためにMin/Maxの両方を設定 |
+| GlyphMaxAdvanceX     | FLT_MAX | グリフの最大AdvanceX |
+| MergeMode            | false   | 複数の入力フォントを1つのImFontにまとめることができます。 (例：ASCIIフォント＋アイコン＋日本語グリフ). 異なる高さのフォントをマージする場合は、GlyphOffset.yを使用するとよいでしょう。 |
+| FontBuilderFlags     | 0       | カスタムフォントビルダーの設定。 これはビルダーの実装に依存する。 不明な場合はゼロのままにする。 |
+| RasterizerMultiply   | 1.0f    | フォント出力を明るく (`>1.0f`) または暗く (`<1.0f`) する。 小さなフォントを明るくすることは、より読みやすくするための良い回避策かもしれない。|
+| EllipsisChar         | -1      | 省略記号キャラクタのユニコードコードポイントを明示的に指定する。フォントがマージされるときには、最初に指定された省略記号が使われます。 |
+
+Internal
+
+```cpp
+    char    Name[40];
+    ImFont* DstFont;
 
     IMGUI_API ImFontConfig();
 };
 ```
+
+- `Name`: 名前（厳密にはデバッグを容易にするため）
 
 1グリフ分のレンダリングデータを保持する。
 
@@ -4663,14 +5047,23 @@ struct ImFontConfig
 ```cpp
 struct ImFontGlyph
 {
-    unsigned int    Colored : 1;        // Flag to indicate glyph is colored and should generally ignore tinting (make it usable with no shift on little-endian as this is used in loops)
-    unsigned int    Visible : 1;        // Flag to indicate glyph has no visible pixels (e.g. space). Allow early out when rendering.
-    unsigned int    Codepoint : 30;     // 0x0000..0x10FFFF
-    float           AdvanceX;           // Distance to next character (= data from font + ImFontConfig::GlyphExtraSpacing.x baked in)
-    float           X0, Y0, X1, Y1;     // Glyph corners
-    float           U0, V0, U1, V1;     // Texture coordinates
+    unsigned int Colored : 1;
+    unsigned int Visible : 1;
+    unsigned int Codepoint : 30;
+    float        AdvanceX;
+    float        X0, Y0, X1, Y1;
+    float        U0, V0, U1, V1;
 };
 ```
+
+|名前|説明|
+|---|---|
+| Colored   | グリフが着色されていることを示すフラグ。一般的に、色合いは無視すべきである (ループで使用されるリトルエンディアンをシフトなしで使用できるようにする。) |
+| Visible   | グリフに可視ピクセルがないことを示すフラグ (例：スペース). レンダリング時のアーリーアウトを許可する. |
+| Codepoint | 0x0000..0x10FFFF |
+| AdvanceX      | 次の文字までの距離 (= フォントのデータ + ImFontConfig::GlyphExtraSpacing.x を焼き込む。) |
+| X0, Y0, X1, Y1 | グリフの角 |
+| U0, V0, U1, V1 | テクスチャ座標 |
 
 テキスト/文字列データからグリフ範囲を構築するヘルパー。アプリケーションに文字列/文字を与えてから BuildRanges()を呼び出す。
 これは基本的に、64kブーリアン = 8KBストレージのベクタを密にパックしたものです。
@@ -4678,34 +5071,57 @@ struct ImFontGlyph
 ```cpp
 struct ImFontGlyphRangesBuilder
 {
-    ImVector<ImU32> UsedChars;            // Store 1-bit per Unicode code point (0=unused, 1=used)
+    ImVector<ImU32> UsedChars;
+```
 
+- `UsedChars`: Unicode コードポイントごとに 1 ビットを格納 (0=unused, 1=used)
+
+```cpp
     ImFontGlyphRangesBuilder()              { Clear(); }
     inline void     Clear()                 { int size_in_bytes = (IM_UNICODE_CODEPOINT_MAX + 1) / 8; UsedChars.resize(size_in_bytes / (int)sizeof(ImU32)); memset(UsedChars.Data, 0, (size_t)size_in_bytes); }
-    inline bool     GetBit(size_t n) const  { int off = (int)(n >> 5); ImU32 mask = 1u << (n & 31); return (UsedChars[off] & mask) != 0; }  // Get bit n in the array
-    inline void     SetBit(size_t n)        { int off = (int)(n >> 5); ImU32 mask = 1u << (n & 31); UsedChars[off] |= mask; }               // Set bit n in the array
-    inline void     AddChar(ImWchar c)      { SetBit(c); }                      // Add character
-    IMGUI_API void  AddText(const char* text, const char* text_end = NULL);     // Add string (each character of the UTF-8 string are added)
-    IMGUI_API void  AddRanges(const ImWchar* ranges);                           // Add ranges, e.g. builder.AddRanges(ImFontAtlas::GetGlyphRangesDefault()) to force add all of ASCII/Latin+Ext
-    IMGUI_API void  BuildRanges(ImVector<ImWchar>* out_ranges);                 // Output new ranges
+    inline bool     GetBit(size_t n) const  { int off = (int)(n >> 5); ImU32 mask = 1u << (n & 31); return (UsedChars[off] & mask) != 0; }
+    inline void     SetBit(size_t n)        { int off = (int)(n >> 5); ImU32 mask = 1u << (n & 31); UsedChars[off] |= mask; }
+    inline void     AddChar(ImWchar c)      { SetBit(c); }
+    IMGUI_API void  AddText(const char* text, const char* text_end = NULL);
+    IMGUI_API void  AddRanges(const ImWchar* ranges);
+    IMGUI_API void  BuildRanges(ImVector<ImWchar>* out_ranges);
 };
 ```
+
+|名前|説明|
+|---|---|
+| Clear() | |
+| GetBit()       | 配列のビットnを取得 |
+| SetBit()       | 配列のビットnを設定する |
+| AddChar()      | キャラクターの追加 |
+| AddText()      | 文字列を追加 (UTF-8文字列の各文字が追加される。) |
+| AddRanges()    | レンジの追加, 例えば、 builder.AddRanges(ImFontAtlas::GetGlyphRangesDefault()) で ASCII/Latin+Ext のすべてを強制的に追加する。 |
+| BuildRanges()  | 新しいレンジを出力する |
 
 ImFontAtlas::AddCustomRectXXX 関数を参照してください。
 
 ```cpp
 struct ImFontAtlasCustomRect
 {
-    unsigned short  Width, Height;  // Input    // Desired rectangle dimension
-    unsigned short  X, Y;           // Output   // Packed position in Atlas
-    unsigned int    GlyphID;        // Input    // For custom font glyphs only (ID < 0x110000)
-    float           GlyphAdvanceX;  // Input    // For custom font glyphs only: glyph xadvance
-    ImVec2          GlyphOffset;    // Input    // For custom font glyphs only: glyph display offset
-    ImFont*         Font;           // Input    // For custom font glyphs only: target font
+    unsigned short  Width, Height;
+    unsigned short  X, Y;
+    unsigned int    GlyphID;
+    float           GlyphAdvanceX;
+    ImVec2          GlyphOffset;
+    ImFont*         Font;        
     ImFontAtlasCustomRect()         { Width = Height = 0; X = Y = 0xFFFF; GlyphID = 0; GlyphAdvanceX = 0.0f; GlyphOffset = ImVec2(0, 0); Font = NULL; }
     bool IsPacked() const           { return X != 0xFFFF; }
 };
 ```
+
+|名前|I/O|説明|
+|---|---|---|
+| Width, Height | Input  | 長方形の希望寸法 |
+| X, Y          | Output | アトラスでのポジション |
+| GlyphID       | Input  | カスタムフォントグリフのみ (`ID < 0x110000`) |
+| GlyphAdvanceX | Input  | カスタムフォントグリフのみ: glyph xadvance |
+| GlyphOffset   | Input  | カスタムフォントグリフのみ: glyph display offset |
+| Font          | Input  | カスタムフォントグリフのみ: target font |
 
 ### ImFontAtlas ビルドのフラグ
 
@@ -4713,17 +5129,28 @@ struct ImFontAtlasCustomRect
 enum ImFontAtlasFlags_
 {
     ImFontAtlasFlags_None               = 0,
-    ImFontAtlasFlags_NoPowerOfTwoHeight = 1 << 0,   // Don't round the height to next power of two
-    ImFontAtlasFlags_NoMouseCursors     = 1 << 1,   // Don't build software mouse cursors into the atlas (save a little texture memory)
-    ImFontAtlasFlags_NoBakedLines       = 1 << 2,   // Don't build thick line textures into the atlas (save a little texture memory, allow support for point/nearest filtering). The AntiAliasedLinesUseTex features uses them, otherwise they will be rendered using polygons (more expensive for CPU/GPU).
+    ImFontAtlasFlags_NoPowerOfTwoHeight = 1 << 0,
+    ImFontAtlasFlags_NoMouseCursors     = 1 << 1,
+    ImFontAtlasFlags_NoBakedLines       = 1 << 2,
 };
 ```
 
+|名前|説明|
+|---|---|
+| ImFontAtlasFlags_None               | |
+| ImFontAtlasFlags_NoPowerOfTwoHeight | 高さを2のべき乗で丸めない |
+| ImFontAtlasFlags_NoMouseCursors     | ソフトウェアのマウスカーソルをアトラスに組み込まない (テクスチャメモリを少し節約) |
+| ImFontAtlasFlags_NoBakedLines       | アトラスに太い線のテクスチャーを組み込まない (テクスチャ・メモリを少し節約し、ポイント／ニアレスト・フィルタリングをサポート。). AntiAliasedLinesUseTex 機能を使用すると、ポリゴンを使用してレンダリングされます。 (CPU/GPUはより高価). |
+
+
 複数のTTF/OTFフォントを同じテクスチャにロードしてラスタライズ。フォントアトラスは単一のテクスチャ保持を構築します：
+
  - 1つまたは複数のフォント。
  - Dear ImGuiが必要とするシェイプをレンダリングするために必要なカスタムグラフィックデータ。
  - ソフトウェアカーソルレンダリングのためのマウスカーソル形状（フォントアトラスの'Flags |= ImFontAtlasFlags_NoMouseCursors'を設定しない限り）。
+
 アトラスをセットアップ/ビルドし、ピクセルデータをグラフィックスAPIでアクセス可能なテクスチャにアップロードするのは、ユーザーコードの責任です。
+ 
  - オプションとして、AddFont***関数のいずれかを呼び出します。何も呼び出さない場合は、コードに埋め込まれたデフォルトフォントが読み込まれます。
  - GetTexDataAsAlpha8()またはGetTexDataAsRGBA32()を呼び出して、ピクセルデータを構築し、取得します。
  - ピクセルデータをグラフィックシステム内のテクスチャにアップロードします（imgui_impl_xxxx.cppの例を参照）。
@@ -4733,7 +5160,7 @@ enum ImFontAtlasFlags_
 - `AddFont***` 関数に 'glyph_ranges' 配列を渡す場合、その配列がアトラスが構築されるまで持続することを確認する必要があります。
   (`GetTexData***`またはBuild()を呼び出すとき)。ポインタをコピーするだけで、データはコピーしません。
 - 重要: デフォルトでは、AddFontFromMemoryTTF() はデータの所有権を取ります。たとえ書き込みを行わなくても、破棄時にポインタを解放します。
-  font_cfg->FontDataOwnedByAtlas=false に設定すれば、データの所有権を保持し、解放されることはありません、
+  `font_cfg->FontDataOwnedByAtlas=false` に設定すれば、データの所有権を保持し、解放されることはありません、
 - 多くの関数に "TTF" というサフィックスがついていますが、OTF データも同様にサポートされています。
 - これは古いAPIであり、現状ではこれらの理由やその他さまざまな理由で不便です！将来的には対応する予定です！
 
@@ -4742,104 +5169,190 @@ struct ImFontAtlas
 {
     IMGUI_API ImFontAtlas();
     IMGUI_API ~ImFontAtlas();
-    IMGUI_API ImFont*           AddFont(const ImFontConfig* font_cfg);
-    IMGUI_API ImFont*           AddFontDefault(const ImFontConfig* font_cfg = NULL);
-    IMGUI_API ImFont*           AddFontFromFileTTF(const char* filename, float size_pixels, const ImFontConfig* font_cfg = NULL, const ImWchar* glyph_ranges = NULL);
-    IMGUI_API ImFont*           AddFontFromMemoryTTF(void* font_data, int font_size, float size_pixels, const ImFontConfig* font_cfg = NULL, const ImWchar* glyph_ranges = NULL); // Note: Transfer ownership of 'ttf_data' to ImFontAtlas! Will be deleted after destruction of the atlas. Set font_cfg->FontDataOwnedByAtlas=false to keep ownership of your data and it won't be freed.
-    IMGUI_API ImFont*           AddFontFromMemoryCompressedTTF(const void* compressed_font_data, int compressed_font_size, float size_pixels, const ImFontConfig* font_cfg = NULL, const ImWchar* glyph_ranges = NULL); // 'compressed_font_data' still owned by caller. Compress with binary_to_compressed_c.cpp.
-    IMGUI_API ImFont*           AddFontFromMemoryCompressedBase85TTF(const char* compressed_font_data_base85, float size_pixels, const ImFontConfig* font_cfg = NULL, const ImWchar* glyph_ranges = NULL);              // 'compressed_font_data_base85' still owned by caller. Compress with binary_to_compressed_c.cpp with -base85 parameter.
-    IMGUI_API void              ClearInputData();           // Clear input data (all ImFontConfig structures including sizes, TTF data, glyph ranges, etc.) = all the data used to build the texture and fonts.
-    IMGUI_API void              ClearTexData();             // Clear output texture data (CPU side). Saves RAM once the texture has been copied to graphics memory.
-    IMGUI_API void              ClearFonts();               // Clear output font data (glyphs storage, UV coordinates).
-    IMGUI_API void              Clear();                    // Clear all input and output.
+    IMGUI_API ImFont* AddFont(const ImFontConfig* font_cfg);
+    IMGUI_API ImFont* AddFontDefault(const ImFontConfig* font_cfg = NULL);
+    IMGUI_API ImFont* AddFontFromFileTTF(const char* filename, float size_pixels, const ImFontConfig* font_cfg = NULL, const ImWchar* glyph_ranges = NULL);
+    IMGUI_API ImFont* AddFontFromMemoryTTF(void* font_data, int font_size, float size_pixels, const ImFontConfig* font_cfg = NULL, const ImWchar* glyph_ranges = NULL);
+    IMGUI_API ImFont* AddFontFromMemoryCompressedTTF(const void* compressed_font_data, int compressed_font_size, float size_pixels, const ImFontConfig* font_cfg = NULL, const ImWchar* glyph_ranges = NULL);
+    IMGUI_API ImFont* AddFontFromMemoryCompressedBase85TTF(const char* compressed_font_data_base85, float size_pixels, const ImFontConfig* font_cfg = NULL, const ImWchar* glyph_ranges = NULL);
+    IMGUI_API void    ClearInputData();
+    IMGUI_API void    ClearTexData();
+    IMGUI_API void    ClearFonts();
+    IMGUI_API void    Clear();
+```
 
-    // Build atlas, retrieve pixel data.
-    // User is in charge of copying the pixels into graphics memory (e.g. create a texture with your engine). Then store your texture handle with SetTexID().
-    // The pitch is always = Width * BytesPerPixels (1 or 4)
-    // Building in RGBA32 format is provided for convenience and compatibility, but note that unless you manually manipulate or copy color data into
-    // the texture (e.g. when using the AddCustomRect*** api), then the RGB pixels emitted will always be white (~75% of memory/bandwidth waste.
-    IMGUI_API bool              Build();                    // Build pixels data. This is called automatically for you by the GetTexData*** functions.
-    IMGUI_API void              GetTexDataAsAlpha8(unsigned char** out_pixels, int* out_width, int* out_height, int* out_bytes_per_pixel = NULL);  // 1 byte per-pixel
-    IMGUI_API void              GetTexDataAsRGBA32(unsigned char** out_pixels, int* out_width, int* out_height, int* out_bytes_per_pixel = NULL);  // 4 bytes-per-pixel
-    bool                        IsBuilt() const             { return Fonts.Size > 0 && TexReady; } // Bit ambiguous: used to detect when user didn't build texture but effectively we should check TexID != 0 except that would be backend dependent...
-    void                        SetTexID(ImTextureID id)    { TexID = id; }
+|名前|説明|
+|---|---|
+| AddFont() | |
+| AddFontDefault() | |
+| AddFontFromFileTTF() | |
+| AddFontFromMemoryTTF()                 | 注: 'ttf_data' の所有権を ImFontAtlas に移す！アトラスの破棄後に削除されます。`font_cfg->FontDataOwnedByAtlas=false` を設定すると、データの所有権を保持し、解放されません。 |
+| AddFontFromMemoryCompressedTTF()       | 'compressed_font_data'はまだ呼び出し元が所有しています。binary_to_compressed_c.cpp で圧縮する。 |
+| AddFontFromMemoryCompressedBase85TTF() | 'compressed_font_data_base85'はまだ呼び出し元が所有しています。binary_to_compressed_c.cpp で -base85 パラメータを指定して圧縮。 |
+| ClearInputData()                       | 入力データのクリア (サイズ、TTF データ、グリフ範囲などを含む、すべての ImFontConfig 構造。) = テクスチャとフォントを構築するために使用されるすべてのデータ。 |
+| ClearTexData()                         | 出力テクスチャデータのクリア (CPU側). テクスチャがグラフィックメモリにコピーされると、RAMを節約します。 |
+| ClearFonts()                           | 出力フォントデータのクリア (glyphs storage, UV coordinates). |
+| Clear()                                | すべての入出力をクリアする。 |
 
-    //-------------------------------------------
-    // Glyph Ranges
-    //-------------------------------------------
+### アトラスを構築し、ピクセルデータを取得する
 
-    // Helpers to retrieve list of common Unicode ranges (2 value per range, values are inclusive, zero-terminated list)
-    // NB: Make sure that your string are UTF-8 and NOT in your local code page.
-    // Read https://github.com/ocornut/imgui/blob/master/docs/FONTS.md/#about-utf-8-encoding for details.
-    // NB: Consider using ImFontGlyphRangesBuilder to build glyph ranges from textual data.
-    IMGUI_API const ImWchar*    GetGlyphRangesDefault();                // Basic Latin, Extended Latin
-    IMGUI_API const ImWchar*    GetGlyphRangesGreek();                  // Default + Greek and Coptic
-    IMGUI_API const ImWchar*    GetGlyphRangesKorean();                 // Default + Korean characters
-    IMGUI_API const ImWchar*    GetGlyphRangesJapanese();               // Default + Hiragana, Katakana, Half-Width, Selection of 2999 Ideographs
-    IMGUI_API const ImWchar*    GetGlyphRangesChineseFull();            // Default + Half-Width + Japanese Hiragana/Katakana + full set of about 21000 CJK Unified Ideographs
-    IMGUI_API const ImWchar*    GetGlyphRangesChineseSimplifiedCommon();// Default + Half-Width + Japanese Hiragana/Katakana + set of 2500 CJK Unified Ideographs for common simplified Chinese
-    IMGUI_API const ImWchar*    GetGlyphRangesCyrillic();               // Default + about 400 Cyrillic characters
-    IMGUI_API const ImWchar*    GetGlyphRangesThai();                   // Default + Thai characters
-    IMGUI_API const ImWchar*    GetGlyphRangesVietnamese();             // Default + Vietnamese characters
+ピクセルをグラフィックメモリにコピーするのはユーザーの役割です（例えば、エンジンでテクスチャを作成します）。その後、SetTexID()でテクスチャハンドルを保存します。
+ピッチは常に `= Width * BytesPerPixels` (1 または 4) です。
+RGBA32フォーマットでのビルドは、利便性と互換性のために提供されていますが、手動でカラーデータを操作またはコピーしない限り（たとえば、テクスチャにカラーデータをコピーする場合）、テクスチャにカラーデータをコピーしないことに注意してください。
+テクスチャにカラーデータを手動で操作またはコピーしない限り（たとえば、`AddCustomRect***` apiを使用する場合）、放出されるRGBピクセルは常に白になることに注意してください（メモリ/帯域幅の浪費の〜75％）。
 
-    //-------------------------------------------
-    // [BETA] Custom Rectangles/Glyphs API
-    //-------------------------------------------
+```cpp
+IMGUI_API bool Build();
+IMGUI_API void GetTexDataAsAlpha8(unsigned char** out_pixels, int* out_width, int* out_height, int* out_bytes_per_pixel = NULL);
+IMGUI_API void GetTexDataAsRGBA32(unsigned char** out_pixels, int* out_width, int* out_height, int* out_bytes_per_pixel = NULL);
+bool           IsBuilt() const             { return Fonts.Size > 0 && TexReady; }
+void           SetTexID(ImTextureID id)    { TexID = id; }
+```
 
-    // You can request arbitrary rectangles to be packed into the atlas, for your own purposes.
-    // - After calling Build(), you can query the rectangle position and render your pixels.
-    // - If you render colored output, set 'atlas->TexPixelsUseColors = true' as this may help some backends decide of prefered texture format.
-    // - You can also request your rectangles to be mapped as font glyph (given a font + Unicode point),
-    //   so you can render e.g. custom colorful icons and use them as regular glyphs.
-    // - Read docs/FONTS.md for more details about using colorful icons.
-    // - Note: this API may be redesigned later in order to support multi-monitor varying DPI settings.
-    IMGUI_API int               AddCustomRectRegular(int width, int height);
-    IMGUI_API int               AddCustomRectFontGlyph(ImFont* font, ImWchar id, int width, int height, float advance_x, const ImVec2& offset = ImVec2(0, 0));
-    ImFontAtlasCustomRect*      GetCustomRectByIndex(int index) { IM_ASSERT(index >= 0); return &CustomRects[index]; }
+|名前|説明|
+|---|---|
+| Build()              | ピクセルデータをビルドします。これは `GetTexData***` 関数によって自動的に呼び出されます。 |
+| GetTexDataAsAlpha8() | ピクセルあたり1バイト |
+| GetTexDataAsRGBA32() | 4バイト/ピクセル |
+| IsBuilt()            | ユーザーがテクスチャをビルドしていないことを検出するために使用されますが、バックエンドに依存することを除けば、実質的にはTexID != 0をチェックする必要があります。 |
 
-    // [Internal]
-    IMGUI_API void              CalcCustomRectUV(const ImFontAtlasCustomRect* rect, ImVec2* out_uv_min, ImVec2* out_uv_max) const;
-    IMGUI_API bool              GetMouseCursorTexData(ImGuiMouseCursor cursor, ImVec2* out_offset, ImVec2* out_size, ImVec2 out_uv_border[2], ImVec2 out_uv_fill[2]);
 
-    //-------------------------------------------
-    // Members
-    //-------------------------------------------
+### グリフの範囲
 
-    ImFontAtlasFlags            Flags;              // Build flags (see ImFontAtlasFlags_)
-    ImTextureID                 TexID;              // User data to refer to the texture once it has been uploaded to user's graphic systems. It is passed back to you during rendering via the ImDrawCmd structure.
-    int                         TexDesiredWidth;    // Texture width desired by user before Build(). Must be a power-of-two. If have many glyphs your graphics API have texture size restrictions you may want to increase texture width to decrease height.
-    int                         TexGlyphPadding;    // Padding between glyphs within texture in pixels. Defaults to 1. If your rendering method doesn't rely on bilinear filtering you may set this to 0 (will also need to set AntiAliasedLinesUseTex = false).
-    bool                        Locked;             // Marked as Locked by ImGui::NewFrame() so attempt to modify the atlas will assert.
-    void*                       UserData;           // Store your own atlas related user-data (if e.g. you have multiple font atlas).
+一般的な Unicode 範囲のリストを取得するヘルパー (1範囲につき2値、値は包括的、ゼロ終端リスト)
+注意：文字列がUTF-8であり、ローカル・コード・ページでないことを確認してください。
+詳しくは`https://github.com/ocornut/imgui/blob/master/docs/FONTS.md/#about-utf-8-encoding`。
+注釈: テキストデータからグリフ範囲を構築するには ImFontGlyphRangesBuilder の使用を考慮すること。
 
-    // [Internal]
-    // NB: Access texture data via GetTexData*() calls! Which will setup a default font for you.
-    bool                        TexReady;           // Set when texture was built matching current font input
-    bool                        TexPixelsUseColors; // Tell whether our texture data is known to use colors (rather than just alpha channel), in order to help backend select a format.
-    unsigned char*              TexPixelsAlpha8;    // 1 component per pixel, each component is unsigned 8-bit. Total size = TexWidth * TexHeight
-    unsigned int*               TexPixelsRGBA32;    // 4 component per pixel, each component is unsigned 8-bit. Total size = TexWidth * TexHeight * 4
-    int                         TexWidth;           // Texture width calculated during Build().
-    int                         TexHeight;          // Texture height calculated during Build().
-    ImVec2                      TexUvScale;         // = (1.0f/TexWidth, 1.0f/TexHeight)
-    ImVec2                      TexUvWhitePixel;    // Texture coordinates to a white pixel
-    ImVector<ImFont*>           Fonts;              // Hold all the fonts returned by AddFont*. Fonts[0] is the default font upon calling ImGui::NewFrame(), use ImGui::PushFont()/PopFont() to change the current font.
-    ImVector<ImFontAtlasCustomRect> CustomRects;    // Rectangles for packing custom texture data into the atlas.
-    ImVector<ImFontConfig>      ConfigData;         // Configuration data
-    ImVec4                      TexUvLines[IM_DRAWLIST_TEX_LINES_WIDTH_MAX + 1];  // UVs for baked anti-aliased lines
+```cpp
+IMGUI_API const ImWchar* GetGlyphRangesDefault();
+IMGUI_API const ImWchar* GetGlyphRangesGreek();
+IMGUI_API const ImWchar* GetGlyphRangesKorean();
+IMGUI_API const ImWchar* GetGlyphRangesJapanese();
+IMGUI_API const ImWchar* GetGlyphRangesChineseFull();
+IMGUI_API const ImWchar* GetGlyphRangesChineseSimplifiedCommon();
+IMGUI_API const ImWchar* GetGlyphRangesCyrillic();
+IMGUI_API const ImWchar* GetGlyphRangesThai();
+IMGUI_API const ImWchar* GetGlyphRangesVietnamese();
+```
 
-    // [Internal] Font builder
-    const ImFontBuilderIO*      FontBuilderIO;      // Opaque interface to a font builder (default to stb_truetype, can be changed to use FreeType by defining IMGUI_ENABLE_FREETYPE).
-    unsigned int                FontBuilderFlags;   // Shared flags (for all fonts) for custom font builder. THIS IS BUILD IMPLEMENTATION DEPENDENT. Per-font override is also available in ImFontConfig.
+|名前|説明|
+|---|---|
+| GetGlyphRangesDefault()                 | 基本ラテン語、拡張ラテン語 |
+| GetGlyphRangesGreek()                   | デフォルト + ギリシャ語とコプト語 |
+| GetGlyphRangesKorean()                  | デフォルト + ハングル文字 |
+| GetGlyphRangesJapanese()                | デフォルト + ひらがな、カタカナ、半角、2999の表意文字の選択 |
+| GetGlyphRangesChineseFull()             | デフォルト + 半角＋ひらがな・カタカナ＋日中韓統合表意文字約21000字フルセット |
+| GetGlyphRangesChineseSimplifiedCommon() | デフォルト + 半角＋ひらがな・カタカナ＋簡体字用日中韓統合表意文字2500セット |
+| GetGlyphRangesCyrillic()                | デフォルト + キリル文字約400字 |
+| GetGlyphRangesThai()                    | デフォルト + タイ文字 |
+| GetGlyphRangesVietnamese()              | デフォルト + ベトナム文字 |
 
-    // [Internal] Packing data
-    int                         PackIdMouseCursors; // Custom texture rectangle ID for white pixel and mouse cursors
-    int                         PackIdLines;        // Custom texture rectangle ID for baked anti-aliased lines
+### (ベータ) カスタム矩形/グリフAPI
+
+自分の目的のために、アトラスに詰め込む任意の矩形を要求することができる。
+- Build()を呼び出した後、矩形の位置を問い合わせ、ピクセルをレンダリングすることができます。
+- 色付きの出力をレンダリングする場合は、 '`atlas->TexPixelsUseColors = true`' を設定してください。
+- また、矩形をフォントのグリフとしてマッピングするように要求することもできます（フォント＋Unicodeポイントが与えられます）、
+  これにより、例えばカラフルなカスタムアイコンをレンダリングし、通常のグリフとして使用することができます。
+- カラフルなアイコンの使用についての詳細はdocs/FONTS.mdをお読みください。
+- 注意: このAPIは、マルチモニタのさまざまなDPI設定をサポートするために、後で再設計される可能性があります。
+
+```cpp
+IMGUI_API int          AddCustomRectRegular(int width, int height);
+IMGUI_API int          AddCustomRectFontGlyph(ImFont* font, ImWchar id, int width, int height, float advance_x, const ImVec2& offset = ImVec2(0, 0));
+ImFontAtlasCustomRect* GetCustomRectByIndex(int index) { IM_ASSERT(index >= 0); return &CustomRects[index]; }
+```
+
+内部
+
+```cpp
+IMGUI_API void CalcCustomRectUV(const ImFontAtlasCustomRect* rect, ImVec2* out_uv_min, ImVec2* out_uv_max) const;
+IMGUI_API bool GetMouseCursorTexData(ImGuiMouseCursor cursor, ImVec2* out_offset, ImVec2* out_size, ImVec2 out_uv_border[2], ImVec2 out_uv_fill[2]);
+```
+
+メンバー
+
+```cpp
+ImFontAtlasFlags Flags;
+ImTextureID      TexID;
+int              TexDesiredWidth;
+int              TexGlyphPadding;
+bool             Locked;
+void*            UserData;
+```
+
+|名前|説明|
+|---|---|
+| Flags           | ビルドフラグ (ImFontAtlasFlags_ 参照) |
+| TexID           | テクスチャがユーザーのグラフィックシステムにアップロードされると、テクスチャを参照するためのユーザーデータ。これは、ImDrawCmd構造体を介してレンダリング中にあなたに引き渡されます。 |
+| TexDesiredWidth | Build()の前にユーザーが希望するテクスチャ幅。2のべき乗でなければなりません。グリフが多い場合、グラフィックス API にテクスチャサイズの制限があるため、テクスチャ幅を大きくして高さを小さくしたい場合があります。 |
+| TexGlyphPadding | テクスチャ内のグリフ間のパディングをピクセル単位で指定します。レンダリング方法がバイリニアフィルタリングに依存しない場合、これを 0 に設定することができます (AntiAliasedLinesUseTex = false も設定する必要があります)。 |
+| Locked          | ImGui::NewFrame()によってLockedとしてマークされたため、アトラスを変更しようとするとアサートされます。 |
+| UserData        | 独自のアトラス関連のユーザーデータを保存します（複数のフォントアトラスを持っている場合など）。 |
+
+(内部)
+
+注：`GetTexData*()`コールを使ってテクスチャーデータにアクセスしてください！これでデフォルトのフォントが設定されます。
+
+```cpp
+bool TexReady;
+bool TexPixelsUseColors;
+unsigned char* TexPixelsAlpha8;
+unsigned int* TexPixelsRGBA32;
+int TexWidth;
+int TexHeight;
+ImVec2 TexUvScale;
+ImVec2 TexUvWhitePixel;
+ImVector<ImFont*> Fonts;
+ImVector<ImFontAtlasCustomRect> CustomRects;
+ImVector<ImFontConfig> ConfigData;
+ImVec4 TexUvLines[IM_DRAWLIST_TEX_LINES_WIDTH_MAX + 1];
+```
+
+|名前|説明|
+|---|---|
+| TexReady           | 現在のフォント入力に一致するテクスチャが作成されたときに設定されます。 |
+| TexPixelsUseColors | バックエンドがフォーマットを選択しやすくするために、テクスチャデータが（アルファチャンネルだけでなく）カラーを使用することが知られているかどうかを知らせます。 |
+| TexPixelsAlpha8    | 1ピクセルあたり1成分、各成分は符号なし8ビット。合計サイズ = `TexWidth * TexHeight` |
+| TexPixelsRGBA32    | ピクセルあたり4成分、各成分は符号なし8ビット。 合計サイズ = `TexWidth * TexHeight * 4` |
+| TexWidth           | Build()時に計算されるテクスチャ幅。 |
+| TexHeight          | Build()時に計算されたテクスチャの高さ。 |
+| TexUvScale         | = `(1.0f/TexWidth, 1.0f/TexHeight)` |
+| TexUvWhitePixel    | 白いピクセルへのテクスチャ座標 |
+| Fonts              | `AddFont*` が返すすべてのフォントを保持する。`Fonts[0]`は ImGui::NewFrame() を呼び出したときのデフォルトのフォントで、現在のフォントを変更するには ImGui::PushFont()/PopFont() を使用します。 |
+| CustomRects        | カスタムテクスチャデータをアトラスに詰め込むための矩形。 |
+| ConfigData         | 設定データ |
+| TexUvLines         | ベイクド・アンチエイリアス線用UV |
+
+(内部) フォントビルダー
+
+```cpp
+const ImFontBuilderIO* FontBuilderIO;
+unsigned int           FontBuilderFlags;
+```
+
+|名前|説明|
+|---|---|
+| FontBuilderIO    | フォントビルダへの不透明インターフェイス (デフォルトは stb_truetype で、IMGUI_ENABLE_FREETYPE を定義することで FreeType を使うように変更可能)。 |
+| FontBuilderFlags | カスタムフォントビルダー用の共有フラグ（すべてのフォント用）。これはビルド実装に依存します。フォントごとのオーバーライドは ImFontConfig でも可能です。 |
+
+(内部) 梱包データ
+
+```cpp
+    int PackIdMouseCursors;
+    int PackIdLines;
 
     // [Obsolete]
     //typedef ImFontAtlasCustomRect    CustomRect;         // OBSOLETED in 1.72+
     //typedef ImFontGlyphRangesBuilder GlyphRangesBuilder; // OBSOLETED in 1.67+
 };
 ```
+
+|名前|説明|
+|---|---|
+| PackIdMouseCursors | 白ピクセルとマウスカーソル用のカスタムテクスチャ矩形ID |
+| PackIdLines        | ベイクされたアンチエイリアス線用のカスタムテクスチャ矩形ID |
 
 ### フォント・ランタイム・データとレンダリング
 
@@ -4848,55 +5361,103 @@ ImFontAtlasは、GetTexDataAsAlpha8()またはGetTexDataAsRGBA32()を呼び出�
 ```cpp
 struct ImFont
 {
-    // Members: Hot ~20/24 bytes (for CalcTextSize)
-    ImVector<float>             IndexAdvanceX;      // 12-16 // out //            // Sparse. Glyphs->AdvanceX in a directly indexable way (cache-friendly for CalcTextSize functions which only this this info, and are often bottleneck in large UI).
-    float                       FallbackAdvanceX;   // 4     // out // = FallbackGlyph->AdvanceX
-    float                       FontSize;           // 4     // in  //            // Height of characters/line, set during loading (don't change after loading)
+```
 
-    // Members: Hot ~28/40 bytes (for CalcTextSize + render loop)
-    ImVector<ImWchar>           IndexLookup;        // 12-16 // out //            // Sparse. Index glyphs by Unicode code-point.
-    ImVector<ImFontGlyph>       Glyphs;             // 12-16 // out //            // All glyphs.
-    const ImFontGlyph*          FallbackGlyph;      // 4-8   // out // = FindGlyph(FontFallbackChar)
+メンバー: ホット〜20/24バイト（CalcTextSize用）
 
-    // Members: Cold ~32/40 bytes
-    ImFontAtlas*                ContainerAtlas;     // 4-8   // out //            // What we has been loaded into
-    const ImFontConfig*         ConfigData;         // 4-8   // in  //            // Pointer within ContainerAtlas->ConfigData
-    short                       ConfigDataCount;    // 2     // in  // ~ 1        // Number of ImFontConfig involved in creating this font. Bigger than 1 when merging multiple font sources into one ImFont.
-    ImWchar                     FallbackChar;       // 2     // out // = FFFD/'?' // Character used if a glyph isn't found.
-    ImWchar                     EllipsisChar;       // 2     // out // = '...'/'.'// Character used for ellipsis rendering.
-    short                       EllipsisCharCount;  // 1     // out // 1 or 3
-    float                       EllipsisWidth;      // 4     // out               // Width
-    float                       EllipsisCharStep;   // 4     // out               // Step between characters when EllipsisCount > 0
-    bool                        DirtyLookupTables;  // 1     // out //
-    float                       Scale;              // 4     // in  // = 1.f      // Base font scale, multiplied by the per-window font scale which you can adjust with SetWindowFontScale()
-    float                       Ascent, Descent;    // 4+4   // out //            // Ascent: distance from top to bottom of e.g. 'A' [0..FontSize]
-    int                         MetricsTotalSurface;// 4     // out //            // Total surface in pixels to get an idea of the font rasterization/texture cost (not exact, we approximate the cost of padding between glyphs)
-    ImU8                        Used4kPagesMap[(IM_UNICODE_CODEPOINT_MAX+1)/4096/8]; // 2 bytes if ImWchar=ImWchar16, 34 bytes if ImWchar==ImWchar32. Store 1-bit for each block of 4K codepoints that has one active glyph. This is mainly used to facilitate iterations across all used codepoints.
+```cpp
+ImVector<float> IndexAdvanceX;
+float           FallbackAdvanceX;
+float           FontSize;
+```
 
-    // Methods
-    IMGUI_API ImFont();
-    IMGUI_API ~ImFont();
-    IMGUI_API const ImFontGlyph*FindGlyph(ImWchar c) const;
-    IMGUI_API const ImFontGlyph*FindGlyphNoFallback(ImWchar c) const;
-    float                       GetCharAdvance(ImWchar c) const     { return ((int)c < IndexAdvanceX.Size) ? IndexAdvanceX[(int)c] : FallbackAdvanceX; }
-    bool                        IsLoaded() const                    { return ContainerAtlas != NULL; }
-    const char*                 GetDebugName() const                { return ConfigData ? ConfigData->Name : "<unknown>"; }
+|名前|値|I/O|説明|
+|---|---|---|---|
+| IndexAdvanceX    | 12-16 | out | スパース。直接インデックス可能な方法で `Glyphs->AdvanceX` (この情報しか持たない CalcTextSize 関数にとってキャッシュフレンドリーであり、大きな UI ではボトルネックになりがちです)。 |
+| FallbackAdvanceX | 4     | out | = `FallbackGlyph->AdvanceX` |
+| FontSize         | 4     | in  | 文字/行の高さ、ロード中に設定（ロード後は変更しない） |
 
-    // 'max_width' stops rendering after a certain width (could be turned into a 2d size). FLT_MAX to disable.
-    // 'wrap_width' enable automatic word-wrapping across multiple lines to fit into given width. 0.0f to disable.
-    IMGUI_API ImVec2            CalcTextSizeA(float size, float max_width, float wrap_width, const char* text_begin, const char* text_end = NULL, const char** remaining = NULL) const; // utf8
-    IMGUI_API const char*       CalcWordWrapPositionA(float scale, const char* text, const char* text_end, float wrap_width) const;
-    IMGUI_API void              RenderChar(ImDrawList* draw_list, float size, const ImVec2& pos, ImU32 col, ImWchar c) const;
-    IMGUI_API void              RenderText(ImDrawList* draw_list, float size, const ImVec2& pos, ImU32 col, const ImVec4& clip_rect, const char* text_begin, const char* text_end, float wrap_width = 0.0f, bool cpu_fine_clip = false) const;
+メンバー: ホット ~28/40 バイト (CalcTextSize + レンダー ループ用)
 
-    // [Internal] Don't use!
-    IMGUI_API void              BuildLookupTable();
-    IMGUI_API void              ClearOutputData();
-    IMGUI_API void              GrowIndex(int new_size);
-    IMGUI_API void              AddGlyph(const ImFontConfig* src_cfg, ImWchar c, float x0, float y0, float x1, float y1, float u0, float v0, float u1, float v1, float advance_x);
-    IMGUI_API void              AddRemapChar(ImWchar dst, ImWchar src, bool overwrite_dst = true); // Makes 'dst' character/glyph points to 'src' character/glyph. Currently needs to be called AFTER fonts have been built.
-    IMGUI_API void              SetGlyphVisible(ImWchar c, bool visible);
-    IMGUI_API bool              IsGlyphRangeUnused(unsigned int c_begin, unsigned int c_last);
+```cpp
+ImVector<ImWchar>     IndexLookup;
+ImVector<ImFontGlyph> Glyphs;
+const ImFontGlyph*    FallbackGlyph;
+```
+
+|名前|値|I/O|説明|
+|---|---|---|---|
+| IndexLookup   | 12-16 | out | スパース. Unicodeコードポイントによるグリフのインデックス. |
+| Glyphs        | 12-16 | out | すべてのグリフ。 |
+| FallbackGlyph | 4-8   | out | = FindGlyph(FontFallbackChar) |
+
+メンバー: コールド ～32/40バイト
+
+```cpp
+ImFontAtlas*        ContainerAtlas;
+const ImFontConfig* ConfigData;
+short               ConfigDataCount;
+ImWchar             FallbackChar;
+ImWchar             EllipsisChar;
+short               EllipsisCharCount;
+float               EllipsisWidth;
+float               EllipsisCharStep;
+bool                DirtyLookupTables;
+float               Scale;
+float               Ascent, Descent;
+int                 MetricsTotalSurface;
+ImU8                Used4kPagesMap[(IM_UNICODE_CODEPOINT_MAX+1)/4096/8];
+```
+
+|名前|値|I/O|説明|
+|---|---|---|---|
+| ContainerAtlas      | 4-8 | out | What we has been loaded into |
+| ConfigData          | 4-8 | in  | `ContainerAtlas->ConfigData` 内へのポインタ。 |
+| ConfigDataCount     | 2   | in  | (~ 1) このフォントの作成に関与した ImFontConfig の数。複数のフォントソースを 1 つの ImFont にマージする場合は 1 より大きい。 |
+| FallbackChar        | 2   | out | (= FFFD/'?')  グリフが見つからない場合に使われる文字。 |
+| EllipsisChar        | 2   | out | (= '...'/'.')  省略記号のレンダリングに使用される文字。 |
+| EllipsisCharCount   | 1   | out | (1 or 3) |
+| EllipsisWidth       | 4   | out | 幅 |
+| EllipsisCharStep    | 4   | out | `EllipsisCount > 0`の場合、文字と文字の間をステップで区切る。 |
+| DirtyLookupTables   | 1   | out | |
+| Scale               | 4   | in  | (= 1.f) ベースフォントスケールに、 SetWindowFontScale() で調整できるウィンドウごとのフォントスケールを掛けたもの。 |
+| Ascent, Descent     | 4+4 | out | アセント: 例えば`'A' [0..FontSize]`の上から下までの距離。 |
+| MetricsTotalSurface | 4   | out | フォントのラスタライズ/テクスチャコストを知るためのピクセル単位での総表面。 (正確ではないので、グリフ間のパディングのコストを概算する。) |
+| Used4kPagesMap      |     |     | ImWchar=ImWchar16の場合は2バイト、ImWchar==ImWchar32の場合は34バイト。 アクティブなグリフを 1 つ持つ 4K コードポイントのブロックごとに 1 ビットを格納する。 これは主に、使用されるすべてのコードポイントにわたって反復を容易にするために使用される。 |
+
+
+メソッド
+
+```cpp
+IMGUI_API ImFont();
+IMGUI_API ~ImFont();
+IMGUI_API const ImFontGlyph*FindGlyph(ImWchar c) const;
+IMGUI_API const ImFontGlyph*FindGlyphNoFallback(ImWchar c) const;
+float                       GetCharAdvance(ImWchar c) const     { return ((int)c < IndexAdvanceX.Size) ? IndexAdvanceX[(int)c] : FallbackAdvanceX; }
+bool                        IsLoaded() const                    { return ContainerAtlas != NULL; }
+const char*                 GetDebugName() const                { return ConfigData ? ConfigData->Name : "<unknown>"; }
+```
+
+- `max_width`: ある幅（2次元サイズにすることもできる）を超えるとレンダリングを停止する。FLT_MAXで無効になる。
+- `wrap_width`: 与えられた幅に収まるように、複数行に渡る単語の自動折り返しを有効にする。0.0fで無効。
+
+```cpp
+IMGUI_API ImVec2            CalcTextSizeA(float size, float max_width, float wrap_width, const char* text_begin, const char* text_end = NULL, const char** remaining = NULL) const; // utf8
+IMGUI_API const char*       CalcWordWrapPositionA(float scale, const char* text, const char* text_end, float wrap_width) const;
+IMGUI_API void              RenderChar(ImDrawList* draw_list, float size, const ImVec2& pos, ImU32 col, ImWchar c) const;
+IMGUI_API void              RenderText(ImDrawList* draw_list, float size, const ImVec2& pos, ImU32 col, const ImVec4& clip_rect, const char* text_begin, const char* text_end, float wrap_width = 0.0f, bool cpu_fine_clip = false) const;
+```
+
+(内部) 使わないで！
+
+```cpp
+    IMGUI_API void BuildLookupTable();
+    IMGUI_API void ClearOutputData();
+    IMGUI_API void GrowIndex(int new_size);
+    IMGUI_API void AddGlyph(const ImFontConfig* src_cfg, ImWchar c, float x0, float y0, float x1, float y1, float u0, float v0, float u1, float v1, float advance_x);
+    IMGUI_API void AddRemapChar(ImWchar dst, ImWchar src, bool overwrite_dst = true); // Makes 'dst' character/glyph points to 'src' character/glyph. Currently needs to be called AFTER fonts have been built.
+    IMGUI_API void SetGlyphVisible(ImWchar c, bool visible);
+    IMGUI_API bool IsGlyphRangeUnused(unsigned int c_begin, unsigned int c_last);
 };
 ```
 
@@ -4907,14 +5468,21 @@ struct ImFont
 ```cpp
 enum ImGuiViewportFlags_
 {
-    ImGuiViewportFlags_None                     = 0,
-    ImGuiViewportFlags_IsPlatformWindow         = 1 << 0,   // Represent a Platform Window
-    ImGuiViewportFlags_IsPlatformMonitor        = 1 << 1,   // Represent a Platform Monitor (unused yet)
-    ImGuiViewportFlags_OwnedByApp               = 1 << 2,   // Platform Window: is created/managed by the application (rather than a dear imgui backend)
+    ImGuiViewportFlags_None              = 0,
+    ImGuiViewportFlags_IsPlatformWindow  = 1 << 0,
+    ImGuiViewportFlags_IsPlatformMonitor = 1 << 1,
+    ImGuiViewportFlags_OwnedByApp        = 1 << 2,
 };
 ```
 
-- 現在、親愛なるImGuiウィンドウをホストしているアプリケーションによって作成されたプラットフォームウィンドウを表しています。
+|名前|説明|
+|---|---|
+| ImGuiViewportFlags_None              | |
+| ImGuiViewportFlags_IsPlatformWindow  | プラットフォーム・ウィンドウを表す |
+| ImGuiViewportFlags_IsPlatformMonitor | プラットフォーム・モニターを表す（未使用） |
+| ImGuiViewportFlags_OwnedByApp        | プラットフォーム・ウィンドウ：（dear imguiバックエンドではなく）アプリケーションによって作成／管理される。 |
+
+- 現在、dear ImGuiウィンドウをホストしているアプリケーションによって作成されたプラットフォームウィンドウを表しています。
 - マルチビューポートを有効にした'ドッキング'ブランチでは、このコンセプトを拡張して、複数のアクティブビューポートを持つことができます。
 - 将来的には、この概念をさらに拡張して、Platform Monitorも表現し、「メインプラットフォームウィンドウなし」の操作モードをサポートする予定です。
 - メインエリアとワークエリアについて：
@@ -4925,20 +5493,36 @@ enum ImGuiViewportFlags_
 ```cpp
 struct ImGuiViewport
 {
-    ImGuiViewportFlags  Flags;                  // See ImGuiViewportFlags_
-    ImVec2              Pos;                    // Main Area: Position of the viewport (Dear ImGui coordinates are the same as OS desktop/native coordinates)
-    ImVec2              Size;                   // Main Area: Size of the viewport.
-    ImVec2              WorkPos;                // Work Area: Position of the viewport minus task bars, menus bars, status bars (>= Pos)
-    ImVec2              WorkSize;               // Work Area: Size of the viewport minus task bars, menu bars, status bars (<= Size)
+    ImGuiViewportFlags Flags;
+    ImVec2             Pos;
+    ImVec2             Size;
+    ImVec2             WorkPos;
+    ImVec2             WorkSize;
+```
 
-    // Platform/Backend Dependent Data
-    void*               PlatformHandleRaw;      // void* to hold lower-level, platform-native window handle (under Win32 this is expected to be a HWND, unused for other platforms)
+|名前|説明|
+|---|---|
+| Flags    | ImGuiViewportFlags_を参照。 |
+| Pos      | メインエリア: ビューポートの位置（ImGuiの座標はOSのデスクトップ/ネイティブ座標と同じです。） |
+| Size     | メインエリア: ビューポートのサイズ。 |
+| WorkPos  | 作業エリア: タスクバー、メニューバー、ステータスバーを除いたビューポートの位置 (`>= Pos`) |
+| WorkSize | 作業エリア: タスクバー、メニューバー、ステータスバーを除いたビューポートのサイズ (`<= Size`) |
 
-    ImGuiViewport()     { memset(this, 0, sizeof(*this)); }
+プラットフォーム／バックエンド依存データ
 
-    // Helpers
-    ImVec2              GetCenter() const       { return ImVec2(Pos.x + Size.x * 0.5f, Pos.y + Size.y * 0.5f); }
-    ImVec2              GetWorkCenter() const   { return ImVec2(WorkPos.x + WorkSize.x * 0.5f, WorkPos.y + WorkSize.y * 0.5f); }
+```cpp
+void* PlatformHandleRaw;
+
+ImGuiViewport() { memset(this, 0, sizeof(*this)); }
+```
+
+- `PlatformHandleRaw`: 低レベルの、プラットフォーム固有のウィンドウハンドルを保持する `void*` (Win32ではHWNDとなることが期待されるが、他のプラットフォームでは未使用)
+
+ヘルパー
+
+```cpp
+    ImVec2 GetCenter() const     { return ImVec2(Pos.x + Size.x * 0.5f, Pos.y + Size.y * 0.5f); }
+    ImVec2 GetWorkCenter() const { return ImVec2(WorkPos.x + WorkSize.x * 0.5f, WorkPos.y + WorkSize.y * 0.5f); }
 };
 ```
 
@@ -4965,9 +5549,9 @@ struct ImGuiPlatformImeData
 
 ## 廃止された関数と型
 
-(Will be removed! Read 'API BREAKING CHANGES' section in imgui.cpp for details)
+削除されます！詳しくはimgui.cppの「API BREAKING CHANGES」セクションをお読みください。
 
-Please keep your copy of dear imgui up to date! Occasionally set '#define IMGUI_DISABLE_OBSOLETE_FUNCTIONS' in imconfig.h to stay ahead.
+親愛なるimguiのコピーを最新の状態にしておいてください！時折、imconfig.hに'#define IMGUI_DISABLE_OBSOLETE_FUNCTIONS'を設定してください。
 
 ```cpp
 namespace ImGui
@@ -5092,8 +5676,11 @@ enum ImGuiModFlags_ { ImGuiModFlags_None = 0, ImGuiModFlags_Ctrl = ImGuiMod_Ctrl
 #ifdef _MSC_VER
 #pragma warning (pop)
 #endif
+```
 
-// Include imgui_user.h at the end of imgui.h (convenient for user to only explicitly include vanilla imgui.h)
+imgui.hの末尾にimgui_user.hをインクルードする（ユーザーが明示的にバニラimgui.hだけをインクルードするのに便利）。
+
+```cpp
 #ifdef IMGUI_INCLUDE_IMGUI_USER_H
 #include "imgui_user.h"
 #endif
