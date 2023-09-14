@@ -4,17 +4,15 @@ export default {
     lang: 'ja',
     title: 'みが市',
     description: '',
-
+    ignoreDeadLinks: true,
     lastUpdated: true,
     cleanUrls: true,
-
     head: [['meta', { name: 'theme-color', content: '#3c8772' }]],
     markdown: {
         config: (md) => {
             md.use(require("markdown-it-katex"));
         },
     },
-    
     themeConfig: {
         algolia: {
             appId: 'BT9F9T40EX',
@@ -1316,6 +1314,7 @@ export default {
                         {text: 'stb', link: '/translation/stb/stb.md'},
                         {text: 'シングルファイル', link: '/translation/stb/single_file_libs.md'},
                         {text: 'stb_image.h', link: '/translation/stb/stb_image_h.md'},
+                        {text: 'stb_truetype.h', link: '/translation/stb/stb_truetype_h.md'},
                     ]
                 },
             ],
