@@ -6,25 +6,35 @@ export default {
     description: '',
     ignoreDeadLinks: true,
     lastUpdated: true,
-    cleanUrls: true,
-    head: [['meta', { name: 'theme-color', content: '#3c8772' }]],
+    //cleanUrls: true,
+    //head: [['meta', { name: 'theme-color', content: '#3c8772' }]],
     markdown: {
         config: (md) => {
             md.use(require("markdown-it-katex"));
         },
     },
     themeConfig: {
+        //logo: '/logo_miga.png',
+        sitemap: {
+            hostname: 'https://dolphilia.com'
+        },
+        editLink: {
+            pattern: 'https://github.com/dolphilia/dolphilia.com/edit/main/docs/:path'
+        },
         algolia: {
             appId: 'BT9F9T40EX',
             apiKey: 'aaf30df920537ae115546a12a1554f6b',
             indexName: 'dolphilia'
         },
-        //logo: '/logo_miga.png',
+        footer: {
+            message: '',
+            copyright: 'Copyright © 2023-present dolphilia'
+        },
         siteTitle: 'みが市立図書館',
         socialLinks: [
+            { icon: 'x', link: 'https://twitter.com/dolphilia' },
+            { icon: 'youtube', link: 'https://youtube.com/c/dolphilia'},
             { icon: 'github', link: 'https://github.com/dolphilia' },
-            { icon: 'twitter', link: 'https://twitter.com/dolphilia' },
-            { icon: 'youtube', link: 'https://youtube.com/c/dolphilia'}
             //{ icon: 'mastodon', link: 'https://miga.pw/@dolphilia'},
             //{ icon: 'discord', link: 'https://https://discord.gg/f4sKFrsHyK'},
         ],
@@ -39,7 +49,6 @@ export default {
                 items: [
                     {text: 'ANGLE', link: '/translation/angle/'},
                     {text: 'ANTLR', link: '/translation/antlr/'},
-                    {text: 'CivetWeb', link: '/translation/civetweb/'},
                     {text: 'C言語', link: '/translation/c/'},
                     {text: 'Duktape', link: '/translation/duktape/'},
                     {text: 'GLFW', link: '/translation/GLFW/'},
@@ -973,6 +982,23 @@ export default {
                     collapsed: false,
                     items: [
                         {text: '目次', link: '/translation/GLFW/Reference/'},
+                        {text: 'コンテキスト', link: '/translation/GLFW/Reference/context.md'},
+                        {text: '初期化など', link: '/translation/GLFW/Reference/init.md'},
+                        {text: 'エラーコード', link: '/translation/GLFW/Reference/error.md'},
+                        {text: '入力', link: '/translation/GLFW/Reference/input.md'},
+                        {text: 'ゲームパッドの軸', link: '/translation/GLFW/Reference/gamepad_axes.md'},
+                        {text: 'ゲームパッドのボタン', link: '/translation/GLFW/Reference/gamepad_buttons.md'},
+                        {text: 'ジョイスティックのハット', link: '/translation/GLFW/Reference/joystick_hat_states.md'},
+                        {text: 'ジョイスティック', link: '/translation/GLFW/Reference/joysticks.md'},
+                        {text: 'キーボードのキー', link: '/translation/GLFW/Reference/keyboard_keys.md'},
+                        {text: '修飾キー', link: '/translation/GLFW/Reference/modifier_key_flags.md'},
+                        {text: 'マウスボタン', link: '/translation/GLFW/Reference/mouse_buttons.md'},
+                        {text: 'カーソルの形状', link: '/translation/GLFW/Reference/standard_cursor_shapes.md'},
+                        {text: 'モニター', link: '/translation/GLFW/Reference/monitor.md'},
+                        {text: 'ネイティブアクセス', link: '/translation/GLFW/Reference/native.md'},
+                        {text: 'Vulkanサポート', link: '/translation/GLFW/Reference/vulkan.md'},
+                        {text: 'ウィンドウ', link: '/translation/GLFW/Reference/window.md'},
+                        
                     ]
                 },
             ],
@@ -1486,9 +1512,5 @@ export default {
                 },
             ],
         },
-        footer: {
-            message: '',
-            copyright: 'Copyright © 2023-present dolphilia'
-        }
     }
 }

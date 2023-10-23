@@ -38,7 +38,7 @@ GLFWwindow* second_window = glfwCreateWindow(640, 480, "Second Window", NULL, fi
 
 GLFWには、sharingと呼ばれる素のオブジェクト共有のサンプルプログラムが付属しています。
 
-###オフスクリーンコンテキスト
+### オフスクリーンコンテキスト
 
 GLFW は、関連するウィンドウのないコンテキストの作成をサポートしていない。しかし、隠されたウィンドウを持つコンテキストは、[GLFW_VISIBLE](https://www.glfw.org/docs/latest/window_guide.html#GLFW_VISIBLE_hint)ウィンドウヒントを用いて作成することができる。
 
@@ -199,7 +199,7 @@ PFNGLSPECIALIZESHADERARBPROC pfnSpecializeShaderARB = glfwGetProcAddress("glSpec
 
 さて、すべてのパーツが紹介されましたが、これらを一緒に使用するとどのようになるでしょうか。
 
-```cß
+```c
 #define GLFW_INCLUDE_GLEXT
 #include <GLFW/glfw3.h>
  

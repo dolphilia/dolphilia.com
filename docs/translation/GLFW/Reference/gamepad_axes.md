@@ -1,0 +1,17 @@
+# ゲームパッドの軸
+
+これらの使用方法については、ゲームパッド入力を参照してください。
+
+[[TOC]]
+
+## マクロ
+
+```c
+#define GLFW_GAMEPAD_AXIS_LEFT_X   0
+#define GLFW_GAMEPAD_AXIS_LEFT_Y   1
+#define GLFW_GAMEPAD_AXIS_RIGHT_X   2
+#define GLFW_GAMEPAD_AXIS_RIGHT_Y   3
+#define GLFW_GAMEPAD_AXIS_LEFT_TRIGGER   4
+#define GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER   5
+#define GLFW_GAMEPAD_AXIS_LAST   GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER
+```
