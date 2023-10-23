@@ -1,20 +1,20 @@
-# GLFW入力ガイド（日本語訳）
-
-[原文](https://www.glfw.org/docs/latest/input_guide.html)
+# GLFW入力ガイド
 
 このガイドでは、GLFWの入力関連機能を紹介します。このカテゴリの特定の機能の詳細については、入力のリファレンスを参照してください。また、GLFWの他の領域のガイドもあります。
 
-- Introduction to the API
-- Window guide
-- Context guide
-- Vulkan guide
-- Monitor guide
+- APIの紹介
+- ウィンドウガイド
+- コンテキストガイド
+- Vulkanガイド
+- モニターガイド
 
 GLFWは多くの種類の入力を提供します。時間のようにポーリングしかできないものや、スクロールのように コールバックでしか受け取れないものもありますが、多くはコールバックとポー リングの両方を提供します。コールバックはポーリングより使うのに手間がかかりますが、CPUへの負荷が少なく、状態の変化を見逃さないことが保証されます。
 
 すべての入力コールバックはウィンドウ ハンドルを受け取ります。ウィンドウ ユーザー ポインタを使用すると、コールバックから非グローバル構造体やオブジェクトにアクセスできます。
 
 様々なイベントコールバックがどのように動作するかをより良く感じるには、イベント テストプログラムを実行してください。これはGLFWがサポートするすべてのコールバックを登録し、すべてのイベントに提供されたすべての引数を、時間とシーケンス情報とともにプリントアウトします。
+
+[[TOC]]
 
 ## イベント処理
 
@@ -197,7 +197,10 @@ glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 これはカーソルを隠し、指定されたウィンドウにロックします。GLFWはその後、カーソルの再中心化、オフセット計算、アプリケーションへの仮想カーソル位置の提供など、すべての詳細を引き受けます。この仮想位置は、通常カーソル位置コールバックとポーリングの両方を通して提供されます。
 
-> GLFWの他の機能を使って、この機能の独自のバージョンを実装してはならない。これは、サポートされておらず、GLFW_CURSOR_DISABLEDのように堅牢に動作することはない。
+::: info 
+GLFWの他の機能を使って、この機能の独自のバージョンを実装してはならない。これは、サポートされておらず、GLFW_CURSOR_DISABLEDのように堅牢に動作することはない。
+:::
+
 もし、カーソルがウィンドウの上にあるときだけ隠されるようにしたいが、それでも通常の動作をさせたい場合は、カーソルモードをGLFW_CURSOR_HIDDENに設定すること。
 
 ```c
@@ -447,16 +450,17 @@ const unsigned char* hats = glfwGetJoystickHats(GLFW_JOYSTICK_7, &count);
 
 返された配列の各要素は、以下のいずれかである。
 
-Name	Value
-GLFW_HAT_CENTERED	0
-GLFW_HAT_UP	1
-GLFW_HAT_RIGHT	2
-GLFW_HAT_DOWN	4
-GLFW_HAT_LEFT	8
-GLFW_HAT_RIGHT_UP	GLFW_HAT_RIGHT | GLFW_HAT_UP
-GLFW_HAT_RIGHT_DOWN	GLFW_HAT_RIGHT | GLFW_HAT_DOWN
-GLFW_HAT_LEFT_UP	GLFW_HAT_LEFT | GLFW_HAT_UP
-GLFW_HAT_LEFT_DOWN	GLFW_HAT_LEFT | GLFW_HAT_DOWN
+| 名前 | 値 |
+|---|---|
+| GLFW_HAT_CENTERED | 0 | 
+| GLFW_HAT_UP | 1 |
+| GLFW_HAT_RIGHT | 2 |
+| GLFW_HAT_DOWN | 4 |
+| GLFW_HAT_LEFT | 8 |
+| GLFW_HAT_RIGHT_UP | GLFW_HAT_RIGHT または GLFW_HAT_UP |
+| GLFW_HAT_RIGHT_DOWN | GLFW_HAT_RIGHT または GLFW_HAT_DOWN |
+| GLFW_HAT_LEFT_UP | GLFW_HAT_LEFT または GLFW_HAT_UP |
+| GLFW_HAT_LEFT_DOWN | GLFW_HAT_LEFT または GLFW_HAT_DOWN |
 
 斜めの方向は、主な方向（上、右、下、左）のビット単位の組み合わせで、対応する方向とANDすることで個別にテストすることができます。
 
@@ -516,7 +520,7 @@ void joystick_callback(int jid, int event)
 glfwGetJoystickNameとglfwGetJoystickUserPointerのみが、ジョイスティック切断時に有用な値を返し、 monitorコールバックが返される前に返されるだけです。
 
 
-###ゲームパッド入力
+### ゲームパッド入力
 
 ジョイスティックの機能には、軸、ボタン、ハットなどのラベルがなく、デバイスのどこに配置されているのかもわかりません。また、同じデバイスであっても、プラットフォームによって順番が異なる場合があります。
 
@@ -561,7 +565,23 @@ GLFWgamepadstate構造体は、ボタンの状態と軸の状態の2つの配列
 
 配列のサイズと各配列内の位置は固定である．
 
-ボタンのインデックスは GLFW_GAMEPAD_BUTTON_A, GLFW_GAMEPAD_BUTTON_B, GLFW_GAMEPAD_BUTTON_X, GLFW_GAMEPAD_BUTTON_Y, GLFW_GAMEPAD_BUTTON_LEFT_BUMPER, GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER, GLFW_GAMEPAD_BUTTON_BACK, GLFW_GAMEPAD_BUTTON_START, GLFW_GAMEPAD_BUTTON_GUIDE, GLFW_GAMEPAD_BUTTON_LEFT_THUMB, GLFW_GAMEPAD_BUTTON_RIGHT_THUMB, GLFW_GAMEPAD_BUTTON_DPAD_UP, GLFW_GAMEPAD_BUTTON_DPAD_RIGHT, GLFW_GAMEPAD_BUTTON_DPAD_DOWN and GLFW_GAMEPAD_BUTTON_DPAD_LEFT.
+ボタンのインデックス:
+
+- GLFW_GAMEPAD_BUTTON_A
+- GLFW_GAMEPAD_BUTTON_B
+- GLFW_GAMEPAD_BUTTON_X
+- GLFW_GAMEPAD_BUTTON_Y
+- GLFW_GAMEPAD_BUTTON_LEFT_BUMPER
+- GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER
+- GLFW_GAMEPAD_BUTTON_BACK
+- GLFW_GAMEPAD_BUTTON_START
+- GLFW_GAMEPAD_BUTTON_GUIDE
+- GLFW_GAMEPAD_BUTTON_LEFT_THUMB
+- GLFW_GAMEPAD_BUTTON_RIGHT_THUMB
+- GLFW_GAMEPAD_BUTTON_DPAD_UP
+- GLFW_GAMEPAD_BUTTON_DPAD_RIGHT
+- GLFW_GAMEPAD_BUTTON_DPAD_DOWN
+- GLFW_GAMEPAD_BUTTON_DPAD_LEFT
 
 お好みで、A、B、X、YボタンのインデックスにGLFW_GAMEPAD_BUTTON_CROSS、GLFW_GAMEPAD_BUTTON_CIRCLE、GLFW_GAMEPAD_BUTTON_SQUARE、GLFW_GAMEPAD_BUTTON_TRIANGLEというエイリアスも存在します。
 
@@ -608,15 +628,16 @@ axisまたはbuttonフィールドの値は、ジョイスティックボタン�
 
 以下は、ゲームパッドのマッピングの例です。これは、WindowsのXInput API経由でアクセスするXboxコントローラのためにGLFWに組み込まれたものです。この例は、ページに収まるようにいくつかの行に分かれていますが、実際のゲームパッドマッピングは1行でなければなりません。
 
-```
+```txt
 78696e70757401000000000000000000,XInput Gamepad (GLFW),platform:Windows,a:b0,
 b:b1,x:b2,y:b3,leftshoulder:b4,rightshoulder:b5,back:b6,start:b7,leftstick:b8,
 rightstick:b9,leftx:a0,lefty:a1,rightx:a2,righty:a3,lefttrigger:a4,
 righttrigger:a5,dpup:h0.1,dpright:h0.2,dpdown:h0.4,dpleft:h0.8,
 ```
 
-> GLFW は、最近 SDL に追加された出力範囲と修飾子 + と - をまだサポートしていません。入力修飾子 +, - および ~ はサポートされており、上で説明したとおりです。
-
+::: info
+GLFW は、最近 SDL に追加された出力範囲と修飾子 + と - をまだサポートしていません。入力修飾子 +, - および ~ はサポートされており、上で説明したとおりです。
+:::
 
 ## 時間入力
 

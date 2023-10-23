@@ -1,15 +1,14 @@
-# GLFWモニターガイド（日本語訳）
+# GLFWモニターガイド
 
-[原文](https://www.glfw.org/docs/latest/monitor_guide.html)
+このガイドでは、GLFWのモニター関連機能を紹介しています。このカテゴリの特定の機能の詳細については、モニタのリファレンスを参照してください。また、GLFWの他の領域のガイドもあります。
 
-このガイドでは、GLFWのモニター関連機能を紹介しています。このカテゴリの特定の機能の詳細については、[モニタのリファレンス](https://www.glfw.org/docs/latest/group__monitor.html)を参照してください。また、GLFWの他の領域のガイドもあります。
+- APIの紹介
+- ウィンドウガイド
+- コンテキストガイド
+- Vulkanガイド
+- 入力ガイド
 
-- [Introduction to the API](https://www.glfw.org/docs/latest/intro_guide.html)
-- [Window guide](https://www.glfw.org/docs/latest/window_guide.html)
-- [Context guide](https://www.glfw.org/docs/latest/context_guide.html)
-- [Vulkan guide](https://www.glfw.org/docs/latest/vulkan_guide.html)
-- [Input guide](https://www.glfw.org/docs/latest/input_guide.html)
-
+[[TOC]]
 
 ## モニター対象
 
@@ -194,4 +193,6 @@ glfwSetGamma(monitor, 1.0);
 
 glfwSetGamma関数によるガンマ補正を試すには、ガンマテストプログラムを実行します。
 
-> ソフトウェアで制御されるガンマランプは、ハードウェアのガンマ補正に加えて適用され、今日では通常 sRGB のガンマに近似しています。つまり、完全に直線的なランプ、つまりガンマ 1.0 を設定すると、デフォルトの（通常 sRGB に近い）動作になります。
+::: info
+ソフトウェアで制御されるガンマランプは、ハードウェアのガンマ補正に加えて適用され、今日では通常 sRGB のガンマに近似しています。つまり、完全に直線的なランプ、つまりガンマ 1.0 を設定すると、デフォルトの（通常 sRGB に近い）動作になります。
+:::

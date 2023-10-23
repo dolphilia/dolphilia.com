@@ -1,15 +1,14 @@
 # GLFWウィンドウガイド（日本語訳）
 
-[原文](https://www.glfw.org/docs/latest/window_guide.html)
-
 このガイドでは，GLFWのウィンドウに関する機能を紹介します．このカテゴリの特定の機能の詳細については、ウィンドウのリファレンスを参照してください。また、GLFWの他の領域のガイドもあります。
 
-- Introduction to the API
-- Context guide
-- Vulkan guide
-- Monitor guide
-- Input guide
+- APIの紹介
+- コンテキストガイド
+- Vulkanガイド
+- モニターガイド
+- 入力ガイド
 
+[[TOC]]
 
 ## ウィンドウズ・オブジェクト
 
@@ -45,14 +44,14 @@ GLFWwindow* window = glfwCreateWindow(640, 480, "My Title", glfwGetPrimaryMonito
 
 GLFWvidmode構造体の各フィールドは、関数パラメータまたはウィンドウヒントに対応し、組み合わせてそのウィンドウの希望するビデオモードを形成する。希望するビデオモードに最も近いサポートされているビデオモードが、ウィンドウに入力フォーカスがある限り、選択されたモニターに設定される。ビデオモードの取得に関する詳細については、ビデオモードを参照してください。
 
-| Video mode field | Corresponds to |
+| ビデオモードフィールド | 対応 |
 | --- | --- |
-| GLFWvidmode.width       | width parameter of glfwCreateWindow |
-| GLFWvidmode.height      | height parameter of glfwCreateWindow |
-| GLFWvidmode.redBits     | GLFW_RED_BITS hint |
-| GLFWvidmode.greenBits   | GLFW_GREEN_BITS hint |
-| GLFWvidmode.blueBits    | GLFW_BLUE_BITS hint |
-| GLFWvidmode.refreshRate | GLFW_REFRESH_RATE hint |
+| GLFWvidmode.width       | glfwCreateWindow の width パラメータ。 |
+| GLFWvidmode.height      | glfwCreateWindowのheightパラメータ |
+| GLFWvidmode.redBits     | GLFW_RED_BITS ヒント |
+| GLFWvidmode.greenBits   | GLFW_GREEN_BITS ヒント |
+| GLFWvidmode.blueBits    | GLFW_BLUE_BITS ヒント |
+| GLFWvidmode.refreshRate | GLFW_REFRESH_RATE ヒント |
 
 いったんフルスクリーンウィンドウができたら、glfwSetWindowMonitor でその解像度、リフレッシュレート、モニタを変更することができます。もし、解像度だけを変更する必要があれば、glfwSetWindowSize を呼び出すこともできます。すべての場合において、新しいビデオモードは、glfwCreateWindowによって選択されたビデオモードと同じ方法で選択されます。ウィンドウがOpenGLまたはOpenGL ESのコンテキストを持っている場合、それは影響を受けません。
 
@@ -76,7 +75,7 @@ glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
 GLFWwindow* window = glfwCreateWindow(mode->width, mode->height, "My Title", monitor, NULL);
 ```
 
-This also works for windowed mode windows that are made full screen.
+これは、ウィンドウモードのウィンドウをフルスクリーンにした場合にも機能する。
 
 ```c
 const GLFWvidmode* mode = glfwGetVideoMode(monitor);
@@ -106,8 +105,9 @@ glfwDestroyWindow(window);
 
 いくつかのヒントはプラットフォーム固有です。これらは、どのプラットフォームでも常に有効ですが、特定のプラットフォームにのみ影響します。他のプラットフォームでは無視されます。これらのヒントを設定するために、プラットフォーム固有のヘッダや呼び出しは必要ありません。
 
-> ウィンドウヒントは、指定された属性を持ちたいウィンドウとコンテキストを作成する前に設定する必要があります。これらは glfwCreateWindow への追加引数として機能します。
-
+::: info
+ウィンドウヒントは、指定された属性を持ちたいウィンドウとコンテキストを作成する前に設定する必要があります。これらは glfwCreateWindow への追加引数として機能します。
+:::
 
 #### ハードとソフトの制約
 
@@ -170,8 +170,11 @@ GLFW_SAMPLES は、マルチサンプリングに使用するサンプル数を�
 
 GLFW_SRGB_CAPABLE は、フレームバッファを sRGB 対応にするかどうかを指定します。指定可能な値は GLFW_TRUE および GLFW_FALSE である。
 
-> OpenGL: GL_FRAMEBUFFER_SRGB enableは、システムでサポートされている場合、sRGBレンダリングを制御する。デフォルトでは、sRGBレンダリングは無効である。
-> OpenGL ES: システムでサポートされている場合、コンテキストは常にsRGBレンダリングが有効になっています。
+::: info
+OpenGL: GL_FRAMEBUFFER_SRGB enableは、システムでサポートされている場合、sRGBレンダリングを制御する。デフォルトでは、sRGBレンダリングは無効である。
+
+OpenGL ES: システムでサポートされている場合、コンテキストは常にsRGBレンダリングが有効になっています。
+:::
 
 GLFW_DOUBLEBUFFER は、フレームバッファをダブルバッファにするかどうかを指定します。ほぼ常にダブルバッファリングを使用したい。これはハード的な制約である。指定可能な値は GLFW_TRUE および GLFW_FALSE である。
 
@@ -189,9 +192,11 @@ GLFW_CONTEXT_CREATION_API は、コンテキストの作成に使用する API �
 
 現在のコンテキストを作成するために使用された API を知っていると仮定している拡張ローダライブラリは、 このヒントを変更すると失敗する可能性があります。これは、glfwGetProcAddress を使って関数をロードさせることで解決できます。
 
-> Wayland: EGL APIはネイティブのコンテキスト作成APIであるため、このヒントは何の効果もない。
-> X11: 一部のLinuxシステムでは、1つのプロセスでネイティブAPIとEGL APIの両方を使用してコンテキストを作成すると、アプリケーションのセグメンテーションが発生します。Linuxでは、今のところ、どちらかのAPIを使うようにしてください。
-> OSMesa: その名前が示すように、OSMesaで作成されたOpenGLコンテキストは、そのバッファがスワップされたときにウィンドウの内容を更新しません。フレームバッファの内容を取得するには、OpenGL関数またはOSMesaのネイティブアクセス関数glfwGetOSMesaColorBufferとglfwGetOSMesaDepthBufferを使用します。
+::: info
+- Wayland: EGL APIはネイティブのコンテキスト作成APIであるため、このヒントは何の効果もない。
+- X11: 一部のLinuxシステムでは、1つのプロセスでネイティブAPIとEGL APIの両方を使用してコンテキストを作成すると、アプリケーションのセグメンテーションが発生します。Linuxでは、今のところ、どちらかのAPIを使うようにしてください。
+- OSMesa: その名前が示すように、OSMesaで作成されたOpenGLコンテキストは、そのバッファがスワップされたときにウィンドウの内容を更新しません。フレームバッファの内容を取得するには、OpenGL関数またはOSMesaのネイティブアクセス関数glfwGetOSMesaColorBufferとglfwGetOSMesaDepthBufferを使用します。
+:::
 
 GLFW_CONTEXT_VERSION_MAJOR and GLFW_CONTEXT_VERSION_MINOR は、作成されるコンテキストが互換性を持たなければならないクライアントAPIのバージョンを指定します。これらのヒントの正確な動作は、要求されたクライアント API に依存します。
 
@@ -199,9 +204,11 @@ GLFW_CONTEXT_VERSION_MAJOR and GLFW_CONTEXT_VERSION_MINOR は、作成される�
 
 これらのヒントを GLFW_VERSION_MAJOR および GLFW_VERSION_MINOR と混同しないでください。
 
-> OpenGL: これらのヒントはハード的な制約ではありませんが、作成されたコンテキストのOpenGLバージョンが要求されたものよりも小さい場合、作成は失敗します。したがって、レガシーコードにはバージョン 1.0 のデフォルトを使用してもまったく問題ありませんし、バージョン 3.0 以上の下位互換性のあるコンテキストが利用可能な場合は、それを使用することもできます。
-> OpenGL ES: これらのヒントはハード的な制約ではありませんが、作成されたコンテキストのOpenGL ESバージョンが要求されたものよりも低い場合、作成は失敗します。さらに、2.0以降が要求された場合、OpenGL ES 1.xを返すことはできませんし、その逆もまた然りです。これは、OpenGL ES 3.xは2.0と後方互換性がありますが、OpenGL ES 2.0は1.xと後方互換性がないためです。
-> macOS: OS は、OpenGL バージョン 3.2 以降の前方互換性のあるコアプロファイルコンテキストのみをサポートします。バージョン 3.2 以降の OpenGL コンテキストを作成する前に、GLFW_OPENGL_FORWARD_COMPAT と GLFW_OPENGL_PROFILE ヒントをそれに応じて設定する必要があります。OpenGL 3.0 と 3.1 のコンテキストは、macOS では全くサポートされていません。
+::: info
+- OpenGL: これらのヒントはハード的な制約ではありませんが、作成されたコンテキストのOpenGLバージョンが要求されたものよりも小さい場合、作成は失敗します。したがって、レガシーコードにはバージョン 1.0 のデフォルトを使用してもまったく問題ありませんし、バージョン 3.0 以上の下位互換性のあるコンテキストが利用可能な場合は、それを使用することもできます。
+- OpenGL ES: これらのヒントはハード的な制約ではありませんが、作成されたコンテキストのOpenGL ESバージョンが要求されたものよりも低い場合、作成は失敗します。さらに、2.0以降が要求された場合、OpenGL ES 1.xを返すことはできませんし、その逆もまた然りです。これは、OpenGL ES 3.xは2.0と後方互換性がありますが、OpenGL ES 2.0は1.xと後方互換性がないためです。
+- macOS: OS は、OpenGL バージョン 3.2 以降の前方互換性のあるコアプロファイルコンテキストのみをサポートします。バージョン 3.2 以降の OpenGL コンテキストを作成する前に、GLFW_OPENGL_FORWARD_COMPAT と GLFW_OPENGL_PROFILE ヒントをそれに応じて設定する必要があります。OpenGL 3.0 と 3.1 のコンテキストは、macOS では全くサポートされていません。
+:::
 
 GLFW_OPENGL_FORWARD_COMPAT は、OpenGL コンテキストが前方互換性を持つかどうかを指定します。これは、要求されたOpenGLのバージョンが3.0以上の場合にのみ使用する必要があります。OpenGL ESが要求された場合、このヒントは無視されます。
 
@@ -242,50 +249,51 @@ GLFW_COCOA_GRAPHICS_SWITCHING は、Automatic Graphics Switching、つまり、�
 
 GLFW_X11_CLASS_NAME and GLFW_X11_INSTANCE_NAME は、ICCCM WM_CLASSウィンドウプロパティのクラス部とインスタンス部をASCIIエンコードしたものを指定する。これらは、glfwWindowHintStringで設定される。
 
-#### Supported and default values
+#### サポート値とデフォルト値
 
-Window hint	Default value	Supported values
-GLFW_RESIZABLE	GLFW_TRUE	GLFW_TRUE or GLFW_FALSE
-GLFW_VISIBLE	GLFW_TRUE	GLFW_TRUE or GLFW_FALSE
-GLFW_DECORATED	GLFW_TRUE	GLFW_TRUE or GLFW_FALSE
-GLFW_FOCUSED	GLFW_TRUE	GLFW_TRUE or GLFW_FALSE
-GLFW_AUTO_ICONIFY	GLFW_TRUE	GLFW_TRUE or GLFW_FALSE
-GLFW_FLOATING	GLFW_FALSE	GLFW_TRUE or GLFW_FALSE
-GLFW_MAXIMIZED	GLFW_FALSE	GLFW_TRUE or GLFW_FALSE
-GLFW_CENTER_CURSOR	GLFW_TRUE	GLFW_TRUE or GLFW_FALSE
-GLFW_TRANSPARENT_FRAMEBUFFER	GLFW_FALSE	GLFW_TRUE or GLFW_FALSE
-GLFW_FOCUS_ON_SHOW	GLFW_TRUE	GLFW_TRUE or GLFW_FALSE
-GLFW_SCALE_TO_MONITOR	GLFW_FALSE	GLFW_TRUE or GLFW_FALSE
-GLFW_RED_BITS	8	0 to INT_MAX or GLFW_DONT_CARE
-GLFW_GREEN_BITS	8	0 to INT_MAX or GLFW_DONT_CARE
-GLFW_BLUE_BITS	8	0 to INT_MAX or GLFW_DONT_CARE
-GLFW_ALPHA_BITS	8	0 to INT_MAX or GLFW_DONT_CARE
-GLFW_DEPTH_BITS	24	0 to INT_MAX or GLFW_DONT_CARE
-GLFW_STENCIL_BITS	8	0 to INT_MAX or GLFW_DONT_CARE
-GLFW_ACCUM_RED_BITS	0	0 to INT_MAX or GLFW_DONT_CARE
-GLFW_ACCUM_GREEN_BITS	0	0 to INT_MAX or GLFW_DONT_CARE
-GLFW_ACCUM_BLUE_BITS	0	0 to INT_MAX or GLFW_DONT_CARE
-GLFW_ACCUM_ALPHA_BITS	0	0 to INT_MAX or GLFW_DONT_CARE
-GLFW_AUX_BUFFERS	0	0 to INT_MAX or GLFW_DONT_CARE
-GLFW_SAMPLES	0	0 to INT_MAX or GLFW_DONT_CARE
-GLFW_REFRESH_RATE	GLFW_DONT_CARE	0 to INT_MAX or GLFW_DONT_CARE
-GLFW_STEREO	GLFW_FALSE	GLFW_TRUE or GLFW_FALSE
-GLFW_SRGB_CAPABLE	GLFW_FALSE	GLFW_TRUE or GLFW_FALSE
-GLFW_DOUBLEBUFFER	GLFW_TRUE	GLFW_TRUE or GLFW_FALSE
-GLFW_CLIENT_API	GLFW_OPENGL_API	GLFW_OPENGL_API, GLFW_OPENGL_ES_API or GLFW_NO_API
-GLFW_CONTEXT_CREATION_API	GLFW_NATIVE_CONTEXT_API	GLFW_NATIVE_CONTEXT_API, GLFW_EGL_CONTEXT_API or GLFW_OSMESA_CONTEXT_API
-GLFW_CONTEXT_VERSION_MAJOR	1	Any valid major version number of the chosen client API
-GLFW_CONTEXT_VERSION_MINOR	0	Any valid minor version number of the chosen client API
-GLFW_CONTEXT_ROBUSTNESS	GLFW_NO_ROBUSTNESS	GLFW_NO_ROBUSTNESS, GLFW_NO_RESET_NOTIFICATION or GLFW_LOSE_CONTEXT_ON_RESET
-GLFW_CONTEXT_RELEASE_BEHAVIOR	GLFW_ANY_RELEASE_BEHAVIOR	GLFW_ANY_RELEASE_BEHAVIOR, GLFW_RELEASE_BEHAVIOR_FLUSH or GLFW_RELEASE_BEHAVIOR_NONE
-GLFW_OPENGL_FORWARD_COMPAT	GLFW_FALSE	GLFW_TRUE or GLFW_FALSE
-GLFW_OPENGL_DEBUG_CONTEXT	GLFW_FALSE	GLFW_TRUE or GLFW_FALSE
-GLFW_OPENGL_PROFILE	GLFW_OPENGL_ANY_PROFILE	GLFW_OPENGL_ANY_PROFILE, GLFW_OPENGL_COMPAT_PROFILE or GLFW_OPENGL_CORE_PROFILE
-GLFW_COCOA_RETINA_FRAMEBUFFER	GLFW_TRUE	GLFW_TRUE or GLFW_FALSE
-GLFW_COCOA_FRAME_NAME	""	A UTF-8 encoded frame autosave name
-GLFW_COCOA_GRAPHICS_SWITCHING	GLFW_FALSE	GLFW_TRUE or GLFW_FALSE
-GLFW_X11_CLASS_NAME	""	An ASCII encoded WM_CLASS class name
-GLFW_X11_INSTANCE_NAME	""	An ASCII encoded WM_CLASS instance name
+| ウィンドウのヒント | デフォルト値 | サポートされる値 |
+|---|---|---|
+| GLFW_RESIZABLE | GLFW_TRUE | GLFW_TRUE or GLFW_FALSE |
+| GLFW_VISIBLE | GLFW_TRUE | GLFW_TRUE or GLFW_FALSE |
+| GLFW_DECORATED | GLFW_TRUE | GLFW_TRUE or GLFW_FALSE |
+| GLFW_FOCUSED | GLFW_TRUE | GLFW_TRUE or GLFW_FALSE |
+| GLFW_AUTO_ICONIFY | GLFW_TRUE | GLFW_TRUE or GLFW_FALSE |
+| GLFW_FLOATING | GLFW_FALSE | GLFW_TRUE or GLFW_FALSE |
+| GLFW_MAXIMIZED | GLFW_FALSE | GLFW_TRUE or GLFW_FALSE |
+| GLFW_CENTER_CURSOR | GLFW_TRUE | GLFW_TRUE or GLFW_FALSE |
+| GLFW_TRANSPARENT_FRAMEBUFFER | GLFW_FALSE | GLFW_TRUE or GLFW_FALSE |
+| GLFW_FOCUS_ON_SHOW | GLFW_TRUE | GLFW_TRUE or GLFW_FALSE |
+| GLFW_SCALE_TO_MONITOR | GLFW_FALSE | GLFW_TRUE or GLFW_FALSE |
+| GLFW_RED_BITS | 8 | 0 to INT_MAX or GLFW_DONT_CARE |
+| GLFW_GREEN_BITS | 8 | 0 to INT_MAX or GLFW_DONT_CARE |
+| GLFW_BLUE_BITS | 8 | 0 to INT_MAX or GLFW_DONT_CARE |
+| GLFW_ALPHA_BITS | 8 | 0 to INT_MAX or GLFW_DONT_CARE |
+| GLFW_DEPTH_BITS | 24 | 0 to INT_MAX or GLFW_DONT_CARE |
+| GLFW_STENCIL_BITS | 8 | 0 to INT_MAX or GLFW_DONT_CARE |
+| GLFW_ACCUM_RED_BITS | 0 | 0 to INT_MAX or GLFW_DONT_CARE |
+| GLFW_ACCUM_GREEN_BITS | 0 | 0 to INT_MAX or GLFW_DONT_CARE |
+| GLFW_ACCUM_BLUE_BITS | 0 | 0 to INT_MAX or GLFW_DONT_CARE |
+| GLFW_ACCUM_ALPHA_BITS | 0 | 0 to INT_MAX or GLFW_DONT_CARE |
+| GLFW_AUX_BUFFERS | 0 | 0 to INT_MAX or GLFW_DONT_CARE |
+| GLFW_SAMPLES | 0 | 0 to INT_MAX or GLFW_DONT_CARE |
+| GLFW_REFRESH_RATE | GLFW_DONT_CARE | 0 to INT_MAX or GLFW_DONT_CARE |
+| GLFW_STEREO | GLFW_FALSE | GLFW_TRUE or GLFW_FALSE |
+| GLFW_SRGB_CAPABLE | GLFW_FALSE | GLFW_TRUE or GLFW_FALSE |
+| GLFW_DOUBLEBUFFER | GLFW_TRUE | GLFW_TRUE or GLFW_FALSE |
+| GLFW_CLIENT_API | GLFW_OPENGL_API | GLFW_OPENGL_API, GLFW_OPENGL_ES_API or GLFW_NO_API |
+| GLFW_CONTEXT_CREATION_API | GLFW_NATIVE_CONTEXT_API | GLFW_NATIVE_CONTEXT_API, GLFW_EGL_CONTEXT_API or GLFW_OSMESA_CONTEXT_API |
+| GLFW_CONTEXT_VERSION_MAJOR | 1 | Any valid major version number of the chosen client API |
+| GLFW_CONTEXT_VERSION_MINOR | 0 | Any valid minor version number of the chosen client API |
+| GLFW_CONTEXT_ROBUSTNESS | GLFW_NO_ROBUSTNESS | GLFW_NO_ROBUSTNESS, GLFW_NO_RESET_NOTIFICATION or GLFW_LOSE_CONTEXT_ON_RESET |
+| GLFW_CONTEXT_RELEASE_BEHAVIOR | GLFW_ANY_RELEASE_BEHAVIOR | GLFW_ANY_RELEASE_BEHAVIOR, GLFW_RELEASE_BEHAVIOR_FLUSH or GLFW_RELEASE_BEHAVIOR_NONE |
+| GLFW_OPENGL_FORWARD_COMPAT | GLFW_FALSE | GLFW_TRUE or GLFW_FALSE |
+| GLFW_OPENGL_DEBUG_CONTEXT | GLFW_FALSE | GLFW_TRUE or GLFW_FALSE |
+| GLFW_OPENGL_PROFILE | GLFW_OPENGL_ANY_PROFILE | GLFW_OPENGL_ANY_PROFILE, GLFW_OPENGL_COMPAT_PROFILE or GLFW_OPENGL_CORE_PROFILE |
+| GLFW_COCOA_RETINA_FRAMEBUFFER | GLFW_TRUE | GLFW_TRUE or GLFW_FALSE |
+| GLFW_COCOA_FRAME_NAME | "" | A UTF-8 encoded frame autosave name |
+| GLFW_COCOA_GRAPHICS_SWITCHING | GLFW_FALSE | GLFW_TRUE or GLFW_FALSE |
+| GLFW_X11_CLASS_NAME | "" | An ASCII encoded WM_CLASS class name |
+| GLFW_X11_INSTANCE_NAME | "" | An ASCII encoded WM_CLASS instance name |
 
 ## ウィンドウのイベント処理
 
@@ -362,7 +370,9 @@ int width, height;
 glfwGetWindowSize(window, &width, &height);
 ```
 
-> glViewportや他のピクセルベースのOpenGL呼び出しにウィンドウサイズを渡さないでください。ウィンドウサイズはスクリーン座標であり、ピクセルではありません。ピクセルベースの呼び出しには、ピクセル単位であるフレームバッファサイズを使用します。
+::: info
+glViewportや他のピクセルベースのOpenGL呼び出しにウィンドウサイズを渡さないでください。ウィンドウサイズはスクリーン座標であり、ピクセルではありません。ピクセルベースの呼び出しには、ピクセル単位であるフレームバッファサイズを使用します。
+:::
 
 上記の関数はコンテントエリアのサイズで動作しますが、装飾されたウィンドウは通常この矩形の周りにタイトルバーとウィンドウフレームを持ちます。これらの領域は glfwGetWindowFrameSize で取得することができます。
 
@@ -774,8 +784,9 @@ void window_refresh_callback(GLFWwindow* window)
 }
 ```
 
-> Aero、Compiz、Aquaなどの合成ウィンドウシステムで、ウィンドウの内容が画面外に保存される場合、このコールバックは、ウィンドウまたはフレームバッファのサイズが変更されたときにのみ呼び出される可能性があります。
-
+::: info
+Aero、Compiz、Aquaなどの合成ウィンドウシステムで、ウィンドウの内容が画面外に保存される場合、このコールバックは、ウィンドウまたはフレームバッファのサイズが変更されたときにのみ呼び出される可能性があります。
+:::
 
 ### ウィンドウの透明度
 
@@ -871,7 +882,9 @@ GLFW_CONTEXT_CREATION_API は、ウィンドウのコンテキストを作成す
 
 GLFW_CONTEXT_VERSION_MAJOR, GLFW_CONTEXT_VERSION_MINOR and GLFW_CONTEXT_REVISION は、ウィンドウのコンテキストのクライアント API バージョンを示す。
 
-> これらの属性を GLFW_VERSION_MAJOR, GLFW_VERSION_MINOR および GLFW_VERSION_REVISION と混同しないようにしてください。
+::: info
+これらの属性を GLFW_VERSION_MAJOR, GLFW_VERSION_MINOR および GLFW_VERSION_REVISION と混同しないようにしてください。
+:::
 
 GLFW_OPENGL_FORWARD_COMPAT は、ウィンドウのコンテキストがOpenGLの前方互換性のあるものであればGLFW_TRUE、そうでない場合はGLFW_FALSEとなります。
 
@@ -894,14 +907,15 @@ OpenGLまたはOpenGL ESのバージョン3.0以降を使用している場合�
 
 MSAAサンプルの数は、常にglGetIntegervで取得されます。フレームバッファオブジェクトをサポートするコンテキストでは、現在バインドされているフレームバッファのサンプル数が返されます。
 
-Attribute	glGetIntegerv	glGetFramebufferAttachmentParameteriv
-Red bits	GL_RED_BITS	GL_FRAMEBUFFER_ATTACHMENT_RED_SIZE
-Green bits	GL_GREEN_BITS	GL_FRAMEBUFFER_ATTACHMENT_GREEN_SIZE
-Blue bits	GL_BLUE_BITS	GL_FRAMEBUFFER_ATTACHMENT_BLUE_SIZE
-Alpha bits	GL_ALPHA_BITS	GL_FRAMEBUFFER_ATTACHMENT_ALPHA_SIZE
-Depth bits	GL_DEPTH_BITS	GL_FRAMEBUFFER_ATTACHMENT_DEPTH_SIZE
-Stencil bits	GL_STENCIL_BITS	GL_FRAMEBUFFER_ATTACHMENT_STENCIL_SIZE
-MSAA samples	GL_SAMPLES	Not provided by this function
+| 属性 | glGetIntegerv | glGetFramebufferAttachmentParameteriv |
+|---|---|---|
+| Red bits | GL_RED_BITS | GL_FRAMEBUFFER_ATTACHMENT_RED_SIZE |
+| Green bit | GL_GREEN_BITS | GL_FRAMEBUFFER_ATTACHMENT_GREEN_SIZE |
+| Blue bits | GL_BLUE_BITS | GL_FRAMEBUFFER_ATTACHMENT_BLUE_SIZE |
+| Alpha bit | GL_ALPHA_BITS | GL_FRAMEBUFFER_ATTACHMENT_ALPHA_SIZE |
+| Depth bit | GL_DEPTH_BITS | GL_FRAMEBUFFER_ATTACHMENT_DEPTH_SIZE |
+| Stencil bits | GL_STENCIL_BITS | GL_FRAMEBUFFER_ATTACHMENT_STENCIL_SIZE |
+| MSAA samples | GL_SAMPLES | Not provided by this function |
 
 glGetFramebufferAttachmentParameteriv を呼び出すと、赤、緑、青、アルファのサイズは GL_BACK_LEFT から、深度とステンシルのサイズはそれぞれ GL_DEPTH と GL_STENCIL アタッチメントから問い合わせがあります。
 
