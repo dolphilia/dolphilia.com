@@ -2,7 +2,7 @@
 
 ポータブル外部関数インターフェイスライブラリ
 
-本マニュアルは、ポータブルな外部関数インターフェイスライブラリであるlibffiライブラリのためのものです。
+本マニュアルはポータブルな外部関数インターフェイスライブラリであるlibffiライブラリのためのものです。
 
 ## コピーライト
 
@@ -14,21 +14,21 @@ Copyright 2008--2019, 2021, 2022 Anthony Green and Red Hat, Inc.
 
 THE SOFTWARE IS PROVIDED AS IS, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-## libffiとは？
+## libffiとは
 
-高級言語用のコンパイラーは、特定の規約に従ったコードを生成する。これらの規約は、部分的には、個別コンパイルが機能するために必要なものである。  そのような規約のひとつに呼び出し規約がある。  呼び出し規約とは、関数の引数が関数に入るときにどこにあるかをコンパイラが仮定したものです。  呼び出し規約はまた、関数の戻り値がどこにあるかについても指定します。  呼び出し規約はABI（Application Binary Interface）と呼ばれることもあります。
+高級言語用のコンパイラーは特定の規約に従ったコードを生成する。これらの規約は、部分的には個別コンパイルが機能するために必要なものである。そのような規約のひとつに呼び出し規約がある。呼び出し規約とは、関数の引数が関数に入るときにどこにあるかをコンパイラが仮定したものです。呼び出し規約はまた、関数の戻り値がどこにあるかについても指定します。呼び出し規約はABI（Application Binary Interface）と呼ばれることもあります。
 
-プログラムによっては、関数にどのような引数を渡せばよいのか、コンパイル時に分からない場合があります。  libffiは、このようなプログラムにおいて、インタプリタ・プログラムからコンパイル済みコードへの橋渡しをするために使用することができます。
+プログラムによっては関数にどのような引数を渡せばよいのか、コンパイル時に分からない場合があります。libffiは、このようなプログラムにおいて、インタプリタ・プログラムからコンパイル済みコードへの橋渡しをするために使用することができます。
 
-libffiライブラリーは、さまざまな呼び出し規約に対する移植性の高い高レベルプログラミングインターフェースを提供する。  これにより、プログラマーは実行時に呼び出しインターフェイス記述で指定された任意の関数を呼び出すことができます。
+libffiライブラリーは、さまざまな呼び出し規約に対する移植性の高い高レベルプログラミングインターフェースを提供する。これにより、プログラマーは実行時に呼び出しインターフェイス記述で指定された任意の関数を呼び出すことができます。
 
-FFIとは、Foreign Function Interface（外国関数インターフェース）の略です。  外国関数インターフェースは、ある言語で書かれたコードが別の言語で書かれたコードを呼び出すことを可能にするインターフェースの一般的な名称です。libffiライブラリーは、実際には、完全な機能を持つ外部関数インターフェースの最下層、マシン依存のレイヤーを提供するだけである。  libffiの上には、2つの言語間で渡される値の型変換を処理する層が存在しなければならない。
+FFIとは、Foreign Function Interface（外部関数インターフェース）の略です。外部関数インターフェースは、ある言語で書かれたコードが別の言語で書かれたコードを呼び出すことを可能にするインターフェースの一般的な名称です。libffiライブラリーは、実際には、完全な機能を持つ外部関数インターフェースの最下層、マシン依存のレイヤーを提供するだけである。libffiの上には、2つの言語間で渡される値の型変換を処理する層が存在しなければならない。
 
 ## 基本
 
-libffiは、呼び出したい関数へのポインタがあり、その関数に渡す引数の数と型、関数の戻り値の型がわかっていることを前提としています。
+libffi は呼び出したい関数へのポインタがあり、その関数に渡す引数の数と型・関数の戻り値の型がわかっていることを前提としています。
 
-最初にしなければならないことは、呼び出したい関数のシグネチャにマッチするffi_cifオブジェクトを作成することです。  一つのffi_cifを使って複数の呼び出しを行うのが一般的なので、これは別のステップです。  ffi_cifのcifはCall InterFaceの略である。  コール・インターフェイス・オブジェクトを準備するには、関数ffi_prep_cifを使用する。
+最初にしなければならないことは、呼び出したい関数のシグネチャにマッチするffi_cifオブジェクトを作成することです。一つのffi_cifを使って複数の呼び出しを行うのが一般的なので、これは別のステップです。ffi_cifのcifはCall InterFaceの略である。コール・インターフェイス・オブジェクトを準備するには、関数ffi_prep_cifを使用する。
 
 ### cif
 
@@ -40,12 +40,12 @@ ffi_status ffi_prep_cif (ffi_cif *cif, ffi_abi abi, unsigned int nargs, ffi_type
 
 与えられたパラメーターに従ってcifを初期化する。
 
-- abiは使用するABIで、通常はFFI_DEFAULT_ABIを使用する。  通常はFFI_DEFAULT_ABIを使用する。
+- abiは使用するABIで、通常はFFI_DEFAULT_ABIを使用する。通常はFFI_DEFAULT_ABIを使用する。
 - nargsは、この関数が受け付ける引数の数です。
-- rtypeは、関数の戻り値の型を表すffi_type構造体へのポインタです。  型。
-- argtypesはffi_typeポインタのベクトルである。argtypesはnargs要素を持たなければならない。  nargsが0の場合、この引数は無視される。
+- rtypeは、関数の戻り値の型を表すffi_type構造体へのポインタです。
+- argtypesはffi_typeポインタのベクトルである。argtypesはnargs要素を持たなければならない。nargsが0の場合、この引数は無視される。
 
-ffi_prep_cifはffi_status型のlibffiステータスコードを返す。  ffi_typeオブジェクトが正しくない場合はFFI_BAD_TYPEDEF、 abiパラメータが無効な場合はFFI_BAD_ABIとなる。
+ffi_prep_cifはffi_status型のlibffiステータスコードを返す。ffi_typeオブジェクトが正しくない場合はFFI_BAD_TYPEDEF、 abiパラメータが無効な場合はFFI_BAD_ABIとなる。
 
 呼び出される関数がバリアディック(varargs)の場合、ffi_prep_cifの代わりにffi_prep_cif_varを使わなければならない。
 
@@ -55,10 +55,10 @@ ffi_prep_cifはffi_status型のlibffiステータスコードを返す。  ffi_t
 ffi_status ffi_prep_cif_var (ffi_cif *cif, ffi_abi abi, unsigned int nfixedargs, unsigned int ntotalargs, ffi_type *rtype, ffi_type **argtypes)
 ```
 
-これは、与えられたパラメータに従ってcifを初期化するもので、バリアド関数の呼び出しに対応する。  一般的に、この操作はffi_prep_cifと同じである。:
+これは、与えられたパラメータに従ってcifを初期化するもので、バリアド関数の呼び出しに対応する。一般的に、この操作はffi_prep_cifと同じである。:
 
-- nfixedargsは、可変引数の前の固定引数の数である。  ゼロより大きくなければならない。
-- ntotalargs 変数引数と固定引数を含む引数の総数。  argtypesはこれだけの要素を持たなければならない。
+- nfixedargsは、可変引数の前の固定引数の数である。ゼロより大きくなければならない。
+- ntotalargs 変数引数と固定引数を含む引数の総数。argtypesはこれだけの要素を持たなければならない。
 
 ffi_prep_cif_var は、変数引数の型が ffi_type_float (最初に ffi_type_double に昇格)、または int よりも小さい整数型 (最初に int サイズの型に昇格) の場合、FFI_BAD_ARGTYPE を返す。
 
@@ -66,7 +66,7 @@ ffi_prep_cif_var は、変数引数の型が ffi_type_float (最初に ffi_type_
 
 また、ffi_prep_cif_varをnfixedargs=nototalargsで呼び出すことは、ffi_prep_cifを呼び出すことと等価ではないことに注意。
 
-結果として得られるffi_cifは、初期化時に使用されたすべてのffi_typeオブジェクトへのポインタを保持していることに注意してください。  これらの型オブジェクトの寿命は、少なくともffi_cifの寿命と同じになるようにしなければならない。
+結果として得られるffi_cifは、初期化時に使用されたすべてのffi_typeオブジェクトへのポインタを保持していることに注意してください。これらの型オブジェクトの寿命は、少なくともffi_cifの寿命と同じになるようにしなければならない。
 
 初期化されたffi_cifを使って関数を呼び出すには、ffi_call関数を使います：
 
@@ -76,15 +76,15 @@ ffi_prep_cif_var は、変数引数の型が ffi_type_float (最初に ffi_type_
 void ffi_call (ffi_cif *cif, void *fn, void *rvalue, void **avalues)
 ```
 
-これは、cifで与えられた説明に従って関数fnを呼び出す。  cifはすでにffi_prep_cifで準備されていなければならない。
+cifで与えられた説明に従って関数fnを呼び出す。cifはすでにffi_prep_cifで準備されていなければならない。
 
-rvalueは、関数呼び出しの結果を保持するメモリチャンクへのポインタである。  これは、結果を保持するのに十分な大きさでなければならず、システム・レジスタ・サイズ（一般に32ビットまたは64ビット）より小さくはならず、適切にアラインされていなければならない。  cifが（ffi_type_voidを使って）関数はvoidを返すと宣言した場合、rvalueは無視される。
+- rvalueは、関数呼び出しの結果を保持するメモリチャンクへのポインタである。これは、結果を保持するのに十分な大きさでなければならず、システム・レジスタ・サイズ（一般に32ビットまたは64ビット）より小さくはならず、適切にアラインされていなければならない。cifが（ffi_type_voidを使って）関数はvoidを返すと宣言した場合、rvalueは無視される。
 
-ほとんどの場合、libffiはABIに従ってプロモーションを処理する。  しかし、歴史的な理由から、コードで処理しなければならない戻り値の特殊なケースがある。  特に、システム・レジスタ・サイズより狭い積分型（構造体ではない）については、libffiによって返り値が広げられる。  libffiはffi_argという戻り値型として使える型を提供している。  例えば、CIFがcharの戻り値型で定義された場合、libffiは完全なffi_argを戻り値に格納しようとする。
+ほとんどの場合、libffiはABIに従ってプロモーションを処理する。しかし、歴史的な理由から、コードで処理しなければならない戻り値の特殊なケースがある。特に、システム・レジスタ・サイズより狭い積分型（構造体ではない）については、libffiによって返り値が広げられる。libffiはffi_argという戻り値型として使える型を提供している。例えば、CIFがcharの戻り値型で定義された場合、libffiは完全なffi_argを戻り値に格納しようとする。
 
-avaluesは@code{void *}ポインタのベクトルで、呼び出しの引数値を保持するメモリ・ロケーションを指す。  cifが関数に引数がないと宣言した場合（つまりnargsが0だった場合）、avaluesは無視される。
+- avaluesは`void *`ポインタのベクトルで、呼び出しの引数値を保持するメモリ・ロケーションを指す。cifが関数に引数がないと宣言した場合（つまりnargsが0だった場合）、avaluesは無視される。
 
-戻り値はレジスタサイズでなければならないが、引数は宣言された型と正確に一致しなければならないことに注意。  例えば、引数がshortの場合、avaluesのエントリーはshortとして宣言されたオブジェクトを指すべきである。しかし、戻り値の型がshortの場合、rvalueはより大きな型として宣言されたオブジェクト（通常はffi_arg）を指すべきである。
+戻り値はレジスタサイズでなければならないが、引数は宣言された型と正確に一致しなければならないことに注意。例えば、引数がshortの場合、avaluesのエントリーはshortとして宣言されたオブジェクトを指すべきである。しかし、戻り値の型がshortの場合、rvalueはより大きな型として宣言されたオブジェクト（通常はffi_arg）を指すべきである。
 
 
 ## 簡単な例
@@ -103,21 +103,19 @@ int main()
   char *s;
   ffi_arg rc;
 
-  /* Initialize the argument info vectors */
+  /* 引数情報ベクトルを初期化する */
   args[0] = &ffi_type_pointer;
   values[0] = &s;
 
-  /* Initialize the cif */
+  /* cifの初期化 */
   if (ffi_prep_cif(&cif, FFI_DEFAULT_ABI, 1,
 		       &ffi_type_sint, args) == FFI_OK)
     {
       s = "Hello World!";
       ffi_call(&cif, puts, &rc, values);
-      /* rc now holds the result of the call to puts */
+      /* rcはプットのコール結果を保持する。 */
 
-      /* values holds a pointer to the function's arg, so to
-         call puts() again all we need to do is change the
-         value of s */
+      /* の値は関数のargへのポインタを保持しているので、puts()を再び呼び出すために必要なのは、sの値を変更することだけである。 */
       s = "This is cool!";
       ffi_call(&cif, puts, &rc, values);
     }
@@ -134,32 +132,32 @@ int main()
 Libffiは、引数や戻り値の型を記述するために使用できる多くの組み込み型記述子を提供しています：
 
 
-| 名前                        | 説明                                                                                                                                                                                                       |
-|-----------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| ffi_type_void               | The type void.  This cannot be used for argument types, only for return values.                                                                                                                            |
-| ffi_type_uint8              | An unsigned, 8-bit integer type.                                                                                                                                                                           |
-| ffi_type_sint8              | A signed, 8-bit integer type.                                                                                                                                                                              |
-| ffi_type_uint16             | An unsigned, 16-bit integer type.                                                                                                                                                                          |
-| ffi_type_sint16             | A signed, 16-bit integer type.                                                                                                                                                                             |
-| ffi_type_uint32             | An unsigned, 32-bit integer type.                                                                                                                                                                          |
-| ffi_type_sint32             | A signed, 32-bit integer type.                                                                                                                                                                             |
-| ffi_type_uint64             | An unsigned, 64-bit integer type.                                                                                                                                                                          |
-| ffi_type_sint64             | A signed, 64-bit integer type.                                                                                                                                                                             |
-| ffi_type_float              | The C float type.                                                                                                                                                                                          |
-| ffi_type_double             | The C double type.                                                                                                                                                                                         |
-| ffi_type_uchar              | The C unsigned char type.                                                                                                                                                                                  |
-| ffi_type_schar              | The C signed char type.  (Note that there is not an exact equivalent to the C char type in libffi; ordinarily you should either use ffi_type_schar or ffi_type_uchar depending on whether char is signed.) |
-| ffi_type_ushort             | The C unsigned short type.                                                                                                                                                                                 |
-| ffi_type_sshort             | The C short type.                                                                                                                                                                                          |
-| ffi_type_uint               | The C unsigned int type.                                                                                                                                                                                   |
-| ffi_type_sint               | The C int type.                                                                                                                                                                                            |
-| ffi_type_ulong              | The C unsigned long type.                                                                                                                                                                                  |
-| ffi_type_slong              | The C long type.                                                                                                                                                                                           |
-| ffi_type_longdouble         | On platforms that have a C long double type, this is defined. On other platforms, it is not.                                                                                                               |
-| ffi_type_pointer            | A generic `void *` pointer.  You should use this for all pointers, regardless of their real type.                                                                                                          |
-| ffi_type_complex_float      | The C _Complex float type.                                                                                                                                                                                 |
-| ffi_type_complex_double     | The C _Complex double type.                                                                                                                                                                                |
-| ffi_type_complex_longdouble | The C _Complex long double type. On platforms that have a C long double type, this is defined. On other platforms, it is not.                                                                              |
+| 名前                        | 説明                                                                                                                                   |
+|-----------------------------|---------------------------------------------------------------------------------------------------------------------------------------|
+| ffi_type_void               | void型。これは引数型には使用できず、戻り値にのみ使用できる。                                                                                       |
+| ffi_type_uint8              | 符号なしの8ビット整数型。                                                                                                                 |
+| ffi_type_sint8              | 符号付き8ビット整数型。                                                                                                                 |
+| ffi_type_uint16             | 符号なし16ビット整数型。                                                                                                                 |
+| ffi_type_sint16             | 符号付き16ビット整数型。                                                                                                                |
+| ffi_type_uint32             | 符号なし32ビット整数型。                                                                                                                 |
+| ffi_type_sint32             | 符号付き32ビット整数型。                                                                                                                |
+| ffi_type_uint64             | 符号なし64ビット整数型。                                                                                                                 |
+| ffi_type_sint64             | 符号付き64ビット整数型。                                                                                                                |
+| ffi_type_float              | C の浮動小数点型。                                                                                                                   |
+| ffi_type_double             | C のdouble型。                                                                                                                       |
+| ffi_type_uchar              | C の符号なし char 型。                                                                                                                 |
+| ffi_type_schar              | C の符号付き char 型。(libffiには、Cのchar型と正確に等価なものがないことに注意してください。通常、charが符号付きかどうかによって、ffi_type_scharかffi_type_ucharを使うべきです。) |
+| ffi_type_ushort             | C の符号なし short 型。                                                                                                                |
+| ffi_type_sshort             | C の short 型。                                                                                                                      |
+| ffi_type_uint               | C の符号なし int 型。                                                                                                                  |
+| ffi_type_sint               | C の int 型。                                                                                                                        |
+| ffi_type_ulong              | C の符号なし long 型。                                                                                                                 |
+| ffi_type_slong              | C の long 型。                                                                                                                       |
+| ffi_type_longdouble         | Cのlong double型を持つプラットフォームでは、これは定義されている。その他のプラットフォームでは定義されていない。                                                              |
+| ffi_type_pointer            | 汎用 `void *` ポインタ。実際の型に関係なく、すべてのポインタにこれを使うべきである。                                                                          |
+| ffi_type_complex_float      | C _Complex float型。                                                                                                                |
+| ffi_type_complex_double     | C の _Complex double型。                                                                                                             |
+| ffi_type_complex_longdouble | C _Complex long double型。 Cのlong double型を持つプラットフォームでは、これは定義されている。他のプラットフォームでは定義されていない。                                      |
 
 
 それぞれffi_type型なので、ffi_prep_cifに渡すときはアドレスを取る必要がある。
@@ -173,29 +171,28 @@ libffi は構造体の受け渡しを完璧にこなします。まず、 libffi
 
 ffi_typeには以下のメンバがある。:
 
-|メンバ|説明|
-|---|---|
-| size_t size | これはlibffiによって設定されるので、ゼロに初期化する必要がある。 |
-| unsigned short alignment | これはlibffiによって設定されるので、ゼロに初期化する必要がある。 |
-| unsigned short type | 構造体の場合は、FFI_TYPE_STRUCT に設定する。 |
-| ffi_type **elements | これはffi_typeオブジェクトへのポインタのNULL終端の配列である。  構造体のフィールドごとに1つの要素があります。 |
+| メンバ                      | 説明                                                                    |
+|--------------------------|-----------------------------------------------------------------------|
+| size_t size              | これはlibffiによって設定されるので、ゼロに初期化する必要がある。                          |
+| unsigned short alignment | これはlibffiによって設定されるので、ゼロに初期化する必要がある。                          |
+| unsigned short type      | 構造体の場合は、FFI_TYPE_STRUCT に設定する。                               |
+| ffi_type **elements      | これはffi_typeオブジェクトへのポインタのNULL終端の配列である。構造体のフィールドごとに1つの要素があります。 |
 
-libffiはビットフィールドを特別にサポートしていないことに注意。  これらを手動で管理する必要がある。
+libffiはビットフィールドを特別にサポートしていないことに注意。これらを手動で管理する必要がある。
 
 サイズとアライメントのフィールドは、必要に応じてffi_prep_cifまたはffi_prep_cif_varによって埋められる。
 
 ### サイズとアライメント
 
-libffiはffi_typeオブジェクトのサイズとアライメントのフィールドをあなたに代わって設定します。  これは
-の知識を使って行います。
+libffiはffi_typeオブジェクトのサイズとアライメントのフィールドをあなたに代わって設定します。
 
-libffiによって設定された型に対して、これらのフィールドを単純に読み取ることができると思うかもしれない。  しかし、いくつかの注意点がある。
+libffiによって設定された型に対して、これらのフィールドを単純に読み取ることができると思うかもしれない。しかし、いくつかの注意点がある。
 
 - いくつかの組み込み型のサイズやアライメントは、選択したABIによって異なる場合がある。
 - 新しい構造体タイプのサイズとアライメントは、ffi_prep_cif または ffi_get_struct_offsets に渡されるまで libffi によって設定されない。
-- 構造体タイプをABI間で共有することはできない。  代わりに、各ABIは構造体型の独自のコピーを必要とする。
+- 構造体タイプをABI間で共有することはできない。代わりに、各ABIは構造体型の独自のコピーを必要とする。
 
-したがって、これらのフィールドを調べる前に、まずffi_typeオブジェクトをffi_prep_cifかffi_get_struct_offsetsに渡すのが一番安全である。  この関数は必要なセットアップをすべて行ってくれる。
+したがって、これらのフィールドを調べる前に、まずffi_typeオブジェクトをffi_prep_cifかffi_get_struct_offsetsに渡すのが一番安全である。この関数は必要なセットアップをすべて行ってくれる。
 
 ```c
 ffi_type *desired_type;
@@ -219,9 +216,9 @@ ffi_status ffi_get_struct_offsets (ffi_abi abi, ffi_type *struct_type, size_t *o
 
 指定された構造体タイプの各要素のオフセットを計算する。abiは使用するABIで、レイアウトがABIに依存する場合があるため必要である。
 
-offsetsはoutパラメータである。  呼び出し側は、すべての結果を書き込むのに十分なスペース（struct_typeの各要素型につき1要素）を提供する責任を負う。  offsetsがNULLの場合、型はレイアウトされるが、それ以外は変更されない。  これは、前述のように型のサイズやレイアウトにアクセスするのに便利である。
+offsetsはoutパラメータである。呼び出し側は、すべての結果を書き込むのに十分なスペース（struct_typeの各要素型につき1要素）を提供する責任を負う。offsetsがNULLの場合、型はレイアウトされるが、それ以外は変更されない。これは、前述のように型のサイズやレイアウトにアクセスするのに便利である。
 
-abi が無効な場合は FFI_BAD_ABI、 struct_type が何らかの方法で無効な場合は FFI_BAD_TYPEDEF を返す。  ここではFFI_STRUCT型のみが有効であることに注意。
+abi が無効な場合は FFI_BAD_ABI、 struct_type が何らかの方法で無効な場合は FFI_BAD_TYPEDEF を返す。ここではFFI_STRUCT型のみが有効であることに注意。
 
 
 ### 配列 ユニオン 列挙型
@@ -249,13 +246,13 @@ array_type.elements = elements;
 
 このように作成された構造体型は、実際のFFI_TYPE_STRUCTオブジェクトのメンバを参照するためにのみ使用されるべきである。
 
-しかし、このようなニセの配列型を引数や戻り値の型として使用しても、libffiがエラーを起こすことはありません。  これは混乱を招くかもしれません。
+しかし、このようなニセの配列型を引数や戻り値の型として使用しても、libffiがエラーを起こすことはありません。これは混乱を招くかもしれません。
 
 #### Unions
 
-ユニオンはFFI_TYPE_STRUCTを使ってエミュレートすることもできる。  しかしこの場合、サイズとアライメントがユニオンの実際の要求と一致するようにしなければなりません。
+ユニオンはFFI_TYPE_STRUCTを使ってエミュレートすることもできる。しかしこの場合、サイズとアライメントがユニオンの実際の要求と一致するようにしなければなりません。
 
-これを行う1つの簡単な方法は、各要素型がレイアウトされていることを確認することです。  それから、新しい構造体タイプに1つの要素、最大の要素のサイズ、同様に見られる最大のアライメントを与える。
+これを行う1つの簡単な方法は、各要素型がレイアウトされていることを確認することです。それから、新しい構造体タイプに1つの要素、最大の要素のサイズ、同様に見られる最大のアライメントを与える。
 
 この例では、ffi_prep_cifのトリックを使って、各要素型がレイアウトされていることを確認している。
 
@@ -310,7 +307,7 @@ struct tm {
     int tm_wday;
     int tm_yday;
     int tm_isdst;
-    /* Those are for future use. */
+    /* 将来のため */
     long int __tm_gmtoff__;
     __const char *__tm_zone__;
 };
@@ -335,31 +332,30 @@ struct tm {
       tm_type_elements[10] = &ffi_type_pointer;
       tm_type_elements[11] = NULL;
 
-      /* tm_type can now be used to represent tm argument types and
-	 return types for ffi_prep_cif() */
+      /* tm_type が ffi_prep_cif() の tm 引数型と戻り値の型を表すのに使えるようになった。 */
     }
 ```
 
-### Complex Types
+### Complex型
 
 libffi は、組み込み型記述子 ffi_type_complex_float、 ffi_type_complex_double、 ffi_type_complex_longdouble を使って、 C99 標準 _Complex float、 _Complex double、 _Complex long double で定義された複素数型をサポートしています。
 
-_Complex intのようなカスタムの複合型も使えます。libffi に複合型を記述するために、ffi_type オブジェクトを定義する必要があります。
+_Complex intのようなカスタムの複合型も使えます。libffi にComplex型を記述するために、ffi_type オブジェクトを定義する必要があります。
 
-|メンバ|説明|
-|---|---|
-| size_t size | This must be manually set to the size of the complex type. |
-| unsigned short alignment | This must be manually set to the alignment of the complex type. |
-| unsigned short type | For a complex type, this must be set to FFI_TYPE_COMPLEX. |
-| ffi_type **elements |  This is a NULL-terminated array of pointers to ffi_type objects.  The first element is set to the ffi_type of the complex's base type.  The second element must be set to NULL. |
+| メンバ                      | 説明                                                                                                                                                                            |
+|--------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| size_t size              | これはComplex型のサイズに手動で設定しなければならない。                                                                                                                  |
+| unsigned short alignment | これはComplex型のアライメントに手動で設定しなければならない。                                                                                                            |
+| unsigned short type      | Complex型の場合は、FFI_TYPE_COMPLEXに設定しなければならない。                                                                                                                   |
+| ffi_type **elements      | これはffi_typeオブジェクトへのポインタのNULL終端の配列である。最初の要素にはComplexの基本型のffi_typeが設定される。2番目の要素はNULLに設定されなければならない。 |
 
-複素数の例のセクションでは、プラットフォームに依存しない方法でサイズとアライメントメンバーを決定する方法を示している。
+Complexの例のセクションでは、プラットフォームに依存しない方法でサイズとアライメントメンバーを決定する方法を示している。
 
-libffiにまだ複素数のサポートがないプラットフォームでは、関数ffi_prep_cifとffi_prep_argsは複素数型に遭遇するとプログラムを中断します。
+libffiにまだComplexのサポートがないプラットフォームでは、関数ffi_prep_cifとffi_prep_argsは複素数型に遭遇するとプログラムを中断します。
 
-### Complex Type Example
+### Complex 型の例
 
-This example demonstrates how to use complex types:
+この例は、Complex型の使い方を示している：
 
 ```c
 #include <stdio.h>
@@ -385,7 +381,7 @@ int main()
   _Complex double cd;
   _Complex long double cld;
 
-  /* Initialize the argument info vectors */
+  /* 引数情報ベクトルを初期化する */
   args[0] = &ffi_type_complex_float;
   args[1] = &ffi_type_complex_double;
   args[2] = &ffi_type_complex_longdouble;
@@ -393,14 +389,14 @@ int main()
   values[1] = &cd;
   values[2] = &cld;
 
-  /* Initialize the cif */
+  /* cifの初期化 */
   if (ffi_prep_cif(&cif, FFI_DEFAULT_ABI, 3,
                    &ffi_type_void, args) == FFI_OK)
     {
       cf = 1.0 + 20.0 * I;
       cd = 300.0 + 4000.0 * I;
       cld = 50000.0 + 600000.0 * I;
-      /* Call the function */
+      /* 関数を呼び出す */
       ffi_call(&cif, (void (*)(void))complex_fn, 0, values);
     }
 
@@ -408,16 +404,13 @@ int main()
 }
 ```
 
-This is an example for defining a custom complex type descriptor
-for compilers that support them:
+これは、カスタム複合型記述子をサポートするコンパイラ用に定義する例である。:
 
 ```c
 /*
- * This macro can be used to define new complex type descriptors
- * in a platform independent way.
+ * このマクロは、プラットフォームに依存しない方法で新しい複合型記述子を定義するために使用できる。
  *
- * name: Name of the new descriptor is ffi_type_complex_<name>.
- * type: The C base type of the complex type.
+ * name: 新しい記述子の名前はffi_type_complex_<name>である。. type: 複合型のCの基本型。
  */
 #define FFI_COMPLEX_TYPEDEF(name, type, ffitype)             \
   static ffi_type *ffi_elements_complex_##name [2] = {      \
@@ -434,28 +427,28 @@ for compilers that support them:
     (ffi_type **)ffi_elements_complex_##name                 \
   }
 
-/* Define new complex type descriptors using the macro: */
+/* マクロを使って新しい複合型記述子を定義する: */
 /* ffi_type_complex_sint */
 FFI_COMPLEX_TYPEDEF(sint, int, ffi_type_sint);
 /* ffi_type_complex_uchar */
 FFI_COMPLEX_TYPEDEF(uchar, unsigned char, ffi_type_uint8);
 ```
 
-The new type descriptors can then be used like one of the built-in type descriptors in the previous example.
+新しい型記述子は、前の例の組み込み型記述子のように使うことができる。
 
-### Multiple ABIs
+### 複数のABI
 
-A given platform may provide multiple different ABIs at once.  For instance, the x86 platform has both stdcall and fastcall functions.
+あるプラットフォームが複数の異なるABIを同時に提供することがある。例えば、x86プラットフォームにはstdcall関数とfastcall関数がある。
 
-libffi provides some support for this.  However, this is necessarily platform-specific.
+libffiはこれをある程度サポートしている。しかし、これは必然的にプラットフォーム固有となる。
 
-### The Closure API
+### クロージャAPI
 
 libffiは汎用関数を書く方法も提供している。任意の引数の組み合わせを受け入れ、デコードできる関数。これはインタープリターを書くときや、任意の関数のラッパーを提供するときに便利だ。
 
 この機能はクロージャAPIと呼ばれる。クロージャはすべてのプラットフォームでサポートされているわけではありません。現在のプラットフォームでサポートされているかどうかは、FFI_CLOSURES定義で確認できます。
 
-クロージャは実行時に小さな関数をアセンブルすることで動作するため、実行不可能なヒープを持つプラットフォームでは特別な割り当てが必要になる。  クロージャのメモリー管理は、2つの関数によって処理される：
+クロージャは実行時に小さな関数をアセンブルすることで動作するため、実行不可能なヒープを持つプラットフォームでは特別な割り当てが必要になる。クロージャのメモリー管理は、2つの関数によって処理される：
 
 #### `ffi_closure_alloc()`
 
@@ -463,7 +456,7 @@ libffiは汎用関数を書く方法も提供している。任意の引数の�
 void *ffi_closure_alloc (size_t size, void **code)
 ```
 
-サイズ・バイトのメモリチャンクを確保する。  これは書き込み可能なアドレスへのポインタを返し、*codeを対応する実行可能アドレスに設定する。
+サイズ・バイトのメモリチャンクを確保する。これは書き込み可能なアドレスへのポインタを返し、*codeを対応する実行可能アドレスに設定する。
 
 sizeはffi_closureオブジェクトを保持するのに十分でなければならない。
 
@@ -474,9 +467,9 @@ sizeはffi_closureオブジェクトを保持するのに十分でなければ�
 void ffi_closure_free (void *writable)
 ```
 
-ffi_closure_alloc を使って割り当てられたメモリーを解放する。  引数は返された書き込み可能なアドレスである。
+ffi_closure_alloc を使って割り当てられたメモリーを解放する。引数は返された書き込み可能なアドレスである。
 
-Once you have allocated the memory for a closure, you must construct a ffi_cif describing the function call.  Finally you can prepare the closure function:
+クロージャ用のメモリーを割り当てたら、関数コールを記述するffi_cifを作成しなければならない。最後にクロージャー関数を用意する。:
 
 #### `ffi_prep_closure_loc()`
 
@@ -484,36 +477,35 @@ Once you have allocated the memory for a closure, you must construct a ffi_cif d
 ffi_status ffi_prep_closure_loc (ffi_closure *closure, ffi_cif *cif, void (*fun) (ffi_cif *cif, void *ret, void **args, void *user_data), void *user_data, void *codeloc)
 ```
 
-クロージャー関数を準備する。  ffi_prep_closure_locの引数は以下の通り：
+クロージャー関数を準備する。ffi_prep_closure_locの引数は以下の通り：
 
-|引数名|説明|
-|---|---|
-| closure | The address of a ffi_closure object; this is the writable address returned by ffi_closure_alloc. |
-| cif | The ffi_cif describing the function parameters.  Note that this object, and the types to which it refers, must be kept alive until the closure itself is freed. |
-| user_data | An arbitrary datum that is passed, uninterpreted, to your closure function. |
-| codeloc | The executable address returned by ffi_closure_alloc. |
-| fun | The function which will be called when the closure is invoked.  It is called with the arguments: |
-| cif | The ffi_cif passed to ffi_prep_closure_loc. |
-| ret | A pointer to the memory used for the function's return value. If the function is declared as returning void, then this value is garbage and should not be used. Otherwise, fun must fill the object to which this points, following the same special promotion behavior as ffi_call. That is, in most cases, ret points to an object of exactly the size of the type specified when cif was constructed.  However, integral types narrower than the system register size are widened.  In these cases your program may assume that ret points to an ffi_arg object. |
-| args | A vector of pointers to memory holding the arguments to the function. |
-| user_data | The same user_data that was passed to ffi_prep_closure_loc. |
+| 引数名    | 説明                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+|-----------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| closure   | これは ffi_closure_alloc が返す書き込み可能なアドレスです。                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| cif       | 関数のパラメータを記述するffi_cif。このオブジェクトと、それが参照する型は、クロージャ自体が解放されるまで生きていなければならないことに注意してください。                                                                                                                                                                                                                                                                                                                                                                                                 |
+| user_data | クロージャ関数に解釈されずに渡される任意のデータ。                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| codeloc   | ffi_closure_alloc が返す実行可能アドレス。                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| fun       | クロージャが呼び出されたときに呼び出される関数。引数とともに呼び出される：                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| cif       | ffi_prep_closure_locに渡されるffi_cif。                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| ret       | 関数の戻り値に使用されるメモリへのポインタ。関数がvoidを返すと宣言されている場合、この値はガベージであり、使用すべきではありません。そうでない場合、funは、ffi_callと同じ特別なプロモーション動作に従って、この値が指すオブジェクトを埋めなければなりません。つまり、ほとんどの場合、retはcifが構築されたときに指定された型のサイズにぴったりのオブジェクトを指す。しかし、システム・レジスタ・サイズより狭い積分型は拡張される。このような場合、プログラムはretがffi_argオブジェクトを指していると仮定することができる。 |
+| args      | 関数の引数を保持するメモリへのポインタのベクトル。                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| user_data | ffi_prep_closure_locに渡されたものと同じuser_data。                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 
-ffi_prep_closure_loc will return FFI_OK if everything went ok, and one of the other ffi_status values on error.
+ffi_prep_closure_locは、問題がなければFFI_OKを返し、エラーがあれば他のffi_status値のいずれかを返す。
 
-After calling ffi_prep_closure_loc, you can cast codeloc to the appropriate pointer-to-function type.
+ffi_prep_closure_locを呼び出した後、codelocを適切な関数へのポインタ型にキャストすることができる。
 
-You may see old code referring to ffi_prep_closure.  This function is deprecated, as it cannot handle the need for separate writable and executable addresses.
+ffi_prep_closureを参照する古いコードを見かけるかもしれません。この関数は、書き込み可能アドレスと実行可能アドレスを別々にする必要性に対応できないため、非推奨となっている。
 
-### Closure Example
+### クロージャーの例
 
-A trivial example that creates a new puts by binding
-fputs with stdout.
+fputsをstdoutにバインドして新しいputsを作成する些細な例。
 
 ```c
 #include <stdio.h>
 #include <ffi.h>
 
-/* Acts like puts with the file given at time of enclosure. */
+/* 封入時に与えられたファイルでputsのように動作する。 */
 void puts_binding(ffi_cif *cif, void *ret, void* args[],
                   void *stream)
 {
@@ -531,69 +523,69 @@ int main()
   void *bound_puts;
   int rc;
 
-  /* Allocate closure and bound_puts */
+  /* クロージャとbound_putsの割り当て */
   closure = ffi_closure_alloc(sizeof(ffi_closure), &bound_puts);
 
   if (closure)
     {
-      /* Initialize the argument info vectors */
+      /* 引数情報ベクトルを初期化する */
       args[0] = &ffi_type_pointer;
 
-      /* Initialize the cif */
+      /* cifの初期化 */
       if (ffi_prep_cif(&cif, FFI_DEFAULT_ABI, 1,
                        &ffi_type_sint, args) == FFI_OK)
         {
-          /* Initialize the closure, setting stream to stdout */
+          /* クロージャを初期化し、ストリームを標準出力に設定する。 */
           if (ffi_prep_closure_loc(closure, &cif, puts_binding,
                                    stdout, bound_puts) == FFI_OK)
             {
               rc = ((puts_t)bound_puts)("Hello World!");
-              /* rc now holds the result of the call to fputs */
+              /* rcはfputsの呼び出し結果を保持する。 */
             }
         }
     }
 
-  /* Deallocate both closure, and bound_puts */
+  /* クロージャとbound_putsの両方をデアロケートする。 */
   ffi_closure_free(closure);
 
   return 0;
 }
 ```
 
-### Thread Safety
+### スレッドの安全性
 
-libffi is not completely thread-safe.  However, many parts are, and if you follow some simple rules, you can use it safely in a multi-threaded program.
+libffiは完全なスレッドセーフではありません。しかし、多くの部分はスレッドセーフであり、いくつかの簡単なルールに従えば、マルチスレッドプログラムで安全に使用することができる。
 
-ffi_prep_cif may modify the ffi_type objects passed to it.  It is best to ensure that only a single thread prepares a given ffi_cif at a time.
+ffi_prep_cifは渡されたffi_typeオブジェクトを変更することがある。一度に一つのスレッドだけが与えられたffi_cifを準備するようにするのが最善である。
 
-On some platforms, ffi_prep_cif may modify the size and alignment of some types, depending on the chosen ABI.  On these platforms, if you switch between ABIs, you must ensure that there is only one call to ffi_prep_cif at a time.
+いくつかのプラットフォームでは、ffi_prep_cifは、選択されたABIに応じて、いくつかの型のサイズとアライメントを変更するかもしれない。このようなプラットフォームでは、ABIを切り替えた場合、一度にffi_prep_cifを呼び出すのは1回だけにしなければならない。
 
-Currently the only affected platform is PowerPC and the only affected type is long double.
-
-
-### Memory Usage
-
-Note that memory allocated by ffi_closure_alloc and freed by ffi_closure_free does not come from the same general pool of memory that malloc and free use.  To accomodate security settings, libffi may aquire memory, for example, by mapping temporary files into multiple places in the address space (once to write out the closure, a second to execute it).  The search follows this list, using the first that works:
-
-- A anonymous mapping (i.e. not file-backed)
-- memfd_create(), if the kernel supports it.
-- A file created in the directory referenced by the environment variable LIBFFI_TMPDIR.
-- Likewise for the environment variable TMPDIR.
-- A file created in /tmp.
-- A file created in /var/tmp.
-- A file created in /dev/shm.
-- A file created in the user's home directory ($HOME).
-- A file created in any directory listed in /etc/mtab.
-- A file created in any directory listed in @code{/proc/mounts}.
+現在、影響を受けるプラットフォームはPowerPCのみで、影響を受ける型はlong doubleのみである。
 
 
-If security settings prohibit using any of these for closures, ffi_closure_alloc will fail.
+### メモリ使用量
 
-### Missing Features
+ffi_closure_allocによって割り当てられ、ffi_closure_freeによって解放されるメモリは、mallocとfreeが使用するのと同じ一般的なメモリプールからではないことに注意してください。セキュリティ設定に対応するために、libffiは、例えば、一時ファイルをアドレス空間の複数の場所にマッピングすることによって、メモリを獲得することができる(一度目はクロージャを書き出すために、二度目はそれを実行するために)。検索はこのリストに従い、最初に動作したものを使用する：
 
-libffi is missing a few features.  We welcome patches to add support for these.
+- 匿名マッピング（つまりファイルバックされていない）。
+- memfd_create()、カーネルがサポートしている場合。
+- 環境変数 LIBFFI_TMPDIR が参照するディレクトリに作成されるファイル。
+- 環境変数 TMPDIR も同様。
+- tmpに作成されるファイル。
+- var/tmpに作成されるファイル。
+- dev/shmに作成されるファイル。
+- ユーザーのホーム・ディレクトリ ($HOME) に作成されるファイル。
+- etc/mtabにリストされているディレクトリに作成されるファイル。
+- proc/mountsにリストされているディレクトリに作成されたファイル。
 
-- Variadic closures.
-- There is no support for bit fields in structures.
-- The raw API is undocumented.
-- The Go API is undocumented.
+
+セキュリティ設定により、クロージャにこれらのいずれかを使用することが禁止されている場合、ffi_closure_allocは失敗する。
+
+### 欠落している機能
+
+libffiにはいくつかの機能が欠けています。これらのサポートを追加するパッチを歓迎します。
+
+- 可変クロージャ。
+- 構造体のビットフィールドをサポートしていない。
+- 生の API は文書化されていません。
+- Go API は文書化されていません。
