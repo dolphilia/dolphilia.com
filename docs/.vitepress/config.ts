@@ -56,6 +56,7 @@ export default {
                     {text: 'HSP', link: '/translation/hsp/'},
                     {text: 'ImGui', link: '/translation/imgui/'},
                     {text: 'JavaScript', link: '/translation/javascript/'},
+                    {text: 'libffi', link: '/translation/libffi/'},
                     {text: 'LLVM', link: '/translation/llvm/'},
                     {text: 'Mastodon', link: '/translation/mastodon/'},
                     {text: 'Mermaid', link: '/translation/mermaid/'},
@@ -1109,6 +1110,26 @@ export default {
                         {text: '50のルール', link: '/translation/javascript/50_javascript_best_practice.md'},
                         {text: 'Clean Code', link: '/translation/javascript/clean_code_javascript.md'},
                         {text: 'W3C', link: '/translation/javascript/javascript_best_practices.md'},
+                    ]
+                },
+            ],
+            '/translation/libffi/': [
+                {
+                    text: 'libffi',
+                    collapsed: false,
+                    items: [
+                        {text: 'はじめに', link: '/translation/libffi/'},
+                        {text: 'マニュアル', link: '/translation/libffi/manual'},
+                        {text: 'LLVMシステム入門', link: '/translation/llvm/getting_started'}
+                    ]
+                },
+                {
+                    text: 'LLVM デザインと概要',
+                    collapsed: true,
+                    items: [
+                        {text: '目次', link: '/translation/llvm/doc/'},
+                        {text: 'Clean Code', link: '/translation/llvm/doc/'},
+                        {text: 'W3C', link: '/translation/llvm/doc/'},
                     ]
                 },
             ],
