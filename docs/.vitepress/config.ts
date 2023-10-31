@@ -1120,16 +1120,6 @@ export default {
                     items: [
                         {text: 'はじめに', link: '/translation/libffi/'},
                         {text: 'マニュアル', link: '/translation/libffi/manual'},
-                        {text: 'LLVMシステム入門', link: '/translation/llvm/getting_started'}
-                    ]
-                },
-                {
-                    text: 'LLVM デザインと概要',
-                    collapsed: true,
-                    items: [
-                        {text: '目次', link: '/translation/llvm/doc/'},
-                        {text: 'Clean Code', link: '/translation/llvm/doc/'},
-                        {text: 'W3C', link: '/translation/llvm/doc/'},
                     ]
                 },
             ],
