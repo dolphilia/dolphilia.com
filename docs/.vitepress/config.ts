@@ -198,6 +198,8 @@ export default {
                     text: 'リンク',
                     collapsed: false,
                     items: [
+
+                        { text: 'ライブラリまとめ', link: '/note/library_matome'},
                         { text: 'お気に入りのウェブサイト', link: '/note/bookmark' },
                     ]
                 },
