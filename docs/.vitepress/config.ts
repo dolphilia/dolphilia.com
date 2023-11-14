@@ -259,10 +259,12 @@ export default {
                     ]
                 },
                 {
-                    text: '数学',
+                    text: '高等学校',
                     collapsed: false,
                     items: [
-                        { text: '高校数学で学ぶこと', link: '/study/list_of_high_school_math' },
+                        { text: '高校の国語で学ぶこと', link: '/study/list_of_high_school_japanese' },
+                        { text: '高校の数学で学ぶこと', link: '/study/list_of_high_school_math' },
+                        { text: '高校の地理歴史で学ぶこと', link: '/study/list_of_high_school_geography_and_history' },
                     ]
                 },
                 {
