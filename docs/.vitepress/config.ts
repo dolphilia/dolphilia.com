@@ -265,6 +265,9 @@ export default {
                         { text: '高校の国語で学ぶこと', link: '/study/list_of_high_school_japanese' },
                         { text: '高校の数学で学ぶこと', link: '/study/list_of_high_school_math' },
                         { text: '高校の地理歴史で学ぶこと', link: '/study/list_of_high_school_geography_and_history' },
+                        { text: '高校の公民で学ぶこと', link: '/study/list_of_high_school_civics' },
+                        { text: '高校の理科で学ぶこと', link: '/study/list_of_high_school_science' },
+                        { text: '高校の外国語で学ぶこと', link: '/study/list_of_high_school_foreign_language' },
                     ]
                 },
                 {
