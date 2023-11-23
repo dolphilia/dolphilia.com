@@ -268,6 +268,7 @@ export default {
                         { text: '高校の公民で学ぶこと', link: '/study/list_of_high_school_civics' },
                         { text: '高校の理科で学ぶこと', link: '/study/list_of_high_school_science' },
                         { text: '高校の外国語で学ぶこと', link: '/study/list_of_high_school_foreign_language' },
+                        { text: '引用書籍', link: '/study/citation_books' },
                     ]
                 },
                 {
