@@ -2,7 +2,7 @@
 head:
   - - link
     - rel: stylesheet
-      href: https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.5.1/katex.min.css
+      href: https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css
 ---
 
 # KaTeXで数式を書く

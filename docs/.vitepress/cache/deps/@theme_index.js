@@ -8,7 +8,7 @@ import {
   unref,
   watch,
   watchEffect
-} from "./chunk-V634PGSD.js";
+} from "./chunk-CSMLHSNT.js";
 
 // node_modules/vitepress/dist/client/theme-default/index.js
 import "/Users/dolphilia/github/dolphilia.com/node_modules/vitepress/dist/client/theme-default/styles/fonts.css";
@@ -48,6 +48,7 @@ function toValue(r) {
   return typeof r === "function" ? r() : unref(r);
 }
 var isClient = typeof window !== "undefined" && typeof document !== "undefined";
+var isWorker = typeof WorkerGlobalScope !== "undefined" && globalThis instanceof WorkerGlobalScope;
 var isIOS = getIsIOS();
 function getIsIOS() {
   var _a;
@@ -61,9 +62,7 @@ function cacheStringFunction(fn) {
   };
 }
 var hyphenateRE = /\B([A-Z])/g;
-var hyphenate = cacheStringFunction(
-  (str) => str.replace(hyphenateRE, "-$1").toLowerCase()
-);
+var hyphenate = cacheStringFunction((str) => str.replace(hyphenateRE, "-$1").toLowerCase());
 var camelizeRE = /-(\w)/g;
 var camelize = cacheStringFunction((str) => {
   return str.replace(camelizeRE, (_, c) => c ? c.toUpperCase() : "");

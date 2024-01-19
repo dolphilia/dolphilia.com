@@ -1,4 +1,5 @@
 import { defineConfig } from 'vitepress'
+import { withMermaid } from "vitepress-plugin-mermaid";
 
 export default {
     lang: 'ja',
@@ -8,9 +9,15 @@ export default {
     lastUpdated: true,
     //cleanUrls: true,
     //head: [['meta', { name: 'theme-color', content: '#3c8772' }]],
+    mermaid:{
+        //mermaidConfig !theme here works for ligth mode since dark theme is forced in dark mode
+      },
+      mermaidPlugin: {
+        class: "mermaid my-class", // set additional css classes for parent container 
+      },
     markdown: {
         config: (md) => {
-            md.use(require("markdown-it-katex"));
+            md.use(require("@traptitech/markdown-it-katex"));
         },
     },
     themeConfig: {
@@ -50,6 +57,7 @@ export default {
                     {text: 'ANGLE', link: '/translation/angle/'},
                     {text: 'ANTLR', link: '/translation/antlr/'},
                     {text: 'C言語', link: '/translation/c/'},
+                    {text: 'cosmopolitan', link: '/translation/cosmopolitan/'},
                     {text: 'Duktape', link: '/translation/duktape/'},
                     {text: 'GLFW', link: '/translation/GLFW/'},
                     {text: 'HonKit', link: '/translation/honkit/'},
@@ -272,6 +280,13 @@ export default {
                     ]
                 },
                 {
+                    text: '数学',
+                    collapsed: false,
+                    items: [
+                        { text: '高校数学1の公式', link: '/study/formulas_for_high_school_math_1.md'},
+                    ]
+                },
+                {
                     text: '英語',
                     collapsed: false,
                     items: [
@@ -448,6 +463,24 @@ export default {
                     items: [
                         {text: 'はじめに', link: '/translation/c/WG14-C/'},
                         {text: '9899', link: '/translation/c/WG14-C/9899'},
+                    ]
+                }
+            ],
+            '/translation/cosmopolitan/': [
+                {
+                    text: 'cosmopolitan',
+                    collapsed: false,
+                    items: [
+                        {text: 'はじめに', link: '/translation/cosmopolitan/'},
+                        {text: '概要', link: '/translation/cosmopolitan/top'},
+                        {text: 'ツールチェイン', link: '/translation/cosmopolitan/toolchain'},
+                    ]
+                },
+                {
+                    text: 'APE',
+                    collapsed: false,
+                    items: [
+                        {text: 'APE', link: '/translation/cosmopolitan/ape'},
                     ]
                 }
             ],
