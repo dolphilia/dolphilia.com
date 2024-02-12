@@ -206,7 +206,7 @@ export default {
                     text: 'リンク',
                     collapsed: false,
                     items: [
-
+                        { text: '個人サイトのリンク集', link: '/note/personal-website' },
                         { text: 'ライブラリまとめ', link: '/note/library_matome'},
                         { text: 'お気に入りのウェブサイト', link: '/note/bookmark' },
                     ]

@@ -49,11 +49,8 @@ title:お気に入りのリンク集
 - gemi: [hp](http://gemi333.com/)
 - momochy（ももちー）: [hp](http://www.momochy.com/),[bg](http://momochy.blog.jp/),[tw](https://twitter.com/momochy_),[px](http://www.pixiv.net/member.php?id=786315),[tl](http://momochy.tumblr.com/),[fb](https://www.facebook.com/momochy318),[ig](https://www.instagram.com/momochy_/),[gp](https://plus.google.com/113318635549118427423?rel=author)
 - saxyun（ゆるめいつ）: [hp](http://saxyun.sakura.ne.jp/),[tw](https://twitter.com/saxyun)
-- shati（utatane）: [hp](http://utata-ne.net/),[tw](https://twitter.com/shati_ko),[px](http://www.pixiv.net/member.php?id=3880)
-- tica85 bookstores（ちかちかたるとたたん）: [hp](http://lrrh.silk.to/),[tw](https://twitter.com/mouse_p),[px](http://www.pixiv.net/member.php?id=12788),[tl](http://tica85.tumblr.com/)
 - waneella: [hp](https://www.waneella.com/),[tw](https://twitter.com/waneella_)
 - CLAMP（CCさくら）: [hp](https://clamp-net.com/),[tw](https://twitter.com/CLAMP_news)
-- Ixy（なれる！SE）: [tw](https://twitter.com/ixy),[px](http://www.pixiv.net/member.php?id=4935)
 - NOTRE: [hp](http://mauve313.com/),[tw](https://twitter.com/NOEYEBROW313)
 - RIKI（8BIT MUSIC）: [hp](http://riki2riki.com/index.html),[tw](https://twitter.com/riki2riki)
 - MATSUDA98（MATSUDASTYLE.web）: [hp](http://mat98.littlestar.jp/),[tw](https://twitter.com/_matsuda98_),[px](https://www.pixiv.net/member.php?id=479080),[bt](https://matsudastyle.booth.pm/)
@@ -116,6 +113,9 @@ title:お気に入りのリンク集
 
 ### SNSを持っている
 
+- Ixy（なれる！SE）: [tw](https://twitter.com/ixy),[px](http://www.pixiv.net/member.php?id=4935)
+- shati（utatane）: [tw](https://twitter.com/shati_ko),[px](http://www.pixiv.net/member.php?id=3880),[tl](http://utata-ne.net/)
+- tica85 bookstores（ちかちかたるとたたん）: [tw](https://twitter.com/mouse_p),[px](http://www.pixiv.net/member.php?id=12788)
 - pomodorosa（CM音楽・イラスト）: [tw](https://twitter.com/pomodorosa),[px](http://www.pixiv.net/member.php?id=814837),[tl](http://pomodorosa.tumblr.com/),[sc](https://soundcloud.com/pomodorosa),[to](http://otakumode.com/pomodorosa)
 - toshi: [px](https://www.pixiv.net/member.php?id=637016)
 - umi: [tw](https://twitter.com/uminoe622)
