@@ -32,7 +32,13 @@ title:お気に入りのリンク集
 
 - [いなほゆら](http://mof.chu.jp)
 - [森さやか](http://www.sayakamori.jp/)
+- [しぶぞー](https://shibuzoh.com)
+- [けねでぃまりぃ](https://www.mariekennedy77.com)
+
+### 小物系
+
 - [灯さかす](https://www.akarisakasu.com)
+- [つのじゅ](http://mochituno.web.fc2.com/)
 
 ### 画家
 
@@ -46,11 +52,19 @@ title:お気に入りのリンク集
 
 - [えいひ](https://ei.2-d.jp)
 
-### Wix / Jimdo / Weebly / Lit.link / potofu / portforiobox / folio / xfolio
-### Tumblr
+### Wix / Jimdo / Weebly / Lit.link / potofu / portforiobox / folio / xfolio / Adobe Portfolio
+### Tumblr / WordPress / ペライチ / Strikingly Ameba Ownd
 
 ### 分類前
 
+- [とけし](https://tokesabo.com)
+- [Takako](https://www.rum-ice.com)
+- [もの](https://nekogoya.com)
+- [黄菊しーく](https://si-ku.art)
+- [ならの](https://nara-lalana.com)
+- [木芽のい](https://konome.jp)
+- [麦田このみ](https://yurugonomi.com)
+- [模造クリスタル](http://www.mozocry.com)
 - [ももしき](http://pitsche.jp)
 - [まつだひかり](https://www.matsudahikari.com)
 - [もなか](https://www.sayohashi.com)
@@ -74,7 +88,6 @@ title:お気に入りのリンク集
 - [saxyun](http://saxyun.sakura.ne.jp/)
 - [サンカクヘッド](http://sankakuhead.main.jp/)
 - [アキホ](http://kamihitoe1.web.fc2.com/)
-- [つのじゅ](http://mochituno.web.fc2.com/)
 - [ならかっぱ](http://narahome.web.fc2.com/)
 - [新海誠](http://www.shinkaiworks.com/)
 - [momochy](http://www.momochy.com/)
@@ -224,6 +237,7 @@ title:お気に入りのリンク集
 
 ### ゲーム開発
 
+- [路地の浦](http://ikisiteru.web.fc2.com/index.html)
 - [犬と猫](http://inutoneko.jp)
 - [おづみかん](https://ozumikan.com)
 - [ftvoid](http://ftvoid.com/)
