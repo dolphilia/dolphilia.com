@@ -215,6 +215,7 @@ export default {
                     text: '覚え書き',
                     collapsed: false,
                     items: [
+                        { text: 'FFIの比較', link: '/note/ffi-list' },
                         { text: 'Godotのサードパーティ', link: '/note/third-party-godot' },
                         { text: 'Chromiumのサードパーティ', link: '/note/third-party-chromium' },
                         { text: 'CでSJISをUTF8に変換する', link: '/note/c-gengo-de-moji' },
