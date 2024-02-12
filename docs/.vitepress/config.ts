@@ -215,6 +215,8 @@ export default {
                     text: '覚え書き',
                     collapsed: false,
                     items: [
+                        { text: 'Godotのサードパーティ', link: '/note/third-party-godot' },
+                        { text: 'Chromiumのサードパーティ', link: '/note/third-party-chromium' },
                         { text: 'CでSJISをUTF8に変換する', link: '/note/c-gengo-de-moji' },
                         { text: '手動でRSS2.0を作成する', link: '/note/rss20-wo-shudou-de' },
                         { text: 'MusicXMLのチュートリアル', link: '/note/music-xml-no' },
