@@ -58,6 +58,7 @@ export default {
                     {text: 'ANTLR', link: '/translation/antlr/'},
                     {text: 'C言語', link: '/translation/c/'},
                     {text: 'cosmopolitan', link: '/translation/cosmopolitan/'},
+                    {text: 'Dart', link: '/translation/dart/'},
                     {text: 'Duktape', link: '/translation/duktape/'},
                     {text: 'GLFW', link: '/translation/GLFW/'},
                     {text: 'HonKit', link: '/translation/honkit/'},
@@ -486,6 +487,116 @@ export default {
                         {text: 'APE', link: '/translation/cosmopolitan/ape'},
                     ]
                 }
+            ],
+            '/translation/dart/': [
+                {
+                    text: 'ホーム',
+                    collapsed: false,
+                    items: [
+                        {text: 'はじめに', link: '/translation/dart/'},
+                        {text: 'チュートリアル', link: '/translation/dart/tutorials'},
+                    ]
+                },
+                {
+                    text: 'コードラボ',
+                    collapsed: false,
+                    items: [
+                        {text: '準備中', link: '/translation/dart/codelab/'},
+                    ]
+                },
+                {
+                    text: '言語',
+                    collapsed: false,
+                    items: [
+                        {text: 'はじめに', link: '/translation/dart/language/'},
+                        {
+                            text: '構文の基本',
+                            collapsed: false,
+                            items: [
+                                {text: '変数', link: '/translation/dart/language/syntax_basics/variables'},
+                                {text: '演算子', link: '/translation/dart/language/syntax_basics/operators'},
+                                {text: 'コメント', link: '/translation/dart/language/syntax_basics/comments'},
+                                {text: 'メタデータ', link: '/translation/dart/language/syntax_basics/metadata'},
+                                {text: 'ライブラリとインポート', link: '/translation/dart/language/syntax_basics/libraries_and_imports'},
+                                {text: 'キーワード', link: '/translation/dart/language/syntax_basics/keywords'},
+                            ]
+                        },
+                        {
+                            text: '型',
+                            collapsed: false,
+                            items: [
+                                {text: '組み込み型', link: '/translation/dart/language/types/built-in_types'},
+                                {text: 'レコード', link: '/translation/dart/language/types/records'},
+                                {text: 'コレクション', link: '/translation/dart/language/types/collections'},
+                                {text: 'ジェネリクス', link: '/translation/dart/language/types/generics'},
+                                {text: '型定義', link: '/translation/dart/language/types/typedefs'},
+                                {text: '型システム', link: '/translation/dart/language/types/type_system'},
+                            ]
+                        },
+                        {
+                            text: 'パターン',
+                            collapsed: false,
+                            items: [
+                                {text: '概要と使い方', link: '/translation/dart/language/patterns/overview_and_usage'},
+                                {text: 'パターンタイプ', link: '/translation/dart/language/patterns/pattern_types'},
+                            ]
+                        },
+                        {text: '関数', link: '/translation/dart/language/functions'},
+                        {
+                            text: 'フロー制御',
+                            collapsed: false,
+                            items: [
+                                {text: '繰り返し', link: '/translation/dart/language/control_flow/loops'},
+                                {text: '分岐', link: '/translation/dart/language/control_flow/branches'},
+                            ]
+                        },
+                        {text: 'エラーハンドリング', link: '/translation/dart/language/error_handling'},
+                        {
+                            text: 'クラスとオブジェクト',
+                            collapsed: false,
+                            items: [
+                                {text: 'クラス', link: '/translation/dart/language/classes_and_objects/classes'},
+                                {text: 'コンストラクタ', link: '/translation/dart/language/classes_and_objects/constructors'},
+                                {text: 'メソッド', link: '/translation/dart/language/classes_and_objects/methods'},
+                                {text: 'クラスの継承', link: '/translation/dart/language/classes_and_objects/extend_a_class'},
+                                {text: 'ミックスイン', link: '/translation/dart/language/classes_and_objects/mixins'},
+                                {text: '列挙', link: '/translation/dart/language/classes_and_objects/enums'},
+                                {text: '拡張メソッド', link: '/translation/dart/language/classes_and_objects/extension_methods'},
+                                {text: '拡張型', link: '/translation/dart/language/classes_and_objects/extension_types'},
+                                {text: '呼び出し可能なオブジェクト', link: '/translation/dart/language/classes_and_objects/callable_objects'},
+                            ]
+                        },
+                        {
+                            text: 'クラス修飾子',
+                            collapsed: false,
+                            items: [
+                                {text: '概要と使い方', link: '/translation/dart/language/class_modifiers/overview_and_usage'},
+                                {text: 'APIメンテナのためのクラス修飾子', link: '/translation/dart/language/class_modifiers/class_modifiers_for_api_maintainers'},
+                                {text: 'リファレンス', link: '/translation/dart/language/class_modifiers/reference'},
+                            ]
+                        },
+                        {
+                            text: '並行性',
+                            collapsed: false,
+                            items: [
+                                {text: '概要', link: '/translation/dart/language/concurrency/overview'},
+                                {text: '非同期サポート', link: '/translation/dart/language/concurrency/asynchronous_support'},
+                                {text: 'アイソレート', link: '/translation/dart/language/concurrency/isolates'},
+                            ]
+                        },
+                        {
+                            text: 'Null安全',
+                            collapsed: false,
+                            items: [
+                                {text: '健全なNull安全', link: '/translation/dart/language/null_safety/sound_null_safety'},
+                                {text: 'Null安全への移行', link: '/translation/dart/language/null_safety/sound_null_safety'},
+                                {text: 'Null安全を理解する', link: '/translation/dart/language/null_safety/sound_null_safety'},
+                                {text: '不健全なNull安全', link: '/translation/dart/language/null_safety/sound_null_safety'},
+                                {text: 'FAQ', link: '/translation/dart/language/null_safety/sound_null_safety'},
+                            ]
+                        },
+                    ]
+                },
             ],
             '/translation/duktape/': [
                 {

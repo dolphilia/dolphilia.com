@@ -6,23 +6,53 @@ title:お気に入りのリンク集
 
 私のお気に入りの個人サイトを集めました。個人的なブックマークとして使っています。
 
+::: info 
+以下のサービスを使用したウェブサイトは除外しています。
+
+Wix / Jimdo / Weebly / Lit.link / potofu / portforiobox / folio / xfolio / Adobe Portfolio / Tumblr / ペライチ / Strikingly Ameba Ownd / (WordPress)
+:::
+
+
+::: details 分類の方法を考え中・・・
+- 少ない ← ページ数 → 多い
+- 少ない ← 情報量 → 多い
+- 控えめ ←　主張 → 激しい
+- 文字 ← → 絵
+- 寒色 ← 色味 → 暖色
+- レトロ ← 新旧 → モダン
+- 雑然 ← 整頓 → 整然
+- 狭い ← 広さ → 広い
+:::
+
 ## イラスト・漫画・アニメ
 
-### デザインの完成度が高い
+### 個性とデザインの両立
 
 - [potg（ぴおてぐ）](https://potg.art)
+
+### １ページ型
+
 - [佐倉おりこ](https://www.sakuraoriko.com)
 - [上倉エク](http://uekuraeku.com)
 - [桜もよん](https://www.sakuramoyon.com)
-- [成瀬ちさと](http://www.tanpopoya.com/)
-- [武田みか](http://yellow.kirara.st/)
+- [絹谷ゆたか](https://www.kinutaniyutaka.com)
+- [またよし](https://matayosi.oops.jp)
+- [岡森くお](http://kuolia.jp)
+
+### 複数ページ型
+
+- [ちょん*](https://chonxx.com)
 - [中村ひなた](http://lipcream.chu.jp/)
 - [草壁](https://kusakabeworks.net)
 - [gemi](http://gemi333.com/)
-- [いかり](https://ikari13.com)
 - [らぐほのえりか](https://www.ragho.net)
-- [岡森くお](http://kuolia.jp)
-- [絹谷ゆたか](https://www.kinutaniyutaka.com)
+- [成瀬ちさと](http://www.tanpopoya.com/)
+
+### こじんまりとした秘密基地感
+
+- [武田みか](http://yellow.kirara.st/)
+- [もくもしえる](https://mokumosieru.com)
+- [模造クリスタル](http://www.mozocry.com)
 
 ### 充実した情報量
 
@@ -47,16 +77,34 @@ title:お気に入りのリンク集
 ### 漫画
 
 - [ねことうふ](http://grin.oops.jp)
+- [DEUSTELLA](https://www.deustella.com)
 
 ### テンプレート使用
 
+- [いかり](https://ikari13.com)
 - [えいひ](https://ei.2-d.jp)
-
-### Wix / Jimdo / Weebly / Lit.link / potofu / portforiobox / folio / xfolio / Adobe Portfolio
-### Tumblr / WordPress / ペライチ / Strikingly Ameba Ownd
+- [もとなおこ](http://moto-naoko.com)
 
 ### 分類前
 
+- [高瀬むぅ](http://takasemuh.web.fc2.com)
+- [桜木蓮](https://www.sakuranoiro.com)
+- [祐壱](http://2966.web.fc2.com)
+- [憂](http://arcadia-art.com)
+- [些夜](http://petit.afolyte.net)
+- [ウタコ](http://utaco.rurara.com)
+- [サカクラ](http://etc.bake-neko.net)
+- [仮眠](http://dc-ink.com)
+- [藤ちょこ](https://www.fuzichoco.com)
+- [まさる.jp](http://masarudottocom.but.jp)
+- [白沙飴しろまる](https://shiromaru.work)
+- [ゆるめあつし](http://yurume-box.com)
+- [Dmyo(白羽奈尾)](http://dmyo.com)
+- [こもわた遙華](https://www.komowata.com)
+- [つなこ](https://www.tunamayoza.com)
+- [みたらしねこ](https://mitarashi-neko.sakura.ne.jp/wp/)
+- [風ことら](http://aononiwa.web.fc2.com)
+- [宮月もそこ](https://mosoko.jp)
 - [とけし](https://tokesabo.com)
 - [Takako](https://www.rum-ice.com)
 - [もの](https://nekogoya.com)
@@ -64,7 +112,6 @@ title:お気に入りのリンク集
 - [ならの](https://nara-lalana.com)
 - [木芽のい](https://konome.jp)
 - [麦田このみ](https://yurugonomi.com)
-- [模造クリスタル](http://www.mozocry.com)
 - [ももしき](http://pitsche.jp)
 - [まつだひかり](https://www.matsudahikari.com)
 - [もなか](https://www.sayohashi.com)
@@ -72,7 +119,6 @@ title:お気に入りのリンク集
 - [深町なか](https://www.naka-f.com)
 - [かがちさく](https://mofumaruya.com)
 - [あおぷ](https://a.opus-lab.info)
-- [もくもしえる](https://mokumosieru.com)
 - [大賀一五](http://taiga.jpn.org)
 - [こうば](http://ffkaiura.sakura.ne.jp)
 - [けんたうろす](https://kentauloss.art/home)
@@ -132,6 +178,8 @@ title:お気に入りのリンク集
 
 ## 音楽
 
+- [TOKOTOKO（西沢さんP）/ zawaso](https://zawaso.com)
+- [diceproj](https://diceproj.com)
 - [きくお](https://kikuo.jp)
 - [田口囁一](http://www.sen-vec.com/)
 - [ginkiha](http://ginkiha.info/)
