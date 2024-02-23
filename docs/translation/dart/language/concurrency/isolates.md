@@ -1,36 +1,36 @@
-# Isolates
+# アイソレート
 
-This page discusses some examples that use the Isolate API to implement isolates.
+このページでは、アイソレートを実装するためにアイソレートAPIを使用するいくつかの例について説明します。
 
-You should use isolates whenever your application is handling computations that are large enough to temporarily block other computations. The most common example is in Flutter applications, when you need to perform large computations that might otherwise cause the UI to become unresponsive.
+アプリケーションが他の計算を一時的にブロックするような大きな計算を処理するときはいつでもアイソレートを使うべきだ。最も一般的な例はFlutterアプリケーションで、そうでなければUIが応答しなくなるような大きな計算を実行する必要がある場合です。
 
-There aren't any rules about when you must use isolates, but here are some more situations where they can be useful:
+どのような場合にアイソレートを使わなければならないかについてのルールはありませんが、ここではアイソレートが役に立つ状況をいくつか紹介します：
 
-- Parsing and decoding exceptionally large JSON blobs.
-- Processing and compressing photos, audio and video.
-- Converting audio and video files.
-- Performing complex searching and filtering on large lists or within file systems.
-- Performing I/O, such as communicating with a database.
-- Handling a large volume of network requests.
+- 非常に大きなJSON blobの解析とデコード。
+- 写真、オーディオ、ビデオの処理と圧縮
+- オーディオファイルやビデオファイルの変換
+- 大規模なリストやファイルシステム内での複雑な検索やフィルタリングの実行
+- データベースとの通信など、I/Oの実行
+- 大量のネットワークリクエストの処理
 
-## Implementing a simple worker isolate
+## シンプルなワーカーアイソレーションの実装
 
-These examples implement a main isolate that spawns a simple worker isolate. Isolate.run() simplifies the steps behind setting up and managing worker isolates:
+これらの例では、単純なワーカーアイソレートを生成するメインアイソレートを実装しています。Isolate.run()はワーカーアイソレートの設定と管理の手順を簡略化します：
 
-1. Spawns (starts and creates) an isolate.
-2. Runs a function on the spawned isolate.
-3. Captures the result.
-4. Returns the result to the main isolate.
-5. Terminates the isolate once work is complete.
-6. Checks, captures, and throws exceptions and errors back to the main isolate.
+1. アイソレートをスポーン（開始、作成）する。
+2. スポーンされたアイソレートで関数を実行する。
+3. 結果をキャプチャする。
+4. 結果をメインアイソレートに返す。
+5. 作業が完了したら、アイソレートを終了する。
+6. 例外やエラーをチェックし、キャプチャし、メインアイソレートにスローする。
 
 ::: info Flutter note
-If you're using Flutter, you can use Flutter's compute function instead of Isolate.run().
+Flutterを使っている場合は、Isolate.run()の代わりにFlutterのcompute関数を使うことができる。
 :::
 
-## Running an existing method in a new isolate
+## 新しいアイソレートで既存のメソッドを実行する
 
-Call run() to spawn a new isolate (a background worker), directly in the main isolate while main() waits for the result:
+1. run() を呼び出して新しいアイソレート (バックグラウンドワーカー) を生成します：
 
 ```dart
 const String filename = 'with_keys.json';
@@ -44,7 +44,7 @@ void main() async {
 }
 ```
 
-Pass the worker isolate the function you want it to execute as its first argument. In this example, it's the existing function _readAndParseJson():
+2. 最初の引数として、実行させたい関数をワーカーに渡します。この例では、既存の関数 _readAndParseJson() です：
 
 ```dart
 Future<Map<String, dynamic>> _readAndParseJson() async {
@@ -54,19 +54,19 @@ Future<Map<String, dynamic>> _readAndParseJson() async {
 }
 ```
 
-Isolate.run() takes the result _readAndParseJson() returns and sends the value back to the main isolate, shutting down the worker isolate.
+3. Isolate.run()は_readAndParseJson()が返す結果を受け取り、その値をメインアイソレートに送り返し、ワーカーアイソレートをシャットダウンする。
 
-The worker isolate transfers the memory holding the result to the main isolate. It does not copy the data. The worker isolate performs a verification pass to ensure the objects are allowed to be transferred.
+4. ワーカーアイソレートは結果を保持するメモリをメインアイソレートに転送します。データはコピーしません。ワーカーアイソレートは検証パスを実行し、オブジェクトの転送が許可されていることを確認します。
 
-_readAndParseJson() is an existing, asynchronous function that could just as easily run directly in the main isolate. Using Isolate.run() to run it instead enables concurrency. The worker isolate completely abstracts the computations of _readAndParseJson(). It can complete without blocking the main isolate.
+_readAndParseJson()は既存の非同期関数で、メインアイソレートで直接実行することもできます。Isolate.run()を使って実行することで、並行処理が可能になります。ワーカーアイソレートは_readAndParseJson()の計算を完全に抽象化します。メインアイソレートをブロックすることなく完了させることができます。
 
-The result of Isolate.run() is always a Future, because code in the main isolate continues to run. Whether the computation the worker isolate executes is synchronous or asynchronous doesn't impact the main isolate, because it's running concurrently either way.
+Isolate.run()の結果は常にFutureですが、これはメインアイソレート内のコードが実行され続けるためです。ワーカーアイソレートが実行する計算が同期か非同期かは、メインアイソレートには影響しません。
 
-For the complete program, check out the send_and_receive.dart sample.
+完全なプログラムはsend_and_receive.dartサンプルをご覧ください。
 
-## Sending closures with isolates
+## アイソレートでクロージャを送る
 
-You can also create a simple worker isolate with run() using a function literal, or closure, directly in the main isolate.
+メインアイソレートで直接関数リテラルまたはクロージャを使用して run() で単純なワーカーアイソレートを作成することもできます。
 
 ```dart
 const String filename = 'with_keys.json';
@@ -84,80 +84,85 @@ void main() async {
 }
 ```
 
-This example accomplishes the same as the previous. A new isolate spawns, computes something, and sends back the result.
+この例も前と同じことをする。新しいアイソレートがスポーンし、何かを計算し、結果を送り返す。
 
-However, now the isolate sends a closure. Closures are less limited than typical named functions, both in how they function and how they're written into the code. In this example, Isolate.run() executes what looks like local code, concurrently. In that sense, you can imagine run() to work like a control flow operator for "run in parallel".
+しかし、今度はアイソレートがクロージャを送信する。クロージャは一般的な名前付き関数よりも、機能面でもコードへの記述方法でも制限が少ない。この例では、Isolate.run()はローカルコードのようなものを同時に実行している。その意味で、run()は「並列実行」を表すコントロール・フロー演算子のように機能すると想像できる。
 
-## Sending multiple messages between isolates with ports
+## ポートを持つアイソレート間で複数のメッセージを送信する
 
-Short-lived isolates are convenient to use, but require performance overhead to spawn new isolates and to copy objects from one isolate to another. If your code relies on repeatedly running the same computation using Isolate.run, you might improve performance by instead creating long-lived isolates that don’t exit immediately.
+短命なアイソレートは便利に使えますが、新しいアイソレートを生成したり、あるアイソレートから別のアイソレートにオブジェクトをコピーしたりするためのパフォーマンスオーバーヘッドが必要になります。Isolate.runを使用して同じ計算を繰り返し実行するコードに依存している場合、代わりにすぐに終了しない長寿命のアイソレートを作成することでパフォーマンスを改善できるかもしれません。
 
-To do this, you can use some of the low-level isolate APIs that Isolate.run abstracts:
+これを行うには、Isolate.runが抽象化している低レベルのアイソレートAPIの一部を使用することができます：
 
-Isolate.spawn() and Isolate.exit()
-ReceivePort and SendPort
-SendPort.send() method
-This section goes over the steps required to establish 2-way communication between a newly spawned isolate and the main isolate. The first example, Basic ports, introduces the process at a high-level. The second example, Robust ports, gradually adds more practical, real-world functionality to the first.
+- Isolate.spawn() と Isolate.exit()
+- ReceivePort と SendPort
+- SendPort.send() メソッド
 
-## ReceivePort and SendPort
+このセクションでは、新しく生成されたアイソレートとメインアイソレートとの間で双方向通信を確立するために必要な手順について説明します。最初の例であるBasic portsでは、ハイレベルなプロセスを紹介します。2つ目の例である堅牢なportsでは、最初の例に実用的な機能を徐々に追加していきます。
 
-Setting up long-lived communication between isolates requires two classes (in addition to Isolate): ReceivePort and SendPort. These ports are the only way isolates can communicate with each other.
+## ReceivePort と SendPort
 
-A ReceivePort is an object that handles messages that are sent from other isolates. Those messages are sent via a SendPort.
+アイソレート間の長期間の通信を設定するには、（アイソレートに加えて）2つのクラスが必要です：ReceivePortとSendPortです。これらのポートはアイソレート同士が通信する唯一の方法です。
 
-info
-Note
-A SendPort object is associated with exactly one ReceivePort, but a single ReceivePort can have many SendPorts. When you create a ReceivePort, it creates a SendPort for itself. You can create additional SendPorts that can send messages to an existing ReceivePort.
-Ports behave similarly to Stream objects (in fact, receive ports implement Stream!) You can think of a SendPort and ReceivePort like Stream's StreamController and listeners, respectively. A SendPort is like a StreamController because you "add" messages to them with the SendPort.send() method, and those messages are handled by a listener, in this case the ReceivePort. The ReceivePort then handles the messages it receives by passing them as arguments to a callback that you provide.
+ReceivePortは他のアイソレートから送信されるメッセージを処理するオブジェクトです。これらのメッセージはSendPortを介して送信されます。
 
-## Setting up ports
+::: info Note
+1つのSendPortオブジェクトは正確に1つのReceivePortと関連付けられますが、1つのReceivePortは多くのSendPortを持つことができます。ReceivePortを作成すると、それ自身にSendPortが作成されます。既存のReceivePortにメッセージを送信できるSendPortを追加で作成することができます。
+:::
 
-A newly spawned isolate only has the information it receives through the Isolate.spawn call. If you need the main isolate to continue to communicate with a spawned isolate past its initial creation, you must set up a communication channel where the spawned isolate can send messages to the main isolate. Isolates can only communicate via message passing. They can’t “see” inside each others’ memory, which is where the name “isolate” comes from.
+ポートはStreamオブジェクトと同じような動作をします（実際、受信ポートはStream!を実装しています）。SendPortはStreamControllerのようなもので、SendPort.send()メソッドでメッセージを "追加 "し、それらのメッセージはリスナー（この場合はReceivePort）で処理されます。ReceivePortは、受け取ったメッセージをコールバックの引数として渡して処理します。
 
-To set up this 2-way communication, first create a ReceivePort in the main isolate, then pass its SendPort as an argument to the new isolate when spawning it with Isolate.spawn. The new isolate then creates its own ReceivePort, and sends its SendPort back on the SendPort it was passed by the main isolate. The main isolate receives this SendPort, and now both sides have an open channel to send and receive messages.
+### Setting up ports
 
-info
-Note
-The diagrams in this section are high-level and intended to convey the concept of using ports for isolates. Actual implementation requires a bit more code, which you will find later on this page.
-A figure showing events being fed, one by one, into the event loop
+新しくスポーンされたアイソレートは、Isolate.spawn呼び出しを通して受け取った情報のみを持ちます。メインアイソレートが最初に生成された後も生成されたアイソレートと通信を続ける必要がある場合、生成されたアイソレートがメインアイソレートにメッセージを送信できる通信チャネルを設定する必要があります。アイソレートはメッセージパッシングによってのみ通信を行うことができます。お互いのメモリ内部を "見る "ことはできません。"アイソレート "という名前の由来です。
 
-Create a ReceivePort in the main isolate. The SendPort is created automatically as a property on the ReceivePort.
-Spawn the worker isolate with Isolate.spawn()
-Pass a reference to ReceivePort.sendPort as the first message to the worker isolate.
-Create another new ReceivePort in the worker isolate.
-Pass a reference to the worker isolate's ReceivePort.sendPort as the first message back to the main isolate.
-Along with creating the ports and setting up communication, you’ll also need to tell the ports what to do when they receive messages. This is done using the listen method on each respective ReceivePort.
+この双方向通信を設定するには、まずメインアイソレートにReceivePortを作成し、Isolate.spawnで新しいアイソレートを生成する際にその引数としてSendPortを渡します。次に新しいアイソレートは自身のReceivePortを作成し、そのSendPortをメインアイソレートから渡されたSendPortに送り返します。メインアイソレートはこのSendPortを受信し、これで双方がメッセージを送受信するためのオープンチャネルを持つことになります。
 
-A figure showing events being fed, one by one, into the event loop
+:::info Note
+このセクションの図はハイレベルなもので、アイソレートにポートを使うというコンセプトを伝えるためのものです。実際の実装にはもう少しコードが必要で、それはこのページの後半で説明します。
+:::
 
-Send a message via the main isolate’s reference to the worker isolate's SendPort.
-Receive and handle the message via a listener on the worker isolate's ReceivePort. This is where the computation you want to move off the main isolate is executed.
-Send a return message via the worker isolate's reference to the main isolate's SendPort.
-Receive the message via a listener on the main isolate's ReceivePort.
+(図)イベントがひとつずつイベントループに送り込まれる様子を示す
 
-## Basic ports example
+1. メインアイソレートに ReceivePort を作成する。SendPortはReceivePortのプロパティとして自動的に作成される。
+2. Isolate.spawn()でワーカーアイソレートをスポーンする。
+3. ワーカーアイソレートに最初のメッセージとしてReceivePort.sendPortへの参照を渡す。
+4. ワーカーアイソレートに別の新しいReceivePortを作成する。
+5. 最初のメッセージとしてワーカーアイソレートのReceivePort.sendPortへの参照をメインアイソレートに戻します。
 
-This example demonstrates how you can set up a long-lived worker isolate with 2-way communication between it and the main isolate. The code uses the example of sending JSON text to a new isolate, where the JSON will be parsed and decoded, before being sent back to the main isolate.
+ポートの作成と通信の設定に加えて、ポートがメッセージを受信したときに何をすべきかを指示する必要がある。これは、それぞれのReceivePortのlistenメソッドを使って行います。
 
-warning
-Warning
-This example is meant to teach the bare minimum needed to spawn a new isolate that can send and receive multiple messages over time.
+(図)イベントがひとつずつイベントループに送り込まれる様子を示す
 
-It does not cover important pieces of functionality that are expected in production software, like error handling, shutting down ports, and message sequencing.
+1. メインアイソレートの参照を経由して、ワーカーアイソレートの SendPort にメッセージを送信する。
+2. Worker アイソレートの ReceivePort 上のリスナーを介してメッセージを受信し、処理する。ここでメインアイソレートから移動させたい計算が実行される。
+3. ワーカーアイソレートの参照を経由して、メインアイソレートのSendPortにリターンメッセージを送信する。
+4. メインアイソレートの ReceivePort のリスナー経由でメッセージを受信する。
 
-The Robust ports example in the next section covers this functionality and discusses some of the issues that can arise without it.
+## 基本ポートの例
 
-## Step 1: Define the worker class
+この例では、メインアイソレートとの間で双方向通信を行う長寿命のワーカーアイソレートを設定する方法を示します。このコードでは、JSONテキストを新しいアイソレートに送信し、そこでJSONがパースされデコードされた後、メインアイソレートに送り返される例を使用しています。
 
-First, create a class for your background worker isolate. This class contains all the functionality you need to:
+::: warning Warning
+この例は、時間をかけて複数のメッセージを送受信できる新しいアイソレートを生成するために必要な最低限のことを教えるためのものです。
 
-Spawn an isolate.
-Send messages to that isolate.
-Have the isolate decode some JSON.
-Send the decoded JSON back to the main isolate.
-The class exposes two public methods: one that spawns the worker isolate, and one that handles sending messages to that worker isolate.
+エラー処理、ポートのシャットダウン、メッセージのシーケンスなど、本番用ソフトウェアで期待される重要な機能についてはカバーしていません。
 
-The remaining sections in this example will show you how to fill in the class methods, one-by-one.
+次のセクションの Robust ports の例では、この機能をカバーし、それがない場合に発生する可能性のある問題について説明します。
+:::
+
+## Step 1: ワーカークラスの定義
+
+まず、バックグラウンドワーカーアイソレートクラスを作成します。このクラスには、必要なすべての機能が含まれています：
+
+- アイソレートを生む。
+- そのアイソレートにメッセージを送る。
+- アイソレートにJSONをデコードさせる。
+- デコードされたJSONをメインのアイソレートに送り返す。
+
+1つはワーカーアイソレートを生成するメソッド、もう1つはワーカーアイソレートへのメッセージ送信を処理するメソッドです。
+
+この例の残りのセクションでは、クラスメソッドをひとつひとつ埋めていく方法を紹介する。
 
 ```dart
 class Worker {
@@ -180,13 +185,13 @@ class Worker {
 }
 ```
 
-## Step 2: Spawn a worker isolate
+## Step 2: ワーカーアイソレートをスポーンする
 
-The Worker.spawn method is where you will group the code for creating the worker isolate and ensuring it can receive and send messages.
+Worker.spawnメソッドは、Workerを分離し、メッセージを送受信できるようにするためのコードをまとめる場所です。
 
-First, create a ReceivePort. This allows the main isolate to receive messages sent from the newly spawned worker isolate.
-Next, add a listener to the receive port to handle messages the worker isolate will send back. The callback passed to the listener, _handleResponsesFromIsolate, will be covered in step 4.
-Finally, spawn the worker isolate with Isolate.spawn. It expects two arguments: a function to be executed on the worker isolate (covered in step 3), and the sendPort property of the receive port.
+- まず、ReceivePortを作成します。これにより、メインアイソレートは新しくスポーンされたワーカーアイソレートから送信されたメッセージを受信できるようになります。
+- 次に、ワーカーアイソレートが送り返すメッセージを処理するために、受信ポートにリスナーを追加します。リスナーに渡されるコールバック _handleResponsesFromIsolate はステップ 4 で説明します。
+- 最後に、Isolate.spawn でワーカーアイソレートをスポーンします。ワーカーアイソレートで実行する関数（ステップ3で説明）と、受信ポートの sendPort プロパティです。
 
 ```dart
 Future<void> spawn() async {
@@ -196,15 +201,15 @@ Future<void> spawn() async {
 }
 ```
 
-The receivePort.sendPort argument will be passed to the callback (_startRemoteIsolate) as an argument when it’s called on the worker isolate. This is the first step in ensuring that the worker isolate has a way to send messages back to the main isolate.
+receivePort.sendPort引数は、コールバック(_startRemoteIsolate)がワーカーアイソレートで呼び出される際に引数として渡されます。これはワーカーアイソレートがメインアイソレートにメッセージを送り返す方法を確実にするための最初のステップです。
 
-## Step 3: Execute code on the worker isolate
+## Step 3: ワーカーアイソレートでコードを実行する
 
-In this step, you define the method _startRemoteIsolate that is sent to the worker isolate to be executed when it spawns. This method is like the “main” method for the worker isolate.
+このステップでは、ワーカーアイソレートがスポーンしたときに実行されるメソッド _startRemoteIsolate を定義します。このメソッドはワーカーアイソレートの "main "メソッドのようなものです。
 
-First, create another new ReceivePort. This port receives future messages from the main isolate.
-Next, send that port’s SendPort back to the main isolate.
-Finally, add a listener to the new ReceivePort. This listener handles messages the main isolate sends to the worker isolate.
+- まず、別の新しいReceivePortを作成する。このポートはメインアイソレートから将来のメッセージを受信します。
+- 次に、そのポートの SendPort をメインアイソレートに送り返します。
+- 最後に、新しいReceivePortにリスナーを追加します。このリスナーはメインアイソレートがワーカーアイソレートに送信するメッセージを処理します。
 
 ```dart
 static void _startRemoteIsolate(SendPort port) {
@@ -220,13 +225,13 @@ static void _startRemoteIsolate(SendPort port) {
 }
 ```
 
-The listener on the worker’s ReceivePort decodes the JSON passed from the main isolate, and then sends the decoded JSON back to the main isolate.
+Worker の ReceivePort 上のリスナーは、メインアイソレートから渡された JSON をデコードし、デコードされた JSON をメインアイソレートに送り返します。
 
-This listener is the entry point for messages sent from the main isolate to the worker isolate. This is the only chance you have to tell the worker isolate what code to execute in the future.
+このリスナーはメインアイソレートからワーカーアイソレートに送られるメッセージのエントリポイントです。ワーカーアイソレートに今後実行するコードを伝える唯一の機会です。
 
-## Step 4: Handle messages on the main isolate
+## Step 4: メイン・アイソレートでメッセージを扱う
 
-Finally, you need to tell the main isolate how to handle messages sent from the worker isolate back to the main isolate. To do so, you need to fill in the _handleResponsesFromIsolate method. Recall that this method is passed to the receivePort.listen method, as described in step 2:
+最後に、ワーカーアイソレートからメインアイソレートに送り返されるメッセージの処理方法をメインアイソレートに伝える必要があります。そのためには _handleResponsesFromIsolate メソッドを埋める必要があります。このメソッドは、ステップ2で説明したように、receivePort.listenメソッドに渡されることを思い出してください：
 
 ```dart
 Future<void> spawn() async {
@@ -236,10 +241,10 @@ Future<void> spawn() async {
 }
 ```
 
-Also recall that you sent a SendPort back to the main isolate in step 3. This method handles the receipt of that SendPort, as well as handling future messages (which will be decoded JSON).
+また、ステップ3でSendPortをメインアイソレートに送り返したことを思い出してください。このメソッドは、そのSendPortの受信を処理するとともに、今後のメッセージ（デコードされたJSONになる）を処理します。
 
-First, check if the message is a SendPort. If so, assign that port to the class's _sendPort property so it can be used to send messages later.
-Next, check if the message is of type Map<String, dynamic>, the expected type of decoded JSON. If so, handle that message with your application-specific logic. In this example, the message is printed.
+- まず、メッセージがSendPortかどうかをチェックします。もしそうなら、そのポートをクラスの _sendPort プロパティに代入し、後でメッセージの送信に使用できるようにします。
+- 次に、メッセージが `Map<String, dynamic>` 型かどうかをチェックする。もしそうなら、アプリケーション固有のロジックでそのメッセージを処理します。この例では、メッセージを表示します。
 
 ```dart
 void _handleResponsesFromIsolate(dynamic message) {
@@ -252,13 +257,13 @@ void _handleResponsesFromIsolate(dynamic message) {
 }
 ```
 
-## Step 5: Add a completer to ensure your isolate is set-up
+## Step 5: アイソレートのセットアップを確実にするため、コンプリートを追加する。
 
-To complete the class, define a public method called parseJson, which is responsible for sending messages to the worker isolate. It also needs to ensure that messages can be sent before the isolate is fully set up. To handle this, use a Completer.
+クラスを完成させるために、ワーカーアイソレートにメッセージを送信する parseJson というパブリックメソッドを定義します。また、アイソレートが完全にセットアップされる前にメッセージを送信できるようにする必要があります。これを処理するには、Completer を使用します。
 
-First, add a class-level property called a Completer and name it _isolateReady.
-Next, add a call to complete() on the completer in the _handleResponsesFromIsolate method (created in step 4) if the message is a SendPort.
-Finally, in the parseJson method, add await _isolateReady.future before adding _sendPort.send. This ensures that no message can be sent to the worker isolate until it is spawned and has sent its SendPort back to the main isolate.
+- まず、Completer というクラスレベルのプロパティを追加し、_isolateReady という名前を付けます。
+- 次に、メッセージが SendPort の場合、_handleResponsesFromIsolate メソッド (ステップ 4 で作成) で Completer の complete() 呼び出しを追加します。
+- 最後に、_sendPort.sendを追加する前に、_isolateReady.futureを追加します。これにより、ワーカーアイソレートがスポーンされ、そのSendPortをメインアイソレートに送り返すまで、メッセージがワーカーアイソレートに送信されることはありません。
 
 ```dart
 Future<void> parseJson(String message) async {
@@ -267,29 +272,77 @@ Future<void> parseJson(String message) async {
 }
 ```
 
-## Complete example
+## 完全な例
 
-Expand to see the complete example
+```dart
+import 'dart:async';
+import 'dart:convert';
+import 'dart:isolate';
 
-## Robust ports example
+void main() async {
+  final worker = Worker();
+  await worker.spawn();
+  await worker.parseJson('{"key":"value"}');
+}
 
-The previous example explained the basic building blocks needed to set up a long-lived isolate with two-way communication. As mentioned, that example lacks some important features, such as error handling, the ability to close the ports when they’re no longer in use, and inconsistencies around message ordering in some situations.
+class Worker {
+  late SendPort _sendPort;
+  final Completer<void> _isolateReady = Completer.sync();
 
-This example expands on the information in the first example by creating a long-lived worker isolate that has these additional features and more, and follows better design patterns. Although this code has similarities to the first example, it is not an extension of that example.
+  Future<void> spawn() async {
+    final receivePort = ReceivePort();
+    receivePort.listen(_handleResponsesFromIsolate);
+    await Isolate.spawn(_startRemoteIsolate, receivePort.sendPort);
+  }
 
-info
-Note
-This example assumes that you are already familiar with establishing communication between isolates with Isolate.spawn and ports, which was covered in the previous example.
+  void _handleResponsesFromIsolate(dynamic message) {
+    if (message is SendPort) {
+      _sendPort = message;
+      _isolateReady.complete();
+    } else if (message is Map<String, dynamic>) {
+      print(message);
+    }
+  }
 
-## Step 1: Define the worker class
+  static void _startRemoteIsolate(SendPort port) {
+    final receivePort = ReceivePort();
+    port.send(receivePort.sendPort);
 
-First, create a class for your background worker isolate. This class contains all the functionality you need to:
+    receivePort.listen((dynamic message) async {
+      if (message is String) {
+        final transformed = jsonDecode(message);
+        port.send(transformed);
+      }
+    });
+  }
 
-Spawn an isolate.
-Send messages to that isolate.
-Have the isolate decode some JSON.
-Send the decoded JSON back to the main isolate.
-The class exposes three public methods: one that creates the worker isolate, one that handles sending messages to that worker isolate, and one that can shut down the ports when they’re no longer in use.
+  Future<void> parseJson(String message) async {
+    await _isolateReady.future;
+    _sendPort.send(message);
+  }
+}
+```
+
+## ロバスト・ポートの例
+
+前の例では、双方向通信を行う長寿命のアイソレートをセットアップするために必要な 基本的な構成要素を説明しました。前述したように、この例にはエラー処理、ポートが使われなくなったときにポートを閉じる機能、状況によってはメッセージの順序に関する不整合など、いくつかの重要な機能が欠けています。
+
+この例では、最初の例の情報を発展させ、これらの追加機能を持ち、より良いデザインパターンに従った長寿命のワーカーアイソレートを作成します。このコードは最初の例と似ていますが、その例の拡張ではありません。
+
+::: info Note
+この例では、前の例で取り上げたIsolate.spawnとportsを使ったアイソレート間の通信の確立について、すでに熟知していることを前提としています。
+:::
+
+## Step 1: ワーカークラスの定義
+
+まず、バックグラウンドワーカーを隔離するクラスを作成します。このクラスには、必要なすべての機能が含まれています：
+
+- アイソレートを生成する。
+- そのアイソレートにメッセージを送る。
+- アイソレートにJSONをデコードさせる。
+- デコードしたJSONをメインのアイソレートに送り返す。
+
+クラスは3つのパブリックメソッドを公開しています。1つはワーカーアイソレートを作成するメソッド、1つはワーカーアイソレートへのメッセージ送信を処理するメソッド、1つはポートが使用されなくなったときにポートをシャットダウンするメソッドです。
 
 ```dart
 class Worker {
@@ -325,21 +378,21 @@ class Worker {
 }
 ```
 
-info
-Note
-In this example, SendPort and ReceivePort instances follow a best practice naming convention, in which they are named in relation to the main isolate. The messages sent through the SendPort from the main isolate to the worker isolate are called commands, and the messages sent back to the main isolate are called responses.
+::: info Note
+この例では、SendPort と ReceivePort インスタンスはベストプラクティスの命名規則に従っており、メインアイソレートに関連した名前になっています。SendPortを通してメインアイソレートからワーカーアイソレートに送られるメッセージはコマンドと呼ばれ、メインアイソレートに送り返されるメッセージはレスポンスと呼ばれます。
+:::
 
-## Step 2: Create a RawReceivePort in the Worker.spawn method
+## Step 2: Worker.spawnメソッドでRawReceivePortを作成する。
 
-Before spawning an isolate, you need to create a RawReceivePort, which is a lower-level ReceivePort. Using RawReceivePort is a preferred pattern because it allows you to separate your isolate startup logic from logic that handles message passing on the isolate.
+アイソレートをスポーンする前に、下位レベルのReceivePortであるRawReceivePortを作成する必要があります。RawReceivePortを使用することで、アイソレートの起動ロジックとアイソレート上のメッセージパッシングを処理するロジックを分離することができるため、好ましいパターンです。
 
-In the Worker.spawn method:
+Worker.spawnメソッドの中で：
 
-First, create the RawReceivePort. This ReceivePort is only responsible for receiving the initial message from the worker isolate, which will be a SendPort.
-Next, create a Completer that will indicate when the isolate is ready to receive messages. When this completes, it will return a record with a ReceivePort and a SendPort.
-Next, define the RawReceivePort.handler property. This property is a Function? that behaves like ReceivePort.listener. The function is called when a message is received by this port.
-Within the handler function, call connection.complete(). This method expects a record with a ReceivePort and a SendPort as an argument. The SendPort is the initial message sent from the worker isolate, which will be assigned in the next step to the class level SendPort named _commands.
-Then, create a new ReceivePort with the ReceivePort.fromRawReceivePort constructor, and pass in the initPort.
+- まず、RawReceivePortを作成する。このReceivePortはワーカーアイソレートからの最初のメッセージを受信する役割のみを果たします。
+- 次に、アイソレートがメッセージを受信する準備ができたことを示すCompleterを作成します。これが完了すると、ReceivePortとSendPortを持つレコードを返します。
+- 次に、RawReceivePort.handler プロパティを定義します。このプロパティは、ReceivePort.listenerのように振る舞うFunction?この関数は、このポートでメッセージが受信されると呼び出されます。
+- ハンドラ関数の中で、connection.complete() を呼び出します。このメソッドは、引数としてReceivePortとSendPortを持つレコードを指定します。SendPortはワーカーアイソレートから送信される最初のメッセージで、次のステップで_commandsというクラスレベルのSendPortに割り当てられます。
+- 次に、ReceivePort.fromRawReceivePortコンストラクタで新しいReceivePortを作成し、initPortを渡します。
 
 ```dart
 class Worker {
@@ -362,17 +415,17 @@ class Worker {
 }
 ```
 
-By creating a RawReceivePort first, and then a ReceivePort, you’ll be able to add a new callback to ReceivePort.listen later on. Conversely, if you were to create a ReceivePort straight away, you’d only be able to add one listener, because ReceivePort implements Stream, rather than BroadcastStream.
+最初にRawReceivePortを作成し、次にReceivePortを作成することで、後からReceivePort.listenに新しいコールバックを追加することができる。ReceivePortはBroadcastStreamではなくStreamを実装しているためだ。
 
-Effectively, this allows you to separate your isolate start-up logic from the logic that handles receiving messages after setting up communication is complete. This benefit will become more obvious as the logic in the other methods grows.
+事実上、これにより、通信の設定が完了した後にメッセージを受信するロジックと、起動ロジックを分離することができます。この利点は、他のメソッド内のロジックが大きくなるにつれて、より明らかになるでしょう。
 
-## Step 3: Spawn a worker isolate with Isolate.spawn
+## Step 3: Isolate.spawnでワーカーアイソレートをスポーンする
 
-This step continues to fill in the Worker.spawn method. You’ll add the code needed to spawn an isolate, and return an instance of Worker from this class. In this example, the call to Isolate.spawn is wrapped in a try/catch block, which ensures that, if the isolate fails to start up, the initPort will be closed, and the Worker object won’t be created.
+このステップでは引き続きWorker.spawnメソッドを埋めていきます。アイソレートをスポーンし、このクラスからWorkerのインスタンスを返すために必要なコードを追加します。この例では、Isolate.spawnの呼び出しはtry/catchブロックでラップされており、アイソレートの起動に失敗した場合、initPortが閉じられ、Workerオブジェクトが作成されないようになっています。
 
-First, attempt to spawn a worker isolate in a try/catch block. If spawning a worker isolate fails, close the receive port that was created in the previous step. The method passed to Isolate.spawn will be covered in a later step.
-Next, await the connection.future, and destructure the send port and receive port from the record it returns.
-Finally, return an instance of Worker by calling its private constructor, and passing in the ports from that completer.
+- まず、try/catch ブロックでワーカーアイソレートのスポーンを試みます。ワーカーアイソレートのスポーンに失敗した場合は、前のステップで作成した受信ポートを閉じます。Isolate.spawnに渡されるメソッドについては、後のステップで説明します。
+- 次に、connection.futureを待ち、それが返すレコードから送信ポートと受信ポートを再構築する。
+- 最後に、Workerのプライベート コンストラクタを呼び出してWorkerのインスタンスを返します。
 
 ```dart
 class Worker {
@@ -406,13 +459,13 @@ class Worker {
 }
 ```
 
-Note that in this example (compared to the previous example), Worker.spawn acts as an asynchronous static constructor for this class and is the only way to create an instance of Worker. This simplifies the API, making the code that creates an instance of Worker cleaner.
+この例では（前の例と比較して）、Worker.spawnがこのクラスの非同期静的コンストラクタとして機能し、Workerのインスタンスを作成する唯一の方法であることに注意してください。これにより API が単純化され、Worker のインスタンスを作成するコードがすっきりします。
 
-## Step 4: Complete the isolate setup process
+## Step 4: アイソレートのセットアップを完了する
 
-In this step, you will complete the basic isolate setup process. This correlates almost entirely to the previous example, and there are no new concepts. There is a slight change in that the code is broken into more methods, which is a design practice that sets you up for adding more functionality through the remainder of this example. For an in-depth walkthrough of the basic process of setting up an isolate, see the basic ports example.
+このステップでは、基本的なアイソレートのセットアッププロセスを完了します。これは前の例とほぼ完全に関連しており、新しい概念はありません。コードがより多くのメソッドに分割されているという若干の変更がありますが、これはこの例の残りの部分を通してより多くの機能を追加するための設計手法です。アイソレートを設定する基本的なプロセスの詳細なウォークスルーについては、基本的なポートの例を参照してください。
 
-First, create the private constructor that is returned from the Worker.spawn method. In the constructor body, add a listener to the receive port used by the main isolate, and pass an as-yet undefined method to that listener called _handleResponsesFromIsolate.
+まず、Worker.spawn メソッドから返される private コンストラクタを作成します。コンストラクタ本体で、メインのアイソレートが使用する受信ポートにリスナーを追加し、そのリスナーに _handleResponsesFromIsolate という未定義のメソッドを渡します。
 
 ```dart
 class Worker {
@@ -425,11 +478,11 @@ class Worker {
 }
 ```
 
-Next, add the code to _startRemoteIsolate that is responsible for initializing the ports on the worker isolate. Recall that this method was passed to Isolate.spawn in the Worker.spawn method, and it will be passed the main isolate’s SendPort as an argument.
+次に、ワーカーアイソレート上のポートを初期化するコードを _startRemoteIsolate に追加します。このメソッドはWorker.spawnメソッドでIsolate.spawnに渡され、引数としてメインアイソレートのSendPortが渡されることを思い出してください。
 
-Create a new ReceivePort.
-Send that port’s SendPort back to the main isolate.
-Call a new method called _handleCommandsToIsolate, and pass both the new ReceivePort and SendPort from the main isolate as arguments.
+- 新しいReceivePortを作成する。
+- そのポートのSendPortをメインアイソレートに送り返す。
+- handleCommandsToIsolateという新しいメソッドを呼び出し、メインアイソレートからの新しいReceivePortとSendPortの両方を引数として渡します。
 
 ```dart
 static void _startRemoteIsolate(SendPort sendPort) {
@@ -439,11 +492,11 @@ static void _startRemoteIsolate(SendPort sendPort) {
 }
 ```
 
-Next, add the _handleCommandsToIsolate method, which is responsible for receiving messages from the main isolate, decoding json on the worker isolate, and sending the decoded json back as a response.
+次に、_handleCommandsToIsolateメソッドを追加します。このメソッドは、メインアイソレートからメッセージを受け取り、ワーカーアイソレートでjsonをデコードし、デコードしたjsonをレスポンスとして送り返す役割を果たします。
 
-First, declare a listener on the worker isolate’s ReceivePort.
-Within the callback added to the listener, attempt to decode the JSON passed from the main isolate within a try/catch block. If decoding is successful, send the decoded JSON back to the main isolate.
-If there is an error, send back a RemoteError.
+- まず、ワーカーアイソレーションの ReceivePort でリスナーを宣言する。
+- リスナーに追加されたコールバック内で、try/catchブロック内でメインアイソレートから渡されたJSONのデコードを試みます。デコードに成功したら、デコードした JSON をメインアイソレートに送り返します。
+- エラーが発生した場合は、RemoteError を返します。
 
 ```dart
 static void _handleCommandsToIsolate(
@@ -459,10 +512,10 @@ static void _handleCommandsToIsolate(
 }
 ```
 
-Next, add the code for the _handleResponsesFromIsolate method.
+次に、_handleResponsesFromIsolateメソッドのコードを追加する。
 
-First, check if the message is a RemoteError, in which case you should throw that error.
-Otherwise, print the message. In future steps, you will update this code to return messages rather than print them.
+- まず、メッセージがRemoteErrorであるかどうかをチェックする。
+- そうでない場合は、メッセージを表示します。今後のステップでは、メッセージを表示するのではなく、メッセージを返すようにこのコードを更新します。
 
 ```dart
 void _handleResponsesFromIsolate(dynamic message) {
@@ -474,7 +527,7 @@ void _handleResponsesFromIsolate(dynamic message) {
 }
 ```
 
-Finally, add the parseJson method, which is a public method that allows outside code to send JSON to the worker isolate to be decoded.
+これは、外部のコードがワーカーアイソレートにJSONを送信してデコードできるようにするパブリックメソッドです。
 
 ```dart
 Future<Object?> parseJson(String message) async {
@@ -482,18 +535,19 @@ Future<Object?> parseJson(String message) async {
 }
 ```
 
-You will update this method in the next step.
+次のステップでこのメソッドを更新する。
 
-## Step 5: Handle multiple messages at the same time
+## Step 5: 複数のメッセージを同時に扱う
 
-Currently, if you rapidly send messages to the worker isolate, the isolate will send the decoded json response in the order that they complete, rather than the order that they’re sent. You have no way to determine which response corresponds to which message.
+現在のところ、worker isolate にメッセージを高速に送信すると、isolate は送信された順番ではなく、完了した順番にデコードされた json レスポンスを送信します。どのレスポンスがどのメッセージに対応するかを判断する方法はありません。
 
-In this step, you’ll fix this problem by giving each message an id, and using Completer objects to ensure that when outside code calls parseJson the response that is returned to that caller is the correct response.
+このステップでは、各メッセージに ID を与え、Completer オブジェクトを使用して、外部のコードが parseJson を呼び出したときに、その呼び出し元に返されるレスポンスが正しいレスポンスであるようにすることで、この問題を解決します。
 
-First, add two class-level properties to Worker:
+まず、Worker に 2 つのクラスレベルのプロパティを追加します：
 
-Map<int, Completer<Object?>> _activeRequests
-int _idCounter
+- `Map<int, Completer<Object?>> _activeRequests`
+- `int _idCounter`
+
 ```dart
 class Worker {
   final SendPort _commands;
@@ -502,15 +556,15 @@ class Worker {
   int _idCounter = 0;
 ```
 
-The _activeRequests map associates a message sent to the worker isolate with a Completer. The keys used in _activeRequests are taken from _idCounter, which will be increased as more messages are sent.
+_activeRequests マップは、ワーカーアイソレートに送られたメッセージと Completer を関連付けます。activeRequests で使われるキーは _idCounter から取られます。
 
-Next, update the parseJson method to create completers before it sends messages to the worker isolate.
+次に、ワーカーアイソレートにメッセージを送信する前に Completer を作成するように parseJson メソッドを更新します。
 
-First create a Completer.
-Next, increment _idCounter, so that each Completer is associated with a unique number.
-Add an entry to the _activeRequests map in which the key is the current number of _idCounter, and the completer is the value.
-Send the message to the worker isolate, along with the id. Because you can only send one value through the SendPort, wrap the id and message in a record.
-Finally, return the completer’s future, which will eventually contain the response from the worker isolate.
+- 最初に Completer を作成する。
+- 次に _idCounter をインクリメントして、各 Completer が一意な番号と関連付けられるようにする。
+- activeRequests マップにエントリを追加する。キーは _idCounter の現在の番号で、Completer はその値である。
+- ワーカーアイソレートに、id とともにメッセージを送信します。SendPort を通じて送信できる値は 1 つだけなので、id とメッセージを 1 つのレコードにまとめます。
+- 最後に、completer の future を返します。この future には最終的にワーカーアイソレートからの応答が含まれます。
 
 ```dart
 Future<Object?> parseJson(String message) async {
@@ -522,11 +576,11 @@ Future<Object?> parseJson(String message) async {
 }
 ```
 
-You also need to update _handleResponsesFromIsolate and _handleCommandsToIsolate to handle this system.
+また、このシステムを処理するために、_handleResponsesFromIsolateと_handleCommandsToIsolateを更新する必要がある。
 
-In _handleCommandsToIsolate, you need to account for the message being a record with two values, rather than just the json text. Do so by destructuring the values from message.
+handleCommandsToIsolateでは、メッセージが単なるjsonテキストではなく、2つの値を持つレコードであることを考慮する必要があります。そのためには、messageから値を再構築します。
 
-Then, after decoding the json, update the call to sendPort.send to pass both the id and the decoded json back to the main isolate, again using a record.
+次に、jsonをデコードした後、sendPort.sendの呼び出しを更新して、idとデコードされたjsonの両方をメインのアイソレートに渡すようにします。
 
 ```dart
 static void _handleCommandsToIsolate(
@@ -543,11 +597,11 @@ static void _handleCommandsToIsolate(
 }
 ```
 
-Finally, update the _handleResponsesFromIsolate.
+最後に、_handleResponsesFromIsolateを更新する。
 
-First, destructure the id and the response from the message argument again.
-Then, remove the completer that corresponds to this request from the _activeRequests map.
-Lastly, rather than throwing an error or printing the decoded json, complete the completer, passing in the response. When this completes, the response will be returned to the code that called parseJson on the main isolate.
+- まず、メッセージ引数からidとresponseを再構築します。
+- 次に、_activeRequestsマップからこのリクエストに対応するcompleterを削除する。
+- 最後に、エラーをスローしたりデコードされたjsonを表示したりするのではなく、レスポンスを渡してcompleterを完了させる。これが完了すると、メインアイソレートで parseJson を呼び出したコードにレスポンスが返されます。
 
 ```dart
 void _handleResponsesFromIsolate(dynamic message) {
@@ -562,15 +616,15 @@ void _handleResponsesFromIsolate(dynamic message) {
 }
 ```
 
-## Step 6: Add functionality to close the ports
+## Step 6: ポートを閉じる機能を追加
 
-When the isolate is no longer being used by your code, you should close the ports on the main isolate and the worker isolate.
+アイソレートがコードによって使用されなくなったら、メインアイソレートとワーカーアイソレートのポートを閉じる必要があります。
 
-First, add a class-level boolean that tracks if the ports are closed.
-Then, add the Worker.close method. Within this method:
-Update _closed to be true.
-Send a final message to the worker isolate. This message is a String that reads “shutdown”, but it could be any object you’d like. You will use it in the next code snippet.
-Finally, check if _activeRequests is empty. If it is, close down the main isolate’s ReceivePort named _responses.
+- まず、ポートが閉じられているかどうかを追跡するクラスレベルのブール値を追加する。
+- 次に、Worker.closeメソッドを追加します。このメソッド内で
+  - closedをtrueに更新する。
+  - Worker アイソレートに最終メッセージを送信します。このメッセージは、"shutdown" という文字列ですが、どんなオブジェクトでもかまいません。次のコードスニペットで使用します。
+- 最後に、_activeRequests が空かどうかをチェックします。空であれば、_responsesという名前のメインアイソレーションのReceivePortを閉じます。
 
 ```dart
 class Worker {
@@ -586,7 +640,7 @@ class Worker {
   }
 ```
 
-Next, you need to handle the “shutdown” message in the worker isolate. Add the following code to the _handleCommandsToIsolate method. This code will check if the message is a String that reads “shutdown”. If it is, it will close the worker isolate’s ReceivePort, and return.
+- 次に、ワーカーのアイソレートで "shutdown" メッセージを処理する必要があります。以下のコードを _handleCommandsToIsolate メソッドに追加します。このコードは、メッセージが "shutdown" と読める String かどうかをチェックします。もしそうなら、ワーカーアイソレートの ReceivePort を閉じて、リターンします。
 
 ```dart
 static void _handleCommandsToIsolate(
@@ -610,7 +664,7 @@ static void _handleCommandsToIsolate(
 }
 ```
 
-Finally, you should add code to check if the ports are closed before trying to send messages. Add one line in the Worker.parseJson method.
+- 最後に、メッセージを送信しようとする前に、ポートが閉じているかどうかをチェックするコードを追加する。Worker.parseJsonメソッドに1行追加する。
 
 ```dart
 Future<Object?> parseJson(String message) async {
@@ -623,6 +677,114 @@ Future<Object?> parseJson(String message) async {
 }
 ```
 
-## Complete example
+## 完全な例
 
-Expand here to see the full example
+```dart
+import 'dart:async';
+import 'dart:convert';
+import 'dart:isolate';
+
+void main() async {
+  final worker = await Worker.spawn();
+  print(await worker.parseJson('{"key":"value"}'));
+  print(await worker.parseJson('"banana"'));
+  print(await worker.parseJson('[true, false, null, 1, "string"]'));
+  print(
+      await Future.wait([worker.parseJson('"yes"'), worker.parseJson('"no"')]));
+  worker.close();
+}
+
+class Worker {
+  final SendPort _commands;
+  final ReceivePort _responses;
+  final Map<int, Completer<Object?>> _activeRequests = {};
+  int _idCounter = 0;
+  bool _closed = false;
+
+  Future<Object?> parseJson(String message) async {
+    if (_closed) throw StateError('Closed');
+    final completer = Completer<Object?>.sync();
+    final id = _idCounter++;
+    _activeRequests[id] = completer;
+    _commands.send((id, message));
+    return await completer.future;
+  }
+
+  static Future<Worker> spawn() async {
+    // Create a receive port and add its initial message handler
+    final initPort = RawReceivePort();
+    final connection = Completer<(ReceivePort, SendPort)>.sync();
+    initPort.handler = (initialMessage) {
+      final commandPort = initialMessage as SendPort;
+      connection.complete((
+        ReceivePort.fromRawReceivePort(initPort),
+        commandPort,
+      ));
+    };
+
+    // Spawn the isolate.
+    try {
+      await Isolate.spawn(_startRemoteIsolate, (initPort.sendPort));
+    } on Object {
+      initPort.close();
+      rethrow;
+    }
+
+    final (ReceivePort receivePort, SendPort sendPort) =
+        await connection.future;
+
+    return Worker._(receivePort, sendPort);
+  }
+
+  Worker._(this._responses, this._commands) {
+    _responses.listen(_handleResponsesFromIsolate);
+  }
+
+  void _handleResponsesFromIsolate(dynamic message) {
+    final (int id, Object? response) = message as (int, Object?);
+    final completer = _activeRequests.remove(id)!;
+
+    if (response is RemoteError) {
+      completer.completeError(response);
+    } else {
+      completer.complete(response);
+    }
+
+    if (_closed && _activeRequests.isEmpty) _responses.close();
+  }
+
+  static void _handleCommandsToIsolate(
+    ReceivePort receivePort,
+    SendPort sendPort,
+  ) {
+    receivePort.listen((message) {
+      if (message == 'shutdown') {
+        receivePort.close();
+        return;
+      }
+      final (int id, String jsonText) = message as (int, String);
+      try {
+        final jsonData = jsonDecode(jsonText);
+        sendPort.send((id, jsonData));
+      } catch (e) {
+        sendPort.send((id, RemoteError(e.toString(), '')));
+      }
+    });
+  }
+
+  static void _startRemoteIsolate(SendPort sendPort) {
+    final receivePort = ReceivePort();
+    sendPort.send(receivePort.sendPort);
+    _handleCommandsToIsolate(receivePort, sendPort);
+  }
+
+  void close() {
+    if (!_closed) {
+      _closed = true;
+      _commands.send('shutdown');
+      if (_activeRequests.isEmpty) _responses.close();
+      print('--- port closed --- ');
+    }
+  }
+}
+```

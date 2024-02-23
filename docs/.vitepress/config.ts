@@ -589,10 +589,10 @@ export default {
                             collapsed: false,
                             items: [
                                 {text: '健全なNull安全', link: '/translation/dart/language/null_safety/sound_null_safety'},
-                                {text: 'Null安全への移行', link: '/translation/dart/language/null_safety/sound_null_safety'},
-                                {text: 'Null安全を理解する', link: '/translation/dart/language/null_safety/sound_null_safety'},
-                                {text: '不健全なNull安全', link: '/translation/dart/language/null_safety/sound_null_safety'},
-                                {text: 'FAQ', link: '/translation/dart/language/null_safety/sound_null_safety'},
+                                {text: 'Null安全への移行', link: '/translation/dart/language/null_safety/migrating_to_null_safety'},
+                                {text: 'Null安全を理解する', link: '/translation/dart/language/null_safety/understanding_null_safety'},
+                                {text: '不健全なNull安全', link: '/translation/dart/language/null_safety/unsound_null_safety'},
+                                {text: 'FAQ', link: '/translation/dart/language/null_safety/faq'},
                             ]
                         },
                     ]
