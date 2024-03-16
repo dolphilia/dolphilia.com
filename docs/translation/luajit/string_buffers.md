@@ -263,11 +263,11 @@ local function decode(str)
 end
 ```
 
-### Streaming Serialization
+### ストリーミングシリアライズ
 
-In some contexts, it's desirable to do piecewise serialization of large datasets, also known as streaming.
+特定の文脈では、大規模なデータセットの断片的なシリアライズ、すなわちストリーミングを行うことが望ましい場合があります。
 
-This serialization format can be safely concatenated and supports streaming. Multiple encodings can simply be appended to a buffer and later decoded individually:
+このシリアライズフォーマットは、安全に連結でき、ストリーミングをサポートしています。複数のエンコーディングをバッファに単純に追加し、後で個別にデコードすることができます：
 
 ```lua
 local buf = buffer.new()
@@ -277,28 +277,28 @@ local copy1 = buf:decode()
 local copy2 = buf:decode()
 ```
 
-Here's how to iterate over a stream:
+ストリームを反復処理する方法は以下の通りです：
 
 ```lua
 while #buf ~= 0 do
   local obj = buf:decode()
-  -- Do something with obj.
+  -- 何かしらの処理をobjで行う。
 end
 ```
 
-Since the serialization format doesn't prepend a length to its encoding, network applications may need to transmit the length, too.
+シリアライズフォーマットはエンコーディングに長さを前置しないため、ネットワークアプリケーションでは長さも伝送する必要があるかもしれません。
 
-### Serialization Format Specification
+### シリアライズフォーマットの仕様
 
-This serialization format is designed for internal use by LuaJIT applications. Serialized data is upwards-compatible and portable across all supported LuaJIT platforms.
+このシリアライズフォーマットは、LuaJITアプリケーションの内部使用を目的として設計されています。シリアライズされたデータは上位互換性があり、サポートされているすべてのLuaJITプラットフォームで移植可能です。
 
-It's an 8-bit binary format and not human-readable. It uses e.g. embedded zeroes and stores embedded Lua string objects unmodified, which are 8-bit-clean, too. Encoded data can be safely concatenated for streaming and later decoded one top-level object at a time.
+これは8ビットのバイナリフォーマットであり、人が読める形式ではありません。たとえば、組み込みのゼロや、8ビットクリーンである組み込みLua文字列オブジェクトを変更せずに保存します。エンコードされたデータはストリーミング用に安全に連結され、後で一度に1つのトップレベルオブジェクトをデコードすることができます。
 
-The encoding is reasonably compact, but tuned for maximum performance, not for minimum space usage. It compresses well with any of the common byte-oriented data compression algorithms.
+エンコーディングは比較的コンパクトですが、最小のスペース使用ではなく、最大のパフォーマンスにチューニングされています。一般的なバイト指向データ圧縮アルゴリズムでうまく圧縮できます。
 
-Although documented here for reference, this format is explicitly not intended to be a 'public standard' for structured data interchange across computer languages (like JSON or MessagePack). Please do not use it as such.
+ここで参照用に文書化されていますが、このフォーマットは明示的に、コンピュータ言語間で構造化されたデータ交換のための「公開標準」（JSONやMessagePackのような）として意図されていません。そのように使用しないでください。
 
-The specification is given below as a context-free grammar with a top-level object as the starting point. Alternatives are separated by the | symbol and * indicates repeats. Grouping is implicit or indicated by {…}. Terminals are either plain hex numbers, encoded as bytes, or have a .format suffix.
+以下は、トップレベルオブジェクトを開始点とする、文脈自由文法による仕様です。選択肢は`|`記号で区切られ、`*`は繰り返しを示します。グループ化は暗黙的または`{…}`で示されます。終端記号は、バイトとしてエンコードされたプレーンな16進数、または`.format`接尾辞を持ちます。
 
 ```txt
 object    → nil | false | true
@@ -311,62 +311,64 @@ nil       → 0x00
 false     → 0x01
 true      → 0x02
 
-null      → 0x03                            // NULL lightuserdata
-lightud32 → 0x04 data.I                   // 32 bit lightuserdata
-lightud64 → 0x05 data.L                   // 64 bit lightuserdata
+null      → 0x03                            // NULLの軽量ユーザーデータ
+lightud32 → 0x04 data.I                   // 32ビットの軽量ユーザーデータ
+lightud64 → 0x05 data.L                   // 64ビットの軽量ユーザーデータ
 
 int       → 0x06 int.I                                 // int32_t
 num       → 0x07 double.L
 
-tab       → 0x08                                   // Empty table
-          | 0x09 h.U h*{object object}          // Key/value hash
-          | 0x0a a.U a*object                    // 0-based array
-          | 0x0b a.U a*object h.U h*{object object}      // Mixed
-          | 0x0c a.U (a-1)*object                // 1-based array
-          | 0x0d a.U (a-1)*object h.U h*{object object}  // Mixed
-tab_mt    → 0x0e (index-1).U tab          // Metatable dict entry
+tab       → 0x08                                   // 空のテーブル
+          | 0x09 h.U h*{object object}          // キー/値ハッシュ
+          | 0x0a a.U a*object                    // 0基準の配列
+          | 0x0b a.U a*object h.U h*{object object}      // 混合
+          | 0x0c a.U (a-1)*object                // 1基準の配列
+          | 0x0d a.U (a-1)*object h.U h*{object object}  // 混合
+tab_mt    → 0x0e (index-1).U tab          // メタテーブル辞書エントリ
 
 int64     → 0x10 int.L                             // FFI int64_t
 uint64    → 0x11 uint.L                           // FFI uint64_t
-complex   → 0x12 re.L im.L                         // FFI complex
+complex   → 0x12 re.L im.L                         // FFI複素数
 
 string    → (0x20+len).U len*char.B
-          | 0x0f (index-1).U                 // String dict entry
+          | 0x0f (index-1).U                 // 文字列辞書エントリ
 
-.B = 8 bit
-.I = 32 bit little-endian
-.L = 64 bit little-endian
-.U = prefix-encoded 32 bit unsigned number n:
+.B = 8ビット
+.I = 32ビットリトルエンディアン
+.L = 64ビットリトルエンディアン
+.U = プレフィックスエンコードされた32ビット符号なし数n:
      0x00..0xdf   → n.B
      0xe0..0x1fdf → (0xe0|(((n-0xe0)>>8)&0x1f)).B ((n-0xe0)&0xff).B
    0x1fe0..       → 0xff n.I
 ```
 
-## Error handling
+## エラーハンドリング
 
-Many of the buffer methods can throw an error. Out-of-memory or usage errors are best caught with an outer wrapper for larger parts of code. There's not much one can do after that, anyway.
+多くのバッファメソッドはエラーを投げる可能性があります。メモリ不足や使用上のエラーは、コードの大きな部分を外側でラップすることで最もよく捕捉されます。とにかく、その後にできることはあまりありません。
 
-OTOH, you may want to catch some errors individually. Buffer methods need to receive the buffer object as the first argument. The Lua colon-syntax obj:method() does that implicitly. But to wrap a method with pcall(), the arguments need to be passed like this:
+一方で、いくつかのエラーを個別にキャッチしたい場合があります。バッファメソッドは、最初の引数としてバッファオブジェクトを受け取る必要があります。Luaのコロン構文`obj:method()`はそれを暗黙的に行います。しかし、`pcall()`でメソッドをラップするには、引数を次のように渡す必要があります：
 
 ```lua
 local ok, err = pcall(buf.encode, buf, obj)
 if not ok then
-  -- Handle error in err.
+  -- errでエラーを処理する。
 end
 ```
 
-## FFI caveats
+## FFIの注意点
 
-The string buffer library has been designed to work well together with the FFI library. But due to the low-level nature of the FFI library, some care needs to be taken:
+文字列バッファライブラリは、FFIライブラリと一緒にうまく機能するように設計されています。しかし、FFIライブラリの低レベルの性質上、注意が必要です：
 
-First, please remember that FFI pointers are zero-indexed. The space returned by buf:reserve() and buf:ref() starts at the returned pointer and ends before len bytes after that.
+まず、FFIポインターが0からインデックス付けされていることを覚えておいてください。`buf:reserve()`や`buf:ref()`によって返されるスペースは、返されたポインターから始まり、その後のlenバイトの前で終わります。
 
-I.e. the first valid index is `ptr[0]` and the last valid index is `ptr[len-1]`. If the returned length is zero, there's no valid index at all. The returned pointer may even be NULL.
+つまり、最初の有効なインデックスは`ptr[0]`であり、最後の有効なインデックスは`ptr[len-1]`です。返された長さがゼロの場合、有効なインデックスはまったくありません。返されたポインターはNULLである可能性もあります。
 
-The space pointed to by the returned pointer is only valid as long as the buffer is not modified in any way (neither append, nor consume, nor reset, etc.). The pointer is also not a GC anchor for the buffer object itself.
+返されたポインターが指すスペースは、バッファがいかなる方法で（追加、消費、リセットなど）変更されない限り、有効です。ポインターはバッファオブジェクト自体のGCアンカーでもありません。
 
-Buffer data is only guaranteed to be byte-aligned. Casting the returned pointer to a data type with higher alignment may cause unaligned accesses. It depends on the CPU architecture whether this is allowed or not (it's always OK on x86/x64 and mostly OK on other modern architectures).
+バッファデータはバイト単位で整列されていることのみが保証されています。返されたポインターをより高いアライメントのデータ型にキャストすると、アライメントされていないアクセスが発生する可能性があります。これが許可されているかどうかはCPUアーキテクチャによります（x86/x64では常にOK、その他の現代的なアーキテクチャでもほとんどOKです）。
 
-FFI pointers or references do not count as GC anchors for an underlying object. E.g. an array allocated with ffi.new() is anchored by buf:set(array, len), but not by buf:set(array+offset, len). The addition of the offset creates a new pointer, even when the offset is zero. In this case, you need to make sure there's still a reference to the original array as long as its contents are in use by the buffer.
+FFIポインターや参照は、基礎となるオブジェクトのGCアンカーとしてカウントされません。例えば、`ffi.new()`で割り当てられた配列は`buf:set(array, len)`によってアンカーされますが、`buf:set(array+offset, len)`によってはアンカーされません。オフセットの追加により新しいポインターが作成されますが、オフセットがゼロであっても同じです。この場合、バッファがその内容を使用している限り、元の配列への参照が存在することを確認する必要があります。
 
-Even though each LuaJIT VM instance is single-threaded (but you can create multiple VMs), FFI data structures can be accessed concurrently. Be careful when reading/writing FFI cdata from/to buffers to avoid concurrent accesses or modifications. In particular, the memory referenced by buf:set(cdata, len) must not be modified while buffer readers are working on it. Shared, but read-only memory mappings of files are OK, but only if the file does not change.
+LuaJIT VMインスタンスはシングルスレッドですが（複数のVMを作成できます）、FFIデータ構造には同時にアクセスできます。バッファに対してFFI
+
+ cdataを読み書きする際には、同時アクセスや変更を避けるために注意してください。特に、`buf:set(cdata, len)`によって参照されるメモリは、バッファリーダーがそれを使用している間、変更されてはなりません。ファイルの共有された読み取り専用メモリマッピングはOKですが、ファイルが変更されない場合に限ります。

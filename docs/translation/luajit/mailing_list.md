@@ -1,30 +1,37 @@
-# LuaJIT Mailing List
+# LuaJIT メーリングリスト
 
-The LuaJIT mailing list is dedicated to announcements, discussions, bug reports or feature requests for LuaJIT, the just-in-time compiler for Lua.
-The mailing list is provided to the LuaJIT community, courtesy of freelists.org. Thank you very much!
-Subscribing
+LuaJIT メーリングリストは、LuaのジャストインタイムコンパイラであるLuaJITのアナウンス、議論、バグ報告、機能要求に特化しています。
 
-The LuaJIT mailing list is open to anyone, but only subscribers can post messages to the list. The mailing list page at freelists.org offers options to subscribe and unsubscribe.
-Important note: you must confirm the subscription to your email address by clicking on the link in the confirmation mail. Otherwise you won't receive any messages from the list!
-You can also set some options for your mailing list subscription.
-Privacy Policy
+このメーリングリストは、freelists.orgの好意によりLuaJITコミュニティに提供されています。ありがとうございます！
 
-The LuaJIT mailing list is operated by FreeLists, a Service of Avenir Technologies, LLC. Please check their Privacy Policy before subscribing.
-Archives
+## 登録
 
-An archive of all previous postings to the list can be found at the LuaJIT mailing list archive at freelists.org.
-Mailing List Policy
+LuaJIT メーリングリストは誰でも参加できますが、リストにメッセージを投稿できるのは購読者のみです。freelists.orgのメーリングリストページでは、登録と解除のオプションが提供されています。
 
-This list is about LuaJIT only. Please use the Lua mailing list for topics that are more concerned with Lua (the language) or Lua (the interpreter from PUC Rio) and have little to do with LuaJIT itself.
-Please, do not cross-post to the Lua mailing list or other mailing lists — this never works out. Decide for one or the other.
-Please search the LuaJIT mailing list archives before posting a question to the list.
-If you're asking a question on the list, please check the list for answers, too. And be ready to provide more information, if needed.
-Please do not mail an extra copy of your postings to individual subscribers.
-If you want to start a new thread, do not reply to an unrelated message — send a new message to the mailing list address.
-Full quoting, excessive quoting and TOP-posting (answer at top, question below) are not welcome.
-Please keep your signatures short, as far as possible. Sadly, some companies attach excessive signatures without your consent. Consider posting from a private mail account instead.
-Attachments to your postings are allowed, but should be kept as small as possible. Code snippets, examples, error messages and excerpts from debug dumps are all appropriate as attachments or inline. Huge debug dumps, images etc. should be stored somewhere else and referred to via their URL.
-Do not send private info, passwords or core dumps to the mailing list.
-This mailing list has a strict NO SPAM policy — violators will be banned ASAP.
-Unproductive discussions about issues that have been rehashed many times on the Lua mailing list are off-topic: e.g. Lua syntax 'improvements', one-based indexing, the behavior of the length operator, global-by-default or (gasp) flame wars about open source licenses. Subscribers who repeatedly start or engage in off-topic discussions may be banned from the list.
-Announcements of new releases, new modules or bindings should be prefixed with [ANN] in the subject of the posting.
+重要な注意：リストからメッセージを受信するには、確認メールのリンクをクリックしてメールアドレスの登録を確認する必要があります。そうしないと、リストからのメッセージを受け取ることはできません！
+
+メーリングリストの購読に関するいくつかのオプションを設定することもできます。
+
+## プライバシーポリシー
+
+LuaJIT メーリングリストは FreeLists（Avenir Technologies, LLC のサービス）によって運営されています。登録する前に、彼らのプライバシーポリシーを確認してください。
+
+## アーカイブ
+
+リストへの以前の投稿のアーカイブは、freelists.org の LuaJIT メーリングリストアーカイブで見ることができます。
+
+## メーリングリストポリシー
+
+- このリストはLuaJITのみに関するものです。Lua（言語）やPUC RioのLua（インタプリタ）に関するトピックやLuaJIT自体とあまり関係のない内容については、Luaのメーリングリストを使用してください。
+- Luaのメーリングリストや他のメーリングリストにクロスポストしないでください — これはうまくいきません。一方を選択してください。
+- リストに質問を投稿する前に、LuaJIT メーリングリストのアーカイブを検索してください。
+- リストで質問をする場合は、リストでの回答も確認してください。必要に応じて、より多くの情報を提供する準備をしてください。
+- 個々の購読者に投稿のコピーをメールで送らないでください。
+- 新しいスレッドを開始する場合は、関連性のないメッセージに返信せず、メーリングリストのアドレスに新しいメッセージを送ってください。
+- 全文引用、過剰な引用、およびTOP-posting（質問の上に回答）は歓迎されません。
+- できるだけ署名は短く保ってください。残念ながら、一部の企業はあなたの同意なしに過剰な署名を付けてしまいます。代わりにプライベートメールアカウントから投稿を検討してください。
+- 投稿に添付ファイルを付けることは許可されていますが、できるだけ小さく保つべきです。コードスニペット、例、エラーメッセージ、デバッグダンプからの抜粋などは、添付ファイルまたはインラインとして適切です。大きなデバッグダンプ、画像などは他の場所に保存し、そのURLを介して参照してください。
+- メーリングリストにプライベート情報、パスワード、コアダンプを送信しないでください。
+- このメーリングリストは厳格なNO SPAMポリシーを持っています — 違反者はできるだけ早く禁止されます。
+- Luaメーリングリストで何度も反芻された問題についての非生産的な議論はオフトピックです：例えば、Luaの構文「改善」、1ベースのインデックス、長さ演算子の振る舞い、デフォルトのグローバル、または（ため息）オープンソースライセンスに関する炎上議論。オフトピックの議論を繰り返し開始または参加する購読者はリストから禁止されることがあります。
+- 新リリース、新モジュール、またはバインディングのアナウンスは、投稿の件名に `[ANN]` というプレフィックスを付けるべきです。

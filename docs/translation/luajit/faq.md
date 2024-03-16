@@ -1,38 +1,46 @@
-# Frequently Asked Questions (FAQ)
+# よくある質問 (FAQ)
 
-Q: Where can I learn more about LuaJIT and Lua?
-The LuaJIT mailing list focuses on topics related to LuaJIT.
-News about Lua itself can be found at the Lua mailing list. The mailing list archives are worth checking out for older postings about LuaJIT.
-The main Lua.org site has complete documentation of the language and links to books and papers about Lua.
-The community-managed Lua Wiki has information about diverse topics.
-Q: Where can I learn more about the compiler technology used by LuaJIT?
-Please use the following Google Scholar searches to find relevant papers:
-Search for: Trace Compiler
-Search for: JIT Compiler
-Search for: Dynamic Language Optimizations
-Search for: SSA Form
-Search for: Linear Scan Register Allocation
-Here is a list of the innovative features in LuaJIT.
-And, you know, reading the source is of course the only way to enlightenment.
-Q: Sometimes Ctrl-C fails to stop my Lua program. Why?
-The interrupt signal handler sets a Lua debug hook. But this is ignored by compiled code. If your program is running in a tight loop and never falls back to the interpreter, the debug hook never runs and can't throw the "interrupted!" error.
-You have to press Ctrl-C twice to stop your program. That's similar to when it's stuck running inside a C function under the Lua interpreter.
-Q: Table iteration with pairs() does not result in the same order?
-The order of table iteration is explicitly undefined by the Lua language standard.
-Different Lua implementations or versions may use different orders for otherwise identical tables. Different ways of constructing a table may result in different orders, too.
-Due to improved VM security, LuaJIT 2.1 may even use a different order on separate VM invocations or when string keys are newly interned.
+::: tip Q: LuaJITとLuaについてもっと学ぶにはどこで情報を得られますか？
+- LuaJITに関連するトピックに焦点を当てたLuaJITメーリングリストがあります。
+- Lua自体に関するニュースはLuaメーリングリストで見つけることができます。メーリングリストのアーカイブは、LuaJITに関する古い投稿をチェックするのに価値があります。
+- Lua.orgの公式サイトには言語の完全なドキュメンテーションとLuaに関する書籍や論文へのリンクがあります。
+- コミュニティ管理のLua Wikiには多様なトピックに関する情報があります。
+:::
 
-If your program relies on a deterministic order, it has a bug. Rewrite it, so it doesn't rely on the key order. Or sort the table keys, if you must.
-Q: Can Lua code be safely sandboxed?
-Maybe for an extremely restricted subset of Lua and if you relentlessly scrutinize every single interface function you offer to the untrusted code.
-Although Lua provides some sandboxing functionality (setfenv(), hooks), it's very hard to get this right even for the Lua core libraries. Of course, you'll need to inspect any extension library, too. And there are libraries that are inherently unsafe, e.g. the FFI library.
-More reading material at the Lua Wiki and Wikipedia.
+::: tip Q: LuaJITで使用されているコンパイラ技術についてもっと学ぶにはどこで情報を得られますか？
+以下のGoogle Scholar検索を使用して、関連する論文を見つけてください:
 
-Relatedly, loading untrusted bytecode is not safe!
-It's trivial to crash the Lua or LuaJIT VM with maliciously crafted bytecode. This is well known and there's no bytecode verification on purpose, so please don't report a bug about it. Check the mode parameter for the load*() functions to disable loading of bytecode.
+- 検索キーワード: Trace Compiler
+- 検索キーワード: JIT Compiler
+- 検索キーワード: Dynamic Language Optimizations
+- 検索キーワード: SSA Form
+- 検索キーワード: Linear Scan Register Allocation
 
-In general, the only promising approach is to sandbox Lua code at the process level and not the VM level.
-Q: Lua runs everywhere. Why doesn't LuaJIT support my CPU?
-Because it's a compiler — it needs to generate native machine code. This means the code generator must be ported to each architecture. And the fast interpreter is written in assembler and must be ported, too. This is quite an undertaking.
-The install documentation shows the supported architectures.
-Other architectures may follow based on sufficient user demand and market-relevance of the architecture. Sponsoring is required to develop the port itself, to integrate it and to continuously maintain it in the actively developed branches.
+ここにLuaJITの革新的な特徴のリストがあります。
+そしてもちろん、ソースコードを読むことが啓蒙への唯一の方法です。
+:::
+
+::: tip Q: 時々Ctrl-CがLuaプログラムを停止させないのはなぜですか？
+割り込みシグナルハンドラはLuaのデバッグフックを設定します。しかし、これはコンパイルされたコードでは無視されます。プログラムがタイトなループで実行され、インタプリタに戻らない場合、デバッグフックは実行されず、「中断されました！」エラーを投げることができません。
+プログラムを停止するには、Ctrl-Cを二回押す必要があります。これは、Luaインタプリタの下でC関数内で実行がスタックしている場合と似ています。
+:::
+
+::: tip Q: `pairs()` を使ったテーブルの反復処理で同じ順序にならないのはなぜですか？
+Lua言語標準では、テーブルの反復処理の順序は明示的に未定義です。異なるLua実装やバージョンは、同一のテーブルに対して異なる順序を使用することがあります。テーブルの構築方法が異なると、順序も異なる結果になることがあります。改善されたVMのセキュリティのために、LuaJIT 2.1は、別のVM呼び出しであったり、文字列キーが新たにインターンされたときに異なる順序を使用することがあります。
+
+プログラムが決定的な順序に依存している場合、それはバグです。キーの順序に依存しないようにプログラムを書き直すか、必要であればテーブルのキーをソートしてください。
+:::
+
+::: tip Q: Luaコードを安全にサンドボックス化できますか？
+極めて制限されたLuaのサブセットについて、そして提供するすべてのインターフェース関数を徹底的に調査する場合に限り、多分可能です。Luaはいくつかのサンドボックス機能（setfenv()、フックなど）を提供していますが、Luaのコアライブラリでさえ、これを正しく実装することは非常に難しいです。もちろん、拡張ライブラリも検査する必要があります。そして、FFIライブラリのように本質的に安全ではないライブラリもあります。Lua WikiやWikipediaでさらに読むことができます。
+
+関連して、信用できないバイトコードをロードすることは安全ではありません！悪意を持って作られたバイトコードでLuaまたはLuaJIT VMを簡単にクラッシュさせることができます。これはよく知られている事実であり、意図的にバイトコードの検証が行われていないので、バグとして報告しないでください。バイトコードのロードを無効にするために、load*()関数のmodeパラメータをチェックしてください。
+
+一般的に、唯一有望なアプローチは、VMレベルではなくプロセスレベルでLuaコードをサンドボックス化することです。
+:::
+
+::: tip Q: Luaはどこでも動作します。なぜLuaJITは私のCPUをサポートしていないのですか？
+コンパイラだからです — ネイティブマシンコードを生成する必要があります。これは、コード生成器を各アーキテクチャに移植する必要があることを意味します。また、高速インタープリタはアセンブラで書かれており、これも移植する必要があります。これはかなりの取り組みです。
+インストールのドキュメントには、サポートされるアーキテクチャが示されています。
+他のアーキテクチャのサポートは、十分なユーザー需要とアーキテクチャの市場関連性に基づいて追加されるかもしれません。移植自体を開発し、統合し、積極的に開発されているブランチで継続的にメンテナンスするためには、資金提供が必要です。
+:::

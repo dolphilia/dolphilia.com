@@ -1,168 +1,168 @@
-# Profiler
+# プロファイラ
 
-LuaJIT has an integrated statistical profiler with very low overhead. It allows sampling the currently executing stack and other parameters in regular intervals.
+LuaJITには非常に低いオーバーヘッドを持つ統計的プロファイラが統合されています。これにより、定期的な間隔で現在実行中のスタックや他のパラメータをサンプリングすることができます。
 
-- The integrated profiler can be accessed from three levels:
-The bundled high-level profiler, invoked by the -jp command line option.
-- A low-level Lua API to control the profiler.
-- A low-level C API to control the profiler.
+- 統合プロファイラは三つのレベルからアクセスできます：
+  - -jpコマンドラインオプションによって呼び出されるバンドルされた高レベルプロファイラ。
+  - プロファイラを制御するための低レベルLua API。
+  - プロファイラを制御するための低レベルC API。
 
-## High-Level Profiler
+## 高レベルプロファイラ
 
-The bundled high-level profiler offers basic profiling functionality. It generates simple textual summaries or source code annotations. It can be accessed with the -jp command line option or from Lua code by loading the underlying jit.p module.
+バンドルされた高レベルプロファイラは基本的なプロファイリング機能を提供します。簡単なテキストの要約やソースコードの注釈を生成します。-jpコマンドラインオプションまたはLuaコードからjit.pモジュールをロードすることでアクセスできます。
 
-To cut to the chase — run this to get a CPU usage profile by function name:
+要するに、関数名によるCPU使用率のプロファイルを取得するにはこれを実行します：
 
 ```sh
 luajit -jp myapp.lua
 ```
 
-It's not a stated goal of the bundled profiler to add every possible option or to cater for special profiling needs. The low-level profiler APIs are documented below. They may be used by third-party authors to implement advanced functionality, e.g. IDE integration or graphical profilers.
+バンドルされたプロファイラの明確な目標は、あらゆる可能なオプションを追加したり、特別なプロファイリングニーズに対応したりすることではありません。低レベルプロファイラAPIは以下で説明されています。これらはサードパーティの著者によって高度な機能（例えば、IDEの統合やグラフィカルプロファイラ）を実装するために使用されるかもしれません。
 
-::: info Note
-Sampling works for both interpreted and JIT-compiled code. The results for JIT-compiled code may sometimes be surprising. LuaJIT heavily optimizes and inlines Lua code — there's no simple one-to-one correspondence between source code lines and the sampled machine code.
+::: info 注意
+サンプリングは、解釈されたコードとJITコンパイルされたコードの両方で機能します。JITコンパイルされたコードの結果は時々驚くべきものになることがあります。LuaJITはLuaコードを大幅に最適化してインライン化します — ソースコードの行とサンプル化されたマシンコードとの間に単純な一対一の対応はありません。
 :::
 
 #### `-jp=[options[,output]]`
 
-The -jp command line option starts the high-level profiler. When the application run by the command line terminates, the profiler stops and writes the results to stdout or to the specified output file.
+-jpコマンドラインオプションは高レベルプロファイラを起動します。コマンドラインで実行されたアプリケーションが終了すると、プロファイラは停止し、結果をstdoutまたは指定された出力ファイルに書き出します。
 
-The options argument specifies how the profiling is to be performed:
+プロファイリングの方法を指定するためのオプション引数について:
 
-- f — Stack dump: function name, otherwise module:line. This is the default mode.
-- F — Stack dump: ditto, but dump module:name.
-- l — Stack dump: module:line.
-- `<number>` — stack dump depth (callee ← caller). Default: 1.
-- `-<number>` — Inverse stack dump depth (caller → callee).
-- s — Split stack dump after first stack level. Implies depth ≥ 2 or depth ≤ -2.
-- p — Show full path for module names.
-- v — Show VM states.
-- z — Show zones.
-- r — Show raw sample counts. Default: show percentages.
-- a — Annotate excerpts from source code files.
-- A — Annotate complete source code files.
-- G — Produce raw output suitable for graphical tools.
-- `m<number>` — Minimum sample percentage to be shown. Default: 3%.
-- `i<number>` — Sampling interval in milliseconds. Default: 10ms.
+- f — スタックダンプ: 関数名、それ以外の場合はモジュール:行。これがデフォルトモードです。
+- F — スタックダンプ: 同上ですが、モジュール:名前をダンプします。
+- l — スタックダンプ: モジュール:行。
+- `<number>` — スタックダンプの深さ（呼び出し先 ← 呼び出し元）。デフォルト: 1。
+- `-<number>` — 逆のスタックダンプの深さ（呼び出し元 → 呼び出し先）。
+- s — 最初のスタックレベルの後でスタックダンプを分割します。深さ ≥ 2 または深さ ≤ -2 を意味します。
+- p — モジュール名の完全なパスを表示します。
+- v — VMの状態を表示します。
+- z — ゾーンを表示します。
+- r — 生のサンプル数を表示します。デフォルト: パーセンテージを表示します。
+- a — ソースコードファイルからの抜粋に注釈を付けます。
+- A — 完全なソースコードファイルに注釈を付けます。
+- G — グラフィカルツール用の生の出力を生成します。
+- `m<number>` — 表示される最小サンプルパーセンテージ。デフォルト: 3%。
+- `i<number>` — サンプリング間隔（ミリ秒単位）。デフォルト: 10ms。
 
-::: info Note
-The actual sampling precision is OS-dependent.
+::: info 注意
+実際のサンプリング精度はOSに依存します。
 :::
 
-The default output for -jp is a list of the most CPU consuming spots in the application. Increasing the stack dump depth with (say) -jp=2 may help to point out the main callers or callees of hotspots. But sample aggregation is still flat per unique stack dump.
+-jp のデフォルト出力は、アプリケーションで最もCPUを消費する場所のリストです。スタックダンプの深さを（例えば）-jp=2 として増やすと、ホットスポットの主な呼び出し元や呼び出し先を示すのに役立ちます。しかし、サンプルの集約はユニークなスタックダンプごとにフラットです。
 
-To get a two-level view (split view) of callers/callees, use -jp=s or -jp=-s. The percentages shown for the second level are relative to the first level.
+呼び出し元/呼び出し先の二階層ビュー（分割ビュー）を得るには、-jp=s または -jp=-s を使用します。二階層目に表示されるパーセンテージは、一階層目に対する相対値です。
 
-To see how much time is spent in each line relative to a function, use -jp=fl.
+関数に対して各行でどれだけの時間が費やされているかを見るには、-jp=fl を使用します。
 
-To see how much time is spent in different VM states or zones, use -jp=v or -jp=z.
+異なるVMの状態やゾーンでどれだけの時間が費やされているかを見るには、-jp=v または -jp=z を使用します。
 
-Combinations of v/z with f/F/l produce two-level views, e.g. -jp=vf or -jp=fv. This shows the time spent in a VM state or zone vs. hotspots. This can be used to answer questions like "Which time-consuming functions are only interpreted?" or "What's the garbage collector overhead for a specific function?".
+v/z を f/F/l と組み合わせると、二階層ビューが生成されます。例えば -jp=vf や -jp=fv です。これは、VMの状態やゾーンとホットスポットで費やされる時間を示します。これは「どの時間消費関数が解釈されるだけか」や「特定の関数のガベージコレクタのオーバーヘッドは何か」といった質問に答えるために使用できます。
 
-Multiple options can be combined — but not all combinations make sense, see above. E.g. -jp=3si4m1 samples three stack levels deep in 4ms intervals and shows a split view of the CPU consuming functions and their callers with a 1% threshold.
+複数のオプションを組み合わせることができますが、すべての組み合わせが意味をなすわけではありません。上記を参照してください。例えば、-jp=3si4m1 は3つのスタックレベルを4msの間隔でサンプリングし、CPUを消費する関数とその呼び出し元の分割ビューを1%の閾値で表示します。
 
-Source code annotations produced by -jp=a or -jp=A are always flat and at the line level. Obviously, the source code files need to be readable by the profiler script.
+-jp=a または -jp=A によって生成されるソースコードの注釈は、常にフラットであり、行レベルで表示されます。明らかに、ソースコードファイルはプロファイラスクリプトによって読み取り可能である必要があります。
 
-The high-level profiler can also be started and stopped from Lua code with:
+高レベルプロファイラは、Luaコードからも開始および停止することができます:
 
 ```lua
-require("jit.p").start(options, output)
+require("jit.p").start(オプション, 出力)
 ...
 require("jit.p").stop()
 ```
 
-#### jit.zone — Zones
+#### jit.zone — ゾーン
 
-Zones can be used to provide information about different parts of an application to the high-level profiler. E.g. a game could make use of an "AI" zone, a "PHYS" zone, etc. Zones are hierarchical, organized as a stack.
+ゾーンは、アプリケーションの異なる部分についての情報を高レベルプロファイラに提供するために使用できます。例えば、ゲームは「AI」ゾーンや「PHYS」ゾーンなどを利用できます。ゾーンは階層的で、スタックとして組織されています。
 
-The jit.zone module needs to be loaded explicitly:
+jit.zone モジュールは明示的にロードする必要があります:
 
 ```lua
 local zone = require("jit.zone")
 ```
 
-- zone("name") pushes a named zone to the zone stack.
-- zone() pops the current zone from the zone stack and returns its name.
-- zone:get() returns the current zone name or nil.
-- zone:flush() flushes the zone stack.
+- zone("名前") は名前付きゾーンをゾーンスタックにプッシュします。
+- zone() は現在のゾーンをゾーンスタックからポップし、その名前を返します。
+- zone:get() は現在のゾーン名またはnilを返します。
+- zone:flush() はゾーンスタックをフラッシュします。
 
-To show the time spent in each zone use -jp=z. To show the time spent relative to hotspots use e.g. -jp=zf or -jp=fz.
+各ゾーンで費やされた時間を表示するには -jp=z を使用します。ホットスポットに対して相対的に費やされた時間を表示するには、例えば -jp=zf や -jp=fz を使用します。
 
-## Low-level Lua API
+## 低レベルLua API
 
-The jit.profile module gives access to the low-level API of the profiler from Lua code. This module needs to be loaded explicitly:
+jit.profile モジュールは、Luaコードからプロファイラの低レベルAPIにアクセスするために使用されます。このモジュールは明示的にロードする必要があります:
 
 ```lua
 local profile = require("jit.profile")
 ```
 
-This module can be used to implement your own higher-level profiler. A typical profiling run starts the profiler, captures stack dumps in the profiler callback, adds them to a hash table to aggregate the number of samples, stops the profiler and then analyzes all captured stack dumps. Other parameters can be sampled in the profiler callback, too. But it's important not to spend too much time in the callback, since this may skew the statistics.
+このモジュールは、独自の高レベルプロファイラを実装するために使用できます。典型的なプロファイリング実行は、プロファイラを開始し、プロファイラコールバックでスタックダンプをキャプチャし、それらをハッシュテーブルに追加してサンプル数を集約し、プロファイラを停止し、すべてのキャプチャされたスタックダンプを分析することです。プロファイラコールバック内で他のパラメータをサンプリングすることも可能です。しかし、統計を歪める可能性があるため、コールバック内で過度の時間を費やさないことが重要です。
 
-#### profile.start(mode, cb) — Start profiler
+#### profile.start(mode, cb) — プロファイラの開始
 
-This function starts the profiler. The mode argument is a string holding options:
+この関数はプロファイラを開始します。mode 引数はオプションを保持する文字列です:
 
-- f — Profile with precision down to the function level.
-- l — Profile with precision down to the line level.
-- `i<number>` — Sampling interval in milliseconds (default 10ms).
+- f — 関数レベルまでの精度でプロファイリングします。
+- l — 行レベルまでの精度でプロファイリングします。
+- `i<number>` — サンプリング間隔（ミリ秒単位、デフォルトは10ms）。
 
-::: info Note
-The actual sampling precision is OS-dependent.
+::: info 注意
+実際のサンプリング精度はOSに依存します。
 :::
 
-The cb argument is a callback function which is called with three arguments: (thread, samples, vmstate). The callback is called on a separate coroutine, the thread argument is the state that holds the stack to sample for profiling. Note: do not modify the stack of that state or call functions on it.
+cb 引数は3つの引数を持つコールバック関数です: (thread, samples, vmstate)。コールバックは別のコルーチン上で呼び出され、thread 引数はプロファイリングのためのスタックサンプルを保持する状態です。注意: その状態のスタックを変更したり、その上で関数を呼び出したりしないでください。
 
-samples gives the number of accumulated samples since the last callback (usually 1).
+samples は、前回のコールバックからの累積サンプル数を示します（通常は1）。
 
-vmstate holds the VM state at the time the profiling timer triggered. This may or may not correspond to the state of the VM when the profiling callback is called. The state is either 'N' native (compiled) code, 'I' interpreted code, 'C' C code, 'G' the garbage collector, or 'J' the JIT compiler.
+vmstate はプロファイリングタイマーがトリガーされた時点のVM状態を保持します。これは、プロファイリングコールバックが呼び出された時のVMの状態と一致するかもしれませんし、しないかもしれません。状態は 'N' ネイティブ（コンパイル済み）コード、'I' 解釈されたコード、'C' Cコード、'G' ガーベージコレクタ、または 'J' JITコンパイラのいずれかです。
 
-#### profile.stop() — Stop profiler
+#### profile.stop() — プロファイラの停止
 
-This function stops the profiler.
+この関数はプロファイラを停止します。
 
-#### `dump = profile.dumpstack([thread,] fmt, depth)` — Dump stack
+#### `dump = profile.dumpstack([thread,] fmt, depth)` — スタックのダンプ
 
-This function allows taking stack dumps in an efficient manner. It returns a string with a stack dump for the thread (coroutine), formatted according to the fmt argument:
+この関数は効率的にスタックダンプを取得することを可能にします。それはスレッド（コルーチン）のスタックダンプを文字列で返し、fmt 引数に従ってフォーマットされます:
 
-- p — Preserve the full path for module names. Otherwise, only the file name is used.
-- f — Dump the function name if it can be derived. Otherwise, use module:line.
-- F — Ditto, but dump module:name.
-- l — Dump module:line.
-- Z — Zap the following characters for the last dumped frame.
-- All other characters are added verbatim to the output string.
+- p — モジュール名の完全なパスを保持します。それ以外の場合は、ファイル名のみが使用されます。
+- f — それが導き出される場合は関数名をダンプします。そうでなければ、モジュール:行を使用します。
+- F — 同上ですが、モジュール:名前をダンプします。
+- l — モジュール:行をダンプします。
+- Z — 最後にダンプされたフレームの次の文字を消去します。
+- その他の文字は出力文字列にそのまま追加されます。
 
-The depth argument gives the number of frames to dump, starting at the topmost frame of the thread. A negative number dumps the frames in inverse order.
+depth 引数は、スレッドの最上位フレームから始まるダンプするフレームの数を指定します。負の数を指定すると、フレームが逆順にダンプされます。
 
-The first example prints a list of the current module names and line numbers of up to 10 frames in separate lines. The second example prints semicolon-separated function names for all frames (up to 100) in inverse order:
+最初の例では、現在のモジュール名と最大10フレームの行番号を個別の行でリスト表示します。二番目の例では、逆順のすべてのフレーム（最大100）の関数名をセミコロン区切りで表示します:
 
 ```lua
 print(profile.dumpstack(thread, "l\n", 10))
 print(profile.dumpstack(thread, "lZ;", -100))
 ```
 
-## Low-level C API
+## 低レベルC API
 
-The profiler can be controlled directly from C code, e.g. for use by IDEs. The declarations are in "luajit.h" (see Lua/C API extensions).
+プロファイラはCコードから直接制御できます。例えば、IDEによる使用のためです。宣言は "luajit.h" にあります（Lua/C API拡張を参照）。
 
-#### luaJIT_profile_start(L, mode, cb, data) — Start profiler
+#### luaJIT_profile_start(L, mode, cb, data) — プロファイラの開始
 
-This function starts the profiler. See above for a description of the mode argument.
+この関数はプロファイラを開始します。mode 引数の説明については上記を参照してください。
 
-The cb argument is a callback function with the following declaration:
+cb 引数は以下の宣言を持つコールバック関数です:
 
 ```c
 typedef void (*luaJIT_profile_callback)(void *data, lua_State *L, int samples, int vmstate);
 ```
 
-data is available for use by the callback. L is the state that holds the stack to sample for profiling. Note: do not modify this stack or call functions on this stack — use a separate coroutine for this purpose. See above for a description of samples and vmstate.
+data はコールバックによって使用されます。L はプロファイリングのためのスタックを持つ状態です。注意: このスタックを変更したり、このスタック上で関数を呼び出したりしないでください — この目的のためには別のコルーチンを使用してください。samples と vmstate の説明については上記を参照してください。
 
-#### luaJIT_profile_stop(L) — Stop profiler
+#### luaJIT_profile_stop(L) — プロファイラの停止
 
-This function stops the profiler.
+この関数はプロファイラを停止します。
 
 
-#### p = luaJIT_profile_dumpstack(L, fmt, depth, len) — Dump stack
+#### p = luaJIT_profile_dumpstack(L, fmt, depth, len) — スタックのダンプ
 
-This function allows taking stack dumps in an efficient manner. See above for a description of fmt and depth.
+この関数は効率的にスタックダンプを取得することを可能にします。fmt と depth の説明については上記を参照してください。
 
-This function returns a const char * pointing to a private string buffer of the profiler. The int *len argument returns the length of the output string. The buffer is overwritten on the next call and deallocated when the profiler stops. You either need to consume the content immediately or copy it for later use.
+この関数はプロファイラのプライベート文字列バッファを指す const char * を返します。int *len 引数は出力文字列の長さを返します。バッファは次の呼び出しで上書きされ、プロファイラが停止すると解放されます。内容をすぐに使用するか、後で使用するためにコピーする必要があります。

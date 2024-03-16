@@ -1,75 +1,75 @@
-# Lua/C API Extensions
+# Lua/C API 拡張
 
-LuaJIT adds some extensions to the standard Lua/C API. The LuaJIT include directory must be in the compiler search path (-Ipath) to be able to include the required header for C code:
+LuaJITは、標準のLua/C APIにいくつかの拡張を加えています。Cコード用の必要なヘッダーをインクルードするには、コンパイラの検索パスにLuaJITのインクルードディレクトリが含まれている必要があります(-Ipath)：
 
 ```c
 #include "luajit.h"
 ```
 
-Or for C++ code:
+またはC++コードの場合：
 
 ```c
 #include "lua.hpp"
 ```
 
-## luaJIT_setmode(L, idx, mode) — Control VM
+## luaJIT_setmode(L, idx, mode) — VM の制御
 
-This is a C API extension to allow control of the VM from C code. The full prototype of LuaJIT_setmode is:
+これはCコードからVMを制御するためのC API拡張です。LuaJIT_setmodeの完全なプロトタイプは以下の通りです：
 
 ```c
 LUA_API int luaJIT_setmode(lua_State *L, int idx, int mode);
 ```
 
-The returned status is either success (1) or failure (0). The second argument is either 0 or a stack index (similar to the other Lua/C API functions).
+返されるステータスは成功（1）または失敗（0）です。第二引数は0またはスタックインデックス（他のLua/C API関数と同様）です。
 
-The third argument specifies the mode, which is 'or'ed with a flag. The flag can be LUAJIT_MODE_OFF to turn a feature off, LUAJIT_MODE_ON to turn a feature on, or LUAJIT_MODE_FLUSH to flush cached code.
+第三引数はモードを指定し、フラグと'or'されます。フラグは機能をオフにするLUAJIT_MODE_OFF、機能をオンにするLUAJIT_MODE_ON、またはキャッシュされたコードをフラッシュするLUAJIT_MODE_FLUSHにすることができます。
 
-The following modes are defined:
+以下のモードが定義されています：
 
 #### luaJIT_setmode(L, 0, LUAJIT_MODE_ENGINE|flag)
 
-Turn the whole JIT compiler on or off or flush the whole cache of compiled code.
+JITコンパイラ全体をオンまたはオフにするか、コンパイルされたコードのキャッシュ全体をフラッシュします。
 
 #### luaJIT_setmode(L, idx, LUAJIT_MODE_FUNC|flag)
 #### luaJIT_setmode(L, idx, LUAJIT_MODE_ALLFUNC|flag)
 #### luaJIT_setmode(L, idx, LUAJIT_MODE_ALLSUBFUNC|flag)
 
-This sets the mode for the function at the stack index idx or the parent of the calling function (idx = 0). It either enables JIT compilation for a function, disables it and flushes any already compiled code, or only flushes already compiled code. This applies recursively to all sub-functions of the function with LUAJIT_MODE_ALLFUNC or only to the sub-functions with LUAJIT_MODE_ALLSUBFUNC.
+これは、スタックインデックスidxの関数、または呼び出し関数の親(idx = 0)のモードを設定します。関数のJITコンパイルを有効にするか、無効にして既にコンパイルされたコードをフラッシュするか、既にコンパイルされたコードをフラッシュするかを行います。これはLUAJIT_MODE_ALLFUNCを用いた関数の全てのサブ関数、またはLUAJIT_MODE_ALLSUBFUNCを用いたサブ関数のみに再帰的に適用されます。
 
 #### luaJIT_setmode(L, trace, LUAJIT_MODE_TRACE|LUAJIT_MODE_FLUSH)
 
-Flushes the specified root trace and all of its side traces from the cache. The code for the trace will be retained as long as there are any other traces which link to it.
+指定されたルートトレースとそのすべてのサイドトレースをキャッシュからフラッシュします。他にリンクしているトレースが存在する限り、トレースのコードは保持されます。
 
 #### luaJIT_setmode(L, idx, LUAJIT_MODE_WRAPCFUNC|flag)
 
-This mode defines a wrapper function for calls to C functions. If called with LUAJIT_MODE_ON, the stack index at idx must be a lightuserdata object holding a pointer to the wrapper function. From now on, all C functions are called through the wrapper function. If called with LUAJIT_MODE_OFF this mode is turned off and all C functions are directly called.
+このモードはC関数への呼び出しに対するラッパー関数を定義します。LUAJIT_MODE_ONで呼び出された場合、idxでのスタックインデックスは、ラッパー関数へのポインターを保持するlightuserdataオブジェクトでなければなりません。これ以降、すべてのC関数はラッパー関数を介して呼び出されます。LUAJIT_MODE_OFFで呼び出された場合、このモードはオフになり、すべてのC関数は直接呼び出されます。
 
-The wrapper function can be used for debugging purposes or to catch and convert foreign exceptions. But please read the section on C++ exception interoperability first. Recommended usage can be seen in this C++ code excerpt:
+ラッパー関数は、デバッグ目的や外部の例外をキャッチして変換するために使用できます。ただし、C++例外の相互運用性に関するセクションを先に読んでください。推奨される使用方法は、このC++コードの抜粋で見ることができます：
 
 ```cpp
 #include <exception>
 #include "lua.hpp"
 
-// Catch C++ exceptions and convert them to Lua error messages.
-// Customize as needed for your own exception classes.
+// C++の例外をキャッチしてLuaエラーメッセージに変換します。
+// 必要に応じて独自の例外クラスに合わせてカスタマイズしてください。
 static int wrap_exceptions(lua_State *L, lua_CFunction f)
 {
   try {
-    return f(L);  // Call wrapped function and return result.
-  } catch (const char *s) {  // Catch and convert exceptions.
+    return f(L);  // ラップされた関数を呼び出し、結果を返す。
+  } catch (const char *s) {  // 例外をキャッチして変換する。
     lua_pushstring(L, s);
   } catch (std::exception& e) {
     lua_pushstring(L, e.what());
   } catch (...) {
     lua_pushliteral(L, "caught (...)");
   }
-  return lua_error(L);  // Rethrow as a Lua error.
+  return lua_error(L);  // Luaエラーとして再スローする。
 }
 
 static int myinit(lua_State *L)
 {
   ...
-  // Define wrapper function and enable it.
+  // ラッパー関数を定義して有効にする。
   lua_pushlightuserdata(L, (void *)wrap_exceptions);
   luaJIT_setmode(L, -1, LUAJIT_MODE_WRAPCFUNC|LUAJIT_MODE_ON);
   lua_pop(L, 1);
@@ -77,4 +77,4 @@ static int myinit(lua_State *L)
 }
 ```
 
-Note that you can only define a single global wrapper function, so be careful when using this mechanism from multiple C++ modules. Also note that this mechanism is not without overhead.
+グローバルラッパー関数は1つだけ定義できることに注意してください。そのため、複数のC++モジュールからこのメカニズムを使用する場合は注意が必要です。また、このメカニズムにはオーバーヘッドがあることにも注意してください。
