@@ -67,6 +67,7 @@ export default {
                     {text: 'JavaScript', link: '/translation/javascript/'},
                     {text: 'libffi', link: '/translation/libffi/'},
                     {text: 'LLVM', link: '/translation/llvm/'},
+                    {text: 'Lua', link: '/translation/lua/'},
                     {text: 'LuaJIT', link: '/translation/luajit/'},
                     {text: 'Mastodon', link: '/translation/mastodon/'},
                     {text: 'Mermaid', link: '/translation/mermaid/'},
@@ -1296,6 +1297,71 @@ export default {
                         {text: '目次', link: '/translation/llvm/doc/'},
                         {text: 'Clean Code', link: '/translation/llvm/doc/'},
                         {text: 'W3C', link: '/translation/llvm/doc/'},
+                    ]
+                },
+            ],
+            '/translation/lua/': [
+                {
+                    text: 'Lua',
+                    collapsed: false,
+                    items: [
+                        {text: 'ホーム', link: '/translation/lua/'},
+                        {text: 'contact', link: '/translation/lua/contact'},
+                    ]
+                },
+                {
+                    text: 'about',
+                    collapsed: false,
+                    items: [
+                        {text: 'about', link: '/translation/lua/about'},
+                        {text: 'news', link: '/translation/lua/news'},
+                        {text: 'showcase', link: '/translation/lua/showcase'},
+                        {text: 'uses', link: '/translation/lua/uses'},
+                        {text: 'quotes', link: '/translation/lua/quotes'},
+                        {text: 'press', link: '/translation/lua/press'},
+                        {text: 'authors', link: '/translation/lua/authors'},
+                        {text: 'thanks', link: '/translation/lua/thanks'},
+                    ]
+                },
+                {
+                    text: 'download',
+                    collapsed: false,
+                    items: [
+                        {text: 'download', link: '/translation/lua/download'},
+                        {text: 'license', link: '/translation/lua/license'},
+                        {text: 'live demo', link: '/translation/lua/demo'},
+                    ]
+                },
+                {
+                    text: 'documentation',
+                    collapsed: false,
+                    items: [
+                        {text: 'documentation', link: '/translation/lua/documentation'},
+                        {text: 'getting started', link: '/translation/lua/getting_started'},
+                        {
+                            text: 'reference manual',
+                            collapsed: false,
+                            items: [
+                                {text:'reference manual', link:'/translation/lua/reference_manual'},
+                                {text:'5.4 ', link:'/translation/lua/5.4'},
+                                {text:'5.4 manual', link:'/translation/lua/5.4_manual'},
+                                {text:'5.3 ', link:'/translation/lua/5.3'},
+                                {text:'5.3 manual', link:'/translation/lua/5.3_manual'},
+                                {text:'5.2 ', link:'/translation/lua/5.2'},
+                                {text:'5.2 manual', link:'/translation/lua/5.2_manual'},
+                                {text:'5.1 ', link:'/translation/lua/5.1'},
+                                {text:'5.1 manual', link:'/translation/lua/5.1_manual'},
+                            ]
+                        },
+                        {text: 'faq', link: '/translation/lua/faq'},
+                        {text: 'versions', link: '/translation/lua/versions'},
+                    ]
+                },
+                {
+                    text: 'community',
+                    collapsed: false,
+                    items: [
+                        {text: 'community', link: '/translation/lua/community'},
                     ]
                 },
             ],
