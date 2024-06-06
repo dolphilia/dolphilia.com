@@ -81,6 +81,7 @@ export default {
                     {text: 'pygame', link: '/translation/pygame/reference/'},
                     {text: 'Sass', link: '/translation/sass/'},
                     {text: 'Scripting', link: '/translation/scripting/'},
+                    {text: 'Skia', link: '/translation/skia/'},
                     {text: 'sokol', link: '/translation/sokol/'},
                     {text: 'stb', link: '/translation/stb/'},
                     {text: 'SteamOS', link: '/translation/steamos/'},
@@ -1548,6 +1549,21 @@ export default {
                         {text: '組み込みスクリプト言語', link: '/translation/scripting/embedded-scripting-languages.md'},
                         {text: 'JSにコンパイル可能', link: '/translation/scripting/js-languages.md'},
                         {text: 'Luaにコンパイル可能', link: '/translation/scripting/lua-languages.md'},
+                    ]
+                },
+            ],
+            '/translation/skia/': [
+                {
+                    text: 'Skia',
+                    collapsed: false,
+                    items: [
+                        {text: 'はじめに', link: '/translation/skia/'},
+                        {text: 'skia/BUILD.gn', link: '/translation/skia/skia_build_gn.md'},
+                        {text: 'skia/gn/BUILDCONFIG.gn', link: '/translation/skia/skia_gn_buildconfig_gn.md'},
+                        {text: 'skia/gn/skia.gni', link: '/translation/skia/skia_gn_skia_gni.md'},
+                        {text: 'skia/gn/skia/BUILD.gn', link: '/translation/skia/skia_gn_skia_build_gn.md'},
+                        {text: 'skia/gn/toolchain/BUILD.gn', link: '/translation/skia/skia_gn_toolchain_build_gn.md'},
+                        
                     ]
                 },
             ],
