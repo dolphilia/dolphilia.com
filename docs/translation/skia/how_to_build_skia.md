@@ -81,7 +81,7 @@ python tools/git-sync-deps
 ninja -C out/Static
 ```
 
-## ## Android
+## Android
 
 Android 用に Skia をビルドするには、Android NDK が必要です。
 
@@ -301,17 +301,17 @@ clang_win = "C:\Program Files\LLVM"
 is_trivial_abi = false
 ```
 
-### Visual Studio Solutions
+### Visual Studio ソリューション
 
-If you use Visual Studio, you may want to pass --ide=vs to bin/gn gen to generate all.sln. That solution will exist within the GN directory for the specific configuration, and will only build/run that configuration.
+Visual Studio を使用する場合、`bin/gn gen` に `--ide=vs` を渡して `all.sln` を生成することをお勧めします。そのソリューションは特定の構成用に GN ディレクトリ内に存在し、その構成のみをビルド/実行します。
 
-If you want a Visual Studio Solution that supports multiple GN configurations, there is a helper script. It requires that all of your GN directories be inside the out directory. First, create all of your GN configurations as usual. Pass --ide=vs when running bin/gn gen for each one. Then:
+複数の GN 構成をサポートする Visual Studio ソリューションが必要な場合、ヘルパースクリプトがあります。すべての GN ディレクトリを `out` ディレクトリ内に配置する必要があります。まず、通常通りにすべての GN 構成を作成します。各構成のために `bin/gn gen` を実行する際に `--ide=vs` を渡します。その後、以下を実行します:
 
 ```sh
 python3 gn/gn_meta_sln.py
 ```
 
-This creates a new dedicated output directory and solution file out/sln/skia.sln. It has one solution configuration for each GN configuration, and supports building and running any of them. It also adjusts syntax highlighting of inactive code blocks based on preprocessor definitions from the selected solution configuration.
+これにより、新しい専用の出力ディレクトリとソリューションファイル `out/sln/skia.sln` が作成されます。各 GN 構成に対して1つのソリューション構成があり、それらのいずれかをビルドおよび実行することができます。また、選択したソリューション構成のプリプロセッサ定義に基づいて、非アクティブなコードブロックの構文ハイライトも調整されます。
 
 ## Windows ARM64
 

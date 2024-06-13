@@ -1558,6 +1558,7 @@ export default {
                     collapsed: false,
                     items: [
                         {text: 'はじめに', link: '/translation/skia/'},
+                        {text: 'Skiaのダウンロード方法', link: '/translation/skia/how_to_download_skia.md'},
                         {text: 'Skiaのビルド方法', link: '/translation/skia/how_to_build_skia.md'},
                         {text: 'skia/BUILD.gn', link: '/translation/skia/skia_build_gn.md'},
                         {text: 'skia/gn/BUILDCONFIG.gn', link: '/translation/skia/skia_gn_buildconfig_gn.md'},
