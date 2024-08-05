@@ -72,6 +72,7 @@ export default {
                     {text: 'Mastodon', link: '/translation/mastodon/'},
                     {text: 'Mermaid', link: '/translation/mermaid/'},
                     {text: 'Meson', link: '/translation/meson/'},
+                    {text: 'miniaudio', link: '/translation/miniaudio/'},
                     {text: 'Natural Docs', link: '/translation/natural-docs/'},
                     {text: 'Ninja', link: '/translation/ninja/'},
                     {text: 'Node.js', link: '/translation/nodejs/'},
@@ -1440,6 +1441,17 @@ export default {
                         {text: 'クイックスタート', link: '/translation/meson/quick_guide.md'},
                         {text: 'チュートリアル', link: '/translation/meson/tutorial.md'},
                         {text: 'SDLチュートリアル', link: '/translation/meson/guitutorial.md'},
+                    ]
+                },
+            ],
+            '/translation/miniaudio/': [
+                {
+                    text: 'miniaudio',
+                    collapsed: false,
+                    items: [
+                        {text: 'はじめに', link: '/translation/miniaudio/'},
+                        {text: 'マニュアル', link: '/translation/miniaudio/programming_manual.md'},
+                        {text: 'サンプル', link: '/translation/miniaudio/example.md'},
                     ]
                 },
             ],
