@@ -140,6 +140,7 @@ export default {
                     text: 'お絵かき',
                     collapsed: false,
                     items: [
+                        { text: '絵描きにイラスト生成AIはいらない', link: '/essay/ai-illust-to-kesubesu' },
                         { text: 'AIイラストに関する見解', link: '/essay/ai-illut-ni-kansuru-hansei-wo' },
                         { text: 'AIイラストに対抗する', link: '/essay/ai-illust-ni-taikou-suru' },
                         { text: 'AI画像生成との付き合い方', link: '/essay/ai-gazou-seisei' },
